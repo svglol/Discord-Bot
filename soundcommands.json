@@ -44,6 +44,7 @@
     { "file" : "sounds/poo.wav","command" : "poo"},
     { "file" : "sounds/understeer.wav","command" : "understeer"},
     { "file" : "sounds/coom.wav","command" : "coom"},
-    { "file" : "sounds/richard.mp3","command" : "richard"}
+    { "file" : "sounds/richard.wav","command" : "richard"},
+    { "file" : "sounds/crash.wav","command" : "crash"}
 
     ] }
