@@ -155,4 +155,4 @@ client.on('message', message => {
   }
 });
 
-client.login(auth.testToken);
+client.login(process.env.TOKEN);
