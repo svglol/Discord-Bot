@@ -11,7 +11,7 @@
     { "file" : "sounds/punted.wav","command" : "punted"},
     { "file" : "sounds/mobilgang.wav","command" : "mobilgang"},
     { "file" : "sounds/peter.wav","command" : "peter"},
-    { "file" : "sounds/oof.wav","command" : "oof"},
+    { "file" : "sounds/OOF.wav","command" : "oof"},
     { "file" : "sounds/fucksakes.wav","command" : "fucksakes"},
     { "file" : "sounds/damage.wav","command" : "damage"},
     { "file" : "sounds/lisa.wav","command" : "lisa"},
