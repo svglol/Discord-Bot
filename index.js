@@ -31,7 +31,7 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
   // var channel = newMember.guild.channels.find(ch => ch.name === 'general-chat');
   // if (!channel) return;
 
-  if(oldUserChannel === undefined && newUserChannel !== undefined) {
+  if(oldUserChannel === null && newUserChannel !== null) {
     // User Joins a voice channel
     var user = newMember;
     console.log("user joins channel v2");
@@ -70,7 +70,7 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
       }
     });
 
-  } else if(newUserChannel === undefined){
+  } else if(newUserChannel === null){
     // User leaves a voice channel
 
     var user = newMember;
