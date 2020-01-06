@@ -22,8 +22,11 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
   let oldUserChannel = oldMember.channel;
 
   console.log("user joins channel v1");
+  console.log("new user--------------------------------------");
   console.log(newUserChannel);
+  console.log("old user--------------------------------------")
   console.log(oldUserChannel);
+  console.log("----------------------------------------------")
 
   // var channel = newMember.guild.channels.find(ch => ch.name === 'general-chat');
   // if (!channel) return;
