@@ -13,7 +13,7 @@ client.on('ready', () => {
 });
 
 //Detect if user joins voice channel
-const cooldown = 300000;
+const cooldown = 0;
 var lastUsedIntroArray = new Array();
 var lastUsedExitArray = new Array();
 
