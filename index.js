@@ -3,9 +3,9 @@ const client = new Discord.Client();
 
 const intros = require('./intros.json').intros;
 const exits = require('./exits.json').exits;
-const commands = require('./chatcommands.json').commands;
+var commands = require('./chatcommands.json').commands;
 const prefix = require('./chatcommands.json').prefix;
-const sound = require('./soundcommands.json').commands;
+var sound = require('./soundcommands.json').commands;
 
 soundPlaying = false;
 
@@ -16,6 +16,19 @@ client.on('ready', () => {
 const cooldown = 300000;
 var lastUsedIntroArray = new Array();
 var lastUsedExitArray = new Array();
+
+sound.sort(function(a, b){
+  if(a.command < b.command) { return -1; }
+  if(a.command > b.command) { return 1; }
+  return 0;
+})
+
+commands.sort(function(a, b){
+  if(a.command < b.command) { return -1; }
+  if(a.command > b.command) { return 1; }
+  return 0;
+})
+
 
 client.on('voiceStateUpdate', (oldMember, newMember) => {
   let newUserChannel = newMember.channel;
@@ -136,10 +149,9 @@ client.on('message', message => {
       if(msg == obj.command){
         var voiceChannel = message.member.voice.channel;
         if(voiceChannel != undefined){
-
           if(!soundPlaying){
+            soundPlaying = true;
             voiceChannel.join().then(connection => {
-              soundPlaying = true;
               const dispatcher = connection.play(obj.file);
               dispatcher.on('end', end => voiceChannel.leave());
               dispatcher.on('end', end => soundPlaying = false);
