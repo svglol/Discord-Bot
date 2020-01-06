@@ -116,25 +116,23 @@ client.on('message', message => {
   if(message.content.charAt(0) == prefix){
     var msg = message.content.substring(1);
     if(msg == "help"){
-      var soundsMessage = ">>> :loud_sound: "
-      sound.forEach((obj, key) => {
-        if (Object.is(sound.length - 1, key)) {
-          soundsMessage += prefix+obj.command;
-        }else{
-          soundsMessage += prefix+obj.command +", ";
-        }
-      });
-      message.channel.send(soundsMessage);
 
-      var helpMessage = ">>> :tv: ";
-      commands.forEach((obj, key) => {
-        if (Object.is(commands.length - 1, key)) {
-          helpMessage += prefix+obj.command;
-        }else{
-          helpMessage += prefix+obj.command +", ";
-        }
+      var soundsMessage = "";
+      sound.forEach((obj, key) => {
+        soundsMessage += "`"+prefix+obj.command+"` ";
       });
-      message.channel.send(helpMessage);
+
+      var gifMessage = "";
+      commands.forEach((obj, key) => {
+        gifMessage += "`"+prefix+obj.command+"` ";
+      });
+
+      const helpEmbed = new Discord.MessageEmbed()
+      .setColor('#0099ff')
+      .addField(':loud_sound:', soundsMessage)
+      .addField(':tv: ', gifMessage)
+
+      message.channel.send(helpEmbed);
     }
 
     //gif commands
