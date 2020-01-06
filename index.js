@@ -20,9 +20,8 @@ var lastUsedExitArray = new Array();
 client.on('voiceStateUpdate', (oldMember, newMember) => {
   let newUserChannel = newMember.channel;
   let oldUserChannel = oldMember.channel;
-  console.log("in here");
 
-  var channel = newMember.guild.channels.find(ch => ch.name === 'general-chat');
+  // var channel = newMember.guild.channels.find(ch => ch.name === 'general-chat');
   if (!channel) return;
 
   if(oldUserChannel === undefined && newUserChannel !== undefined) {
