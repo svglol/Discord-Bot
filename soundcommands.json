@@ -43,7 +43,7 @@
     { "file" : "sounds/ahfuck.wav","command" : "ahfuck"},
     { "file" : "sounds/poo.wav","command" : "poo"},
     { "file" : "sounds/understeer.wav","command" : "understeer"},
-    { "file" : "sounds/cooom.wav","command" : "cooom"},
-    { "file" : "sounds/richard.wav","command" : "richard"}
+    { "file" : "sounds/coom.wav","command" : "coom"},
+    { "file" : "sounds/richard.mp3","command" : "richard"}
 
     ] }
