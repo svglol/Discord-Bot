@@ -21,20 +21,12 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
   let newUserChannel = newMember.channel;
   let oldUserChannel = oldMember.channel;
 
-  console.log("user joins channel v1");
-  console.log("new user--------------------------------------");
-  console.log(newUserChannel);
-  console.log("old user--------------------------------------")
-  console.log(oldUserChannel);
-  console.log("----------------------------------------------")
-
   var channel = newMember.guild.channels.find(ch => ch.name === 'general-chat');
   if (!channel) return;
 
   if(oldUserChannel === null && newUserChannel !== null) {
     // User Joins a voice channel
     var user = newMember;
-    console.log("user joins channel v2");
     intros.forEach(obj => {
       if(user.id == obj.userid){
         console.log(user.id);
@@ -56,13 +48,11 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
           //check if the cooldown time has passed
           if(currentTime > lastUsedIntroArray[index].usedTime + cooldown){
             //post gif and update entry in array
-            console.log("send intro v1");
             channel.send(obj.link);
             lastUsedIntroArray[index].usedTime = currentTime;
           }
         } else{
           //post gif
-          console.log("send intro v2");
           channel.send(obj.link);
           //add entry to lastUsedIntroArray
           lastUsedIntroArray.push(lastUsedUser);
