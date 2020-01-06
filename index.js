@@ -30,6 +30,7 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
 
     intros.forEach(obj => {
       if(user.id == obj.userid){
+        console.log(user.id);
         var date = new Date();
         var currentTime = date.getTime();
         var lastUsedUser = {userid:user.id, usedTime:currentTime};
@@ -48,11 +49,13 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
           //check if the cooldown time has passed
           if(currentTime > lastUsedIntroArray[index].usedTime + cooldown){
             //post gif and update entry in array
+            console.log("send intro v1");
             channel.send(obj.link);
             lastUsedIntroArray[index].usedTime = currentTime;
           }
         } else{
           //post gif
+          console.log("send intro v2");
           channel.send(obj.link);
           //add entry to lastUsedIntroArray
           lastUsedIntroArray.push(lastUsedUser);
