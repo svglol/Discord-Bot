@@ -21,7 +21,7 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
   let newUserChannel = newMember.channel;
   let oldUserChannel = oldMember.channel;
 
-  var channel = newMember.guild.channels.resolve(ch => ch.name === 'general-chat');
+  var channel = newMember.guild.channels.find(ch => ch.name === 'general-chat');
   if (!channel) return;
 
   if(oldUserChannel === undefined && newUserChannel !== undefined) {
