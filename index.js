@@ -1,7 +1,5 @@
-
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const auth = require('./auth.json');
 
 const intros = require('./intros.json').intros;
 const exits = require('./exits.json').exits;
