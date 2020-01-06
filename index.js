@@ -21,13 +21,13 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
   let newUserChannel = newMember.channel;
   let oldUserChannel = oldMember.channel;
 
-  var channel = newMember.guild.channels.find(ch => ch.name === 'general-chat');
-  if (!channel) return;
+  // var channel = newMember.guild.channels.find(ch => ch.name === 'general-chat');
+  // if (!channel) return;
 
   if(oldUserChannel === undefined && newUserChannel !== undefined) {
     // User Joins a voice channel
     var user = newMember;
-console.log("user joins channel");
+    console.log("user joins channel");
     intros.forEach(obj => {
       if(user.id == obj.userid){
         console.log(user.id);
