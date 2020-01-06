@@ -45,6 +45,10 @@
     { "file" : "sounds/understeer.wav","command" : "understeer"},
     { "file" : "sounds/coom.wav","command" : "coom"},
     { "file" : "sounds/richard.wav","command" : "richard"},
-    { "file" : "sounds/crash.wav","command" : "crash"}
+    { "file" : "sounds/crash.wav","command" : "crash"},
+    { "file" : "sounds/hammond.wav","command" : "hammond"},
+    { "file" : "sounds/dontswear.wav","command" : "dontswear"},
+    { "file" : "sounds/donttalk.wav","command" : "donttalk"},
+    { "file" : "sounds/in.wav","command" : "in"}
 
     ] }
