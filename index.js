@@ -27,7 +27,7 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
   if(oldUserChannel === undefined && newUserChannel !== undefined) {
     // User Joins a voice channel
     var user = newMember;
-
+console.log("user joins channel");
     intros.forEach(obj => {
       if(user.id == obj.userid){
         console.log(user.id);
