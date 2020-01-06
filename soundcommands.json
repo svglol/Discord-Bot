@@ -38,6 +38,7 @@
     { "file" : "sounds/aawesomelap.wav","command" : "aawesomelap"},
     { "file" : "sounds/cockhead.wav","command" : "cockhead"},
     { "file" : "sounds/mohcock.wav","command" : "mohcock"},
-    { "file" : "sounds/shed.wav","command" : "shed"}
+    { "file" : "sounds/shed.wav","command" : "shed"},
+    { "file" : "sounds/getinthere.wav","command" : "getin"}
 
     ] }

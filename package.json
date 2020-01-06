@@ -11,9 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "ffmpeg-binaries": "^3.2.2",
-      "ytdl-core-discord": "1.0.3",
-      "ffmpeg-static": "3.0.0",
-      "node-opus": "0.3.3"
-
-  }
-}
+    "ytdl-core-discord": "1.0.3",
+    "ffmpeg-static": "3.0.0",
+    "node-opus": "0.3.3"
+    }}
