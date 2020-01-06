@@ -49,6 +49,8 @@
     { "file" : "sounds/hammond.wav","command" : "hammond"},
     { "file" : "sounds/dontswear.wav","command" : "dontswear"},
     { "file" : "sounds/donttalk.wav","command" : "donttalk"},
-    { "file" : "sounds/in.wav","command" : "in"}
+    { "file" : "sounds/in.wav","command" : "in"},
+    { "file" : "sounds/goodidea.wav","command" : "goodidea"},
+    { "file" : "sounds/chunky.wav","command" : "chunky"}
 
     ] }
