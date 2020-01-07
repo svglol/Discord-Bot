@@ -65,7 +65,8 @@
     { "file" : "sounds/fuckyou.wav","command" : "fuckyou"},
     { "file" : "sounds/neverraceagain.wav","command" : "neverraceagain"},
     { "file" : "sounds/eatadick.wav","command" : "eatadick"},
-    { "file" : "sounds/uselessprick.wav","command" : "uselessprick"}
+    { "file" : "sounds/uselessprick.wav","command" : "uselessprick"},
+    { "file" : "sounds/box.wav","command" : "box"}
 
 
     ] }
