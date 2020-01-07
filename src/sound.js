@@ -8,7 +8,7 @@ module.exports = {
     if(userVoiceChannel != undefined){
       queueItem = [message,obj];
       queue.push(queueItem);
-      if(dispatcher == null && voiceChannel == null){
+      if(dispatcher == null){
         playNextInQueue();
       }
     }
