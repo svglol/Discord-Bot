@@ -58,6 +58,8 @@
     { "file" : "sounds/move.wav","command" : "move"},
     { "file" : "sounds/movelong.wav","command" : "movelong"},
     { "file" : "sounds/killyourself.wav","command" : "killyourself"},
-    { "file" : "sounds/whincup.wav","command" : "whincup"}
+    { "file" : "sounds/whincup.wav","command" : "whincup"},
+    { "file" : "sounds/goleigh.wav","command" : "goleigh"}
+
 
     ] }
