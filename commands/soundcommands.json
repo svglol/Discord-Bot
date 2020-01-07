@@ -69,7 +69,9 @@
     { "file" : "sounds/box.wav","command" : "box"},
     { "file" : "sounds/penis.wav","command" : "penis"},
     { "file" : "sounds/chinesemeal.wav","command" : "chinesemeal"},
-    { "file" : "sounds/democracymanifest.wav","command" : "democracymanifest"}
+    { "file" : "sounds/democracymanifest.wav","command" : "democracymanifest"},
+    { "file" : "sounds/limppenis.wav","command" : "limppenis"},
+    { "file" : "sounds/judo.wav","command" : "judo"}
 
 
     ] }
