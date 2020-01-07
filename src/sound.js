@@ -1,4 +1,3 @@
-var soundPlaying = false;
 var queue = new Array();
 var dispatcher;
 var voiceChannel;

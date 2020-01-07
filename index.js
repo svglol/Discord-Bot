@@ -14,8 +14,6 @@ var soundCommands = require('./commands/soundcommands.json').commands;
 
 tools.sort(soundCommands,gifCommands);
 
-var soundPlaying = false;
-
 client.on('ready', () => {
 });
 
