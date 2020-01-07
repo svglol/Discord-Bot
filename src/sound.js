@@ -4,8 +4,8 @@ var voiceChannel;
 
 module.exports = {
   queue: function (message,obj) {
-    var voiceChannel = message.member.voice.channel;
-    if(voiceChannel != undefined){
+    var userVoiceChannel = message.member.voice.channel;
+    if(userVoiceChannel != undefined){
       queueItem = [message,obj];
       queue.push(queueItem);
       if(dispatcher == null && voiceChannel == null){
