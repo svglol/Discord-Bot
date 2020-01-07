@@ -57,6 +57,7 @@
     { "file" : "sounds/shit.wav","command" : "shit"},
     { "file" : "sounds/move.wav","command" : "move"},
     { "file" : "sounds/movelong.wav","command" : "movelong"},
-    { "file" : "sounds/killyourself.wav","command" : "killyourself"}
+    { "file" : "sounds/killyourself.wav","command" : "killyourself"},
+    { "file" : "sounds/whincup.wav","command" : "whincup"}
 
     ] }
