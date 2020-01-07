@@ -1,34 +1,25 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-const intros = require('./intros.json').intros;
-const exits = require('./exits.json').exits;
-var commands = require('./chatcommands.json').commands;
-const prefix = require('./chatcommands.json').prefix;
-var sound = require('./soundcommands.json').commands;
+const tools = require('./src/tools.js');
 
-soundPlaying = false;
+const intros = require('./commands/intros.json').intros;
+const exits = require('./commands/exits.json').exits;
+var gifCommands = require('./commands/gifcommands.json').commands;
+const prefix = require('./commands/config.json').prefix;
+const cooldown = require('./commands/config.json').cooldown;
+var soundCommands = require('./commands/soundcommands.json').commands;
+
+tools.sort(soundCommands,gifCommands);
+
+var soundPlaying = false;
 
 client.on('ready', () => {
 });
 
 //Detect if user joins voice channel
-const cooldown = 300000;
 var lastUsedIntroArray = new Array();
 var lastUsedExitArray = new Array();
-
-sound.sort(function(a, b){
-  if(a.command < b.command) { return -1; }
-  if(a.command > b.command) { return 1; }
-  return 0;
-})
-
-commands.sort(function(a, b){
-  if(a.command < b.command) { return -1; }
-  if(a.command > b.command) { return 1; }
-  return 0;
-})
-
 
 client.on('voiceStateUpdate', (oldMember, newMember) => {
   let newUserChannel = newMember.channel;
@@ -42,7 +33,6 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
     var user = newMember;
     intros.forEach(obj => {
       if(user.id == obj.userid){
-        console.log(user.id);
         var date = new Date();
         var currentTime = date.getTime();
         var lastUsedUser = {userid:user.id, usedTime:currentTime};
@@ -75,7 +65,6 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
 
   } else if(newUserChannel === null){
     // User leaves a voice channel
-
     var user = newMember;
     exits.forEach(obj => {
       if(user.id == obj.userid){
@@ -118,12 +107,12 @@ client.on('message', message => {
     if(msg == "help"){
 
       var soundsMessage = "";
-      sound.forEach((obj, key) => {
+      soundCommands.forEach((obj, key) => {
         soundsMessage += "`"+prefix+obj.command+"` ";
       });
 
       var gifMessage = "";
-      commands.forEach((obj, key) => {
+      gifCommands.forEach((obj, key) => {
         gifMessage += "`"+prefix+obj.command+"` ";
       });
 
@@ -136,14 +125,14 @@ client.on('message', message => {
     }
 
     //gif commands
-    commands.forEach(obj => {
+    gifCommands.forEach(obj => {
       if(msg == obj.command){
         message.channel.send(obj.link);
       }
     });
 
     //sound clip chatcommands
-    sound.forEach(obj => {
+    soundCommands.forEach(obj => {
       if(msg == obj.command){
         var voiceChannel = message.member.voice.channel;
         if(voiceChannel != undefined){
