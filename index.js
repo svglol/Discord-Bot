@@ -2,6 +2,8 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 
 const tools = require('./src/tools.js');
+const sound = require('./src/sound.js');
+
 
 const intros = require('./commands/intros.json').intros;
 const exits = require('./commands/exits.json').exits;
@@ -124,6 +126,13 @@ client.on('message', message => {
       message.channel.send(helpEmbed);
     }
 
+    if(msg == "stop"){
+      sound.stop(message);
+    }
+    if(msg == "skip"){
+      sound.skip(message);
+    }
+
     //gif commands
     gifCommands.forEach(obj => {
       if(msg == obj.command){
@@ -134,21 +143,7 @@ client.on('message', message => {
     //sound clip chatcommands
     soundCommands.forEach(obj => {
       if(msg == obj.command){
-        var voiceChannel = message.member.voice.channel;
-        if(voiceChannel != undefined){
-          if(!soundPlaying){
-            soundPlaying = true;
-            voiceChannel.join().then(connection => {
-              const dispatcher = connection.play(obj.file);
-              dispatcher.on('end', end => voiceChannel.leave());
-              dispatcher.on('end', end => soundPlaying = false);
-              dispatcher.on('end', end => message.delete(1000));
-            }).catch(err => console.log(err))
-          }
-          else{
-            message.delete(1000);
-          }
-        }
+        sound.queue(message,obj);
       }
     });
   }
