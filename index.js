@@ -108,18 +108,20 @@ client.on('message', message => {
 
       var soundsMessage = "";
       soundCommands.forEach((obj, key) => {
-        soundsMessage += "`"+prefix+obj.command+"` ";
+        soundsMessage += "`"+obj.command+"` ";
       });
 
       var gifMessage = "";
       gifCommands.forEach((obj, key) => {
-        gifMessage += "`"+prefix+obj.command+"` ";
+        gifMessage += "`"+obj.command+"` ";
       });
 
       const helpEmbed = new Discord.MessageEmbed()
+      .setTitle("Commands")
       .setColor('#0099ff')
-      .addField(':loud_sound:', soundsMessage)
-      .addField(':tv: ', gifMessage)
+      .addField(':blue_circle: Prefix',"`"+prefix+"`")
+      .addField(':loud_sound: Sound Commands', soundsMessage)
+      .addField(':frame_photo: GIF Commands', gifMessage)
 
       message.channel.send(helpEmbed);
     }
