@@ -72,7 +72,8 @@
     { "file" : "sounds/democracymanifest.wav","command" : "democracymanifest"},
     { "file" : "sounds/limppenis.wav","command" : "limppenis"},
     { "file" : "sounds/judo.wav","command" : "judo"},
-    { "file" : "sounds/haha.wav","command" : "haha"}
+    { "file" : "sounds/haha.wav","command" : "haha"},
+    { "file" : "sounds/blueflags.wav","command" : "blueflags"}
 
 
 
