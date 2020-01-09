@@ -75,7 +75,9 @@
     { "file" : "sounds/haha.wav","command" : "haha"},
     { "file" : "sounds/blueflags.wav","command" : "blueflags"},
     { "file" : "sounds/wap.wav","command" : "wap"},
-    { "file" : "sounds/contact.wav","command" : "contact"}
+    { "file" : "sounds/contact.wav","command" : "contact"},
+    { "file" : "sounds/stopit.wav","command" : "stopit"},
+    { "file" : "sounds/timetostop.wav","command" : "timetostop"}
 
 
 
