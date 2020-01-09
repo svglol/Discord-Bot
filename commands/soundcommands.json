@@ -73,7 +73,9 @@
     { "file" : "sounds/limppenis.wav","command" : "limppenis"},
     { "file" : "sounds/judo.wav","command" : "judo"},
     { "file" : "sounds/haha.wav","command" : "haha"},
-    { "file" : "sounds/blueflags.wav","command" : "blueflags"}
+    { "file" : "sounds/blueflags.wav","command" : "blueflags"},
+    { "file" : "sounds/wap.wav","command" : "wap"},
+    { "file" : "sounds/contact.wav","command" : "contact"}
 
 
 
