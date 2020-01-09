@@ -77,8 +77,6 @@
     { "file" : "sounds/wap.wav","command" : "wap"},
     { "file" : "sounds/contact.wav","command" : "contact"},
     { "file" : "sounds/stopit.wav","command" : "stopit"},
-    { "file" : "sounds/timetostop.wav","command" : "timetostop"}
-
-
-
+    { "file" : "sounds/timetostop.wav","command" : "timetostop"},
+    { "file" : "sounds/bettermic.wav","command" : "bettermic"}
     ] }
