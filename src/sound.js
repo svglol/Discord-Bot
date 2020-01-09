@@ -8,7 +8,7 @@ module.exports = {
     if(userVoiceChannel != undefined){
       queueItem = [message,obj];
       queue.push(queueItem);
-      if(dispatcher == null){
+      if(dispatcher == null && voiceChannel == null){
         playNextInQueue();
       }
     }
@@ -32,12 +32,12 @@ module.exports = {
   }
 };
 
-var playNextInQueue = function (){
+var playNextInQueue = async function (){
   var message = queue[0][0];
   var file = queue[0][1].file;
   voiceChannel = message.member.voice.channel;
-  voiceChannel.join().then(connection => {
-    dispatcher = connection.play(file);
+  await voiceChannel.join().then(async connection => {
+    dispatcher = await connection.play(file);
     dispatcher.on('end', () => {
       dispatcher = null;
       message.delete(1000);
@@ -47,8 +47,10 @@ var playNextInQueue = function (){
       }
       else{
         voiceChannel.leave();
-        voiceChannel == null;
+        voiceChannel = null;
       }
     });
-  }).catch(err => console.log(err))
+  }).catch(err => {
+    console.log(err)
+  })
 }
