@@ -16,6 +16,7 @@ module.exports = {
   stop: function(message){
     if(dispatcher != null){
       voiceChannel.leave();
+      voiceChannel = null;
       queue.forEach(obj => {
         obj[0].delete(1000);
       });
