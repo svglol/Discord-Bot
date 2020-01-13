@@ -79,5 +79,6 @@
     { "file" : "sounds/stopit.wav","command" : "stopit"},
     { "file" : "sounds/timetostop.wav","command" : "timetostop"},
     { "file" : "sounds/bettermic.wav","command" : "bettermic"},
-    { "file" : "sounds/hotdamn.wav","command" : "hotdamn"}
+    { "file" : "sounds/hotdamn.wav","command" : "hotdamn"},
+    { "file" : "sounds/fairgo.wav","command" : "fairgo"}
     ] }
