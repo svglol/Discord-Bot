@@ -1,4 +1,4 @@
 {
   "prefix" : ".",
-  "cooldown" : "300000"
+  "cooldown" : 300000
 }
