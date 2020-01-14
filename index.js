@@ -147,6 +147,11 @@ client.on('message', message => {
       if(msg == "skip"){
         sound.skip(message);
       }
+
+      if(msg == "reset"){
+        message.delete(1000).catch(err => console.log(err));
+        client.destroy();
+      }
     }
 
     //gif commands
