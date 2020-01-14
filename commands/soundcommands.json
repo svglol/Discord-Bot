@@ -81,5 +81,6 @@
     { "file" : "sounds/bettermic.wav","command" : "bettermic"},
     { "file" : "sounds/hotdamn.wav","command" : "hotdamn"},
     { "file" : "sounds/fairgo.wav","command" : "fairgo"},
-    { "file" : "sounds/dp.wav","command" : "dp"}
+    { "file" : "sounds/dp.wav","command" : "dp"},
+    { "file" : "sounds/wronghouse.wav","command" : "wronghouse"}
     ] }
