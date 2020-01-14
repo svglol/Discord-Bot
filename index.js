@@ -141,11 +141,19 @@ client.on('message', message => {
     });
 
     //sound clip chatcommands
-    soundCommands.forEach(obj => {
-      if(msg == obj.command){
-        sound.queue(message,obj);
+    splitCommands = msg.split(" ");
+    for (let i = 0; i < splitCommands.length; i++) {
+      var end = false;
+      if(i === splitCommands.length-1){
+        end = true;
       }
-    });
+      soundCommands.forEach(obj => {
+        if(splitCommands[i] == obj.command){
+          sound.queue(message,obj,end);
+        }
+      });
+    }
+
   }
 });
 
