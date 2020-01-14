@@ -82,5 +82,7 @@
     { "file" : "sounds/hotdamn.wav","command" : "hotdamn"},
     { "file" : "sounds/fairgo.wav","command" : "fairgo"},
     { "file" : "sounds/dp.wav","command" : "dp"},
-    { "file" : "sounds/wronghouse.wav","command" : "wronghouse"}
+    { "file" : "sounds/wronghouse.wav","command" : "wronghouse"},
+    { "file" : "sounds/murdering.wav","command" : "murdering"},
+    { "file" : "sounds/wontstart.wav","command" : "wontstart"}
     ] }
