@@ -149,7 +149,7 @@ client.on('message', message => {
       }
 
       if(msg == "reset"){
-        message.delete(1000).catch(err => console.log(err));
+        sound.stop(message);
         client.destroy();
       }
     }
