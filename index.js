@@ -126,24 +126,27 @@ client.on('message', message => {
       message.channel.send(helpEmbed);
     }
 
-    //clear any chatcommands in the channel
-    if(msg == "clear"){
-      message.channel.messages.fetch(20).then(messages => {
-        var messagesToDelete = new Array();
-        messages.forEach(chatMessage => {
-          if(chatMessage.content.charAt(0) == prefix){
-            messagesToDelete.push(chatMessage);
-          }
+    //Limit these commands to admin only
+    if (message.member.hasPermission("ADMINISTRATOR")){
+      //clear any chatcommands in the channel
+      if(msg == "clear"){
+        message.channel.messages.fetch(20).then(messages => {
+          var messagesToDelete = new Array();
+          messages.forEach(chatMessage => {
+            if(chatMessage.content.charAt(0) == prefix){
+              messagesToDelete.push(chatMessage);
+            }
+          });
+          message.channel.bulkDelete(messagesToDelete);
         });
-        message.channel.bulkDelete(messagesToDelete);
-      });
-    }
+      }
 
-    if(msg == "stop"){
-      sound.stop(message);
-    }
-    if(msg == "skip"){
-      sound.skip(message);
+      if(msg == "stop"){
+        sound.stop(message);
+      }
+      if(msg == "skip"){
+        sound.skip(message);
+      }
     }
 
     //gif commands
