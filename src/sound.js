@@ -41,7 +41,7 @@ var playNextInQueue = async function (){
   var message = queue[0][0];
   var file = queue[0][1].file;
   var end = queue[0][2];
-  
+
   voiceChannel = message.member.voice.channel;
   await voiceChannel.join().then(async connection => {
     dispatcher = await connection.play(file);
@@ -63,6 +63,7 @@ var playNextInQueue = async function (){
       }
     });
   }).catch(err => {
+    message.client.destroy();
     console.log(err)
   })
 }
