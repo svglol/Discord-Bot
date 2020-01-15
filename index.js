@@ -13,15 +13,16 @@ const gifCommands = require('./commands/gifcommands.json').commands;
 const prefix = require('./config.json').prefix;
 const cooldown = require('./config.json').cooldown;
 var soundCommands = [];
+var adminSoundCommands = [];
 
-tools.loadSoundCommands(soundCommands);
+tools.loadSoundCommands(soundCommands,adminSoundCommands);
 tools.sort(soundCommands,gifCommands);
 
 client.on('ready', () => {
   client.user.setActivity(prefix + 'help for commands', { type: 'PLAYING' })
   .catch(console.error);
 
-  sound.listen(client,soundCommands);
+  sound.listen(client,soundCommands,adminSoundCommands);
   gifs.listen(client,gifCommands);
   misc.listen(client,sound,soundCommands,gifCommands);
   intro.listen(client,intros,exits,cooldown);

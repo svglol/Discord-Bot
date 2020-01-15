@@ -5,19 +5,38 @@ var voiceChannel;
 const prefix = require('../config.json').prefix;
 
 module.exports = {
-  listen:function(client,soundCommands){
+  listen:function(client,soundCommands,adminSoundCommands){
     client.on('message', message => {
       if(message.content.charAt(0) == prefix){
         var msg = message.content.substring(1);
         splitCommands = msg.split(" ");
         for (let i = 0; i < splitCommands.length; i++) {
           var end = false;
+
+          //check if last command after splitting them up
           if(i === splitCommands.length-1){
             end = true;
           }
+
+          //check if command is to play random sfx
           if(splitCommands[i] == "random"){
             queue(message,soundCommands[Math.floor(Math.random()*soundCommands.length)],end);
           }
+
+          //check if command is admin only
+          if (message.member.hasPermission("ADMINISTRATOR")){
+            adminSoundCommands.forEach(obj => {
+              if(splitCommands[i] == obj.command){
+                //delete message instantly
+                if(!deletedMessages.includes(message.id)){
+                  deletedMessages.push(message.id);
+                  message.delete(1000).catch(err => console.log(err));
+                }
+                queue(message,obj,end);
+              }
+            });
+          }
+
           soundCommands.forEach(obj => {
             if(splitCommands[i] == obj.command){
               queue(message,obj,end);
