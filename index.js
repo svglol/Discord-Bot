@@ -15,6 +15,9 @@ var soundCommands = require('./commands/soundcommands.json').commands;
 tools.sort(soundCommands,gifCommands);
 
 client.on('ready', () => {
+  client.user.setActivity(prefix + 'help for commands', { type: 'PLAYING' })
+  .then(presence => console.log(`Activity set to ${presence.activity.name}`))
+  .catch(console.error);
 });
 
 //Detect if user joins voice channel
