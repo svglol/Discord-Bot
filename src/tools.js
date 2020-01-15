@@ -11,5 +11,8 @@ module.exports = {
       if(a.command > b.command) { return 1; }
       return 0;
     })
+  },
+  createCommand: function(file){
+    return /[^.]*/.exec(file)[0];
   }
 };

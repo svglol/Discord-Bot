@@ -1,22 +1,29 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
+const fs = require('fs');
+
 const tools = require('./src/tools.js');
 const sound = require('./src/sound.js');
-
 
 const intros = require('./commands/intros.json').intros;
 const exits = require('./commands/exits.json').exits;
 var gifCommands = require('./commands/gifcommands.json').commands;
-const prefix = require('./commands/config.json').prefix;
-const cooldown = require('./commands/config.json').cooldown;
-var soundCommands = require('./commands/soundcommands.json').commands;
+const prefix = require('./config.json').prefix;
+const cooldown = require('./config.json').cooldown;
+var soundCommands = [];
+const soundFolder = './resources/sound/';
+
+fs.readdirSync(soundFolder).forEach(file => {
+  var sound = {file:'./resources/sound/'+file, command:tools.createCommand(file)};
+  soundCommands.push(sound);
+});
 
 tools.sort(soundCommands,gifCommands);
 
 client.on('ready', () => {
   client.user.setActivity(prefix + 'help for commands', { type: 'PLAYING' })
-  .then(presence => console.log(`Activity set to ${presence.activity.name}`))
+  .then(presence => console.log())
   .catch(console.error);
 });
 
