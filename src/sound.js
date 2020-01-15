@@ -1,31 +1,41 @@
-var queue = new Array();
+var soundQueue = new Array();
 var deletedMessages = new Array();
 var dispatcher;
 var voiceChannel;
+const prefix = require('../config.json').prefix;
 
 module.exports = {
-  queue: function (message,obj,end) {
-    var userVoiceChannel = message.member.voice.channel;
-    if(userVoiceChannel != undefined){
-      queueItem = [message,obj,end];
-      queue.push(queueItem);
-      if(dispatcher == null && voiceChannel == null){
-        playNextInQueue();
+  listen:function(client,soundCommands){
+    client.on('message', message => {
+      if(message.content.charAt(0) == prefix){
+        var msg = message.content.substring(1);
+        splitCommands = msg.split(" ");
+        for (let i = 0; i < splitCommands.length; i++) {
+          var end = false;
+          if(i === splitCommands.length-1){
+            end = true;
+          }
+          soundCommands.forEach(obj => {
+            if(splitCommands[i] == obj.command){
+              queue(message,obj,end);
+            }
+          });
+        }
       }
-    }
+    });
   },
   stop: function(message){
     if(dispatcher != null){
       voiceChannel.leave();
       voiceChannel = null;
-      queue.forEach(obj => {
+      soundQueue.forEach(obj => {
         if(!deletedMessages.includes(obj[0].id)){
           obj[0].delete(1000).catch(err => console.log(err));
           deletedMessages.push(obj[0].id);
         }
       });
       dispatcher = null;
-      queue = new Array();
+      soundQueue = new Array();
     }
     message.delete(1000).catch(err => console.log(err));
   },
@@ -37,10 +47,21 @@ module.exports = {
   }
 };
 
+var queue = function (message,obj,end) {
+  var userVoiceChannel = message.member.voice.channel;
+  if(userVoiceChannel != undefined){
+    soundQueueItem = [message,obj,end];
+    soundQueue.push(soundQueueItem);
+    if(dispatcher == null && voiceChannel == null){
+      playNextInQueue();
+    }
+  }
+}
+
 var playNextInQueue = async function (){
-  var message = queue[0][0];
-  var file = queue[0][1].file;
-  var end = queue[0][2];
+  var message = soundQueue[0][0];
+  var file = soundQueue[0][1].file;
+  var end = soundQueue[0][2];
 
   voiceChannel = message.member.voice.channel;
   await voiceChannel.join().then(async connection => {
@@ -53,8 +74,8 @@ var playNextInQueue = async function (){
           deletedMessages.push(message.id);
         }
       }
-      queue.shift();
-      if(queue.length != 0){
+      soundQueue.shift();
+      if(soundQueue.length != 0){
         playNextInQueue();
       }
       else{

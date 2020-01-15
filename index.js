@@ -1,192 +1,30 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-const fs = require('fs');
-
 const tools = require('./src/tools.js');
 const sound = require('./src/sound.js');
+const gifs = require('./src/gifs.js');
+const misc = require('./src/misc.js');
+const intro = require('./src/intro.js');
 
 const intros = require('./commands/intros.json').intros;
 const exits = require('./commands/exits.json').exits;
-var gifCommands = require('./commands/gifcommands.json').commands;
+const gifCommands = require('./commands/gifcommands.json').commands;
 const prefix = require('./config.json').prefix;
 const cooldown = require('./config.json').cooldown;
 var soundCommands = [];
-const soundFolder = './resources/sound/';
 
-fs.readdirSync(soundFolder).forEach(file => {
-  var sound = {file:'./resources/sound/'+file, command:tools.createCommand(file)};
-  soundCommands.push(sound);
-});
-
+tools.loadSoundCommands(soundCommands);
 tools.sort(soundCommands,gifCommands);
 
 client.on('ready', () => {
   client.user.setActivity(prefix + 'help for commands', { type: 'PLAYING' })
-  .then(presence => console.log())
   .catch(console.error);
-});
 
-//Detect if user joins voice channel
-var lastUsedIntroArray = new Array();
-var lastUsedExitArray = new Array();
-
-client.on('voiceStateUpdate', (oldMember, newMember) => {
-  let newUserChannel = newMember.channel;
-  let oldUserChannel = oldMember.channel;
-
-  var channel = newMember.guild.channels.find(ch => ch.name === 'general-chat');
-  if (!channel) return;
-
-  if(oldUserChannel === null && newUserChannel !== null) {
-    // User Joins a voice channel
-    var user = newMember;
-    intros.forEach(obj => {
-      if(user.id == obj.userid){
-        var date = new Date();
-        var currentTime = date.getTime();
-        var lastUsedUser = {userid:user.id, usedTime:currentTime};
-
-        //check if there is already an entry
-        if(lastUsedIntroArray.some(lastUser => lastUser.userid === user.id)){
-          //get the lastUser object
-          var index;
-          lastUsedIntroArray.some(function(entry, i) {
-            if (entry.userid === user.id) {
-              index = i;
-              return true;
-            }
-          });
-
-          //check if the cooldown time has passed
-          if(currentTime > lastUsedIntroArray[index].usedTime + cooldown){
-            //post gif and update entry in array
-            channel.send(obj.link);
-            lastUsedIntroArray[index].usedTime = currentTime;
-          }
-        } else{
-          //post gif
-          channel.send(obj.link);
-          //add entry to lastUsedIntroArray
-          lastUsedIntroArray.push(lastUsedUser);
-        }
-      }
-    });
-
-  } else if(newUserChannel === null){
-    // User leaves a voice channel
-    var user = newMember;
-    exits.forEach(obj => {
-      if(user.id == obj.userid){
-        var date = new Date();
-        var currentTime = date.getTime();
-        var lastUsedUser = {userid:user.id, usedTime:currentTime};
-
-        //check if there is already an entry
-        if(lastUsedExitArray.some(lastUser => lastUser.userid === user.id)){
-          //get the lastUser object
-          var index;
-          lastUsedExitArray.some(function(entry, i) {
-            if (entry.userid === user.id) {
-              index = i;
-              return true;
-            }
-          });
-
-          //check if the cooldown time has passed
-          if(currentTime > lastUsedExitArray[index].usedTime + cooldown){
-            //post gif and update entry in array
-            channel.send(obj.link);
-            lastUsedExitArray[index].usedTime = currentTime;
-          }
-        } else{
-          //post gif
-          channel.send(obj.link);
-          //add entry to lastUsedExitArray
-          lastUsedExitArray.push(lastUsedUser);
-        }
-      }
-    });
-  }
-})
-
-// Listen for commands
-client.on('message', message => {
-  if(message.content.charAt(0) == prefix){
-    var msg = message.content.substring(1);
-    if(msg == "help"){
-
-      var soundsMessage = "";
-      soundCommands.forEach((obj, key) => {
-        soundsMessage += "`"+obj.command+"` ";
-      });
-
-      var gifMessage = "";
-      gifCommands.forEach((obj, key) => {
-        gifMessage += "`"+obj.command+"` ";
-      });
-
-      const helpEmbed = new Discord.MessageEmbed()
-      .setTitle("Commands")
-      .setColor('#0099ff')
-      .addField(':blue_circle: Prefix',"`"+prefix+"`")
-      .addField(':loud_sound: Sound Commands', soundsMessage)
-      .addField(':frame_photo: GIF Commands', gifMessage)
-
-      message.channel.send(helpEmbed);
-    }
-
-    //Limit these commands to admin only
-    if (message.member.hasPermission("ADMINISTRATOR")){
-      //clear any chatcommands in the channel
-      if(msg == "clear"){
-        message.channel.messages.fetch(20).then(messages => {
-          var messagesToDelete = new Array();
-          messages.forEach(chatMessage => {
-            if(chatMessage.content.charAt(0) == prefix){
-              messagesToDelete.push(chatMessage);
-            }
-          });
-          message.channel.bulkDelete(messagesToDelete);
-        });
-      }
-
-      if(msg == "stop"){
-        sound.stop(message);
-      }
-      if(msg == "skip"){
-        sound.skip(message);
-      }
-
-      if(msg == "reset"){
-        message.delete(1000).catch(err => console.log(err));
-        sound.stop(message);
-        client.destroy();
-      }
-    }
-
-    //gif commands
-    gifCommands.forEach(obj => {
-      if(msg == obj.command){
-        message.channel.send(obj.link);
-      }
-    });
-
-    //sound clip chatcommands
-    splitCommands = msg.split(" ");
-    for (let i = 0; i < splitCommands.length; i++) {
-      var end = false;
-      if(i === splitCommands.length-1){
-        end = true;
-      }
-      soundCommands.forEach(obj => {
-        if(splitCommands[i] == obj.command){
-          sound.queue(message,obj,end);
-        }
-      });
-    }
-
-  }
+  sound.listen(client,soundCommands);
+  gifs.listen(client,gifCommands);
+  misc.listen(client,sound,soundCommands,gifCommands);
+  intro.listen(client,intros,exits,cooldown);
 });
 
 client.login(process.env.TOKEN);

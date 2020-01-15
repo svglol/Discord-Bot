@@ -1,3 +1,6 @@
+const fs = require('fs');
+const soundFolder = './resources/sound/';
+
 module.exports = {
   sort: function (sound, commands) {
     sound.sort(function(a, b){
@@ -12,7 +15,14 @@ module.exports = {
       return 0;
     })
   },
-  createCommand: function(file){
-    return /[^.]*/.exec(file)[0];
+  loadSoundCommands: function(soundCommands){
+    fs.readdirSync(soundFolder).forEach(file => {
+      var sound = {file:'./resources/sound/'+file, command:createCommand(file)};
+      soundCommands.push(sound);
+    });
   }
 };
+
+var createCommand = function(file){
+  return /[^.]*/.exec(file)[0];
+}
