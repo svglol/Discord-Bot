@@ -15,6 +15,9 @@ module.exports = {
           if(i === splitCommands.length-1){
             end = true;
           }
+          if(splitCommands[i] == "random"){
+            queue(message,soundCommands[Math.floor(Math.random()*soundCommands.length)],end);
+          }
           soundCommands.forEach(obj => {
             if(splitCommands[i] == obj.command){
               queue(message,obj,end);
