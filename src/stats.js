@@ -87,7 +87,14 @@ module.exports = {
             var leaderboardMessage = "";
             for (let i = 0; i < leaderboardArray.length; i++) {
               var readableTotalConnectionTime =  parseMillisecondsIntoReadableTime(leaderboardArray[i].totalTime);
-              var userName = message.guild.member(leaderboardArray[i].userid).displayName;
+              var userName "";
+              try {
+                userName = message.guild.member(leaderboardArray[i].userid).displayName;
+              }
+              catch (e) {
+                console.log(e);
+              }
+              
               if(i <= 9){
                 leaderboardMessage += "```";
                 leaderboardMessage += "#"+ (i+1) + " " + userName +" "+ readableTotalConnectionTime;
