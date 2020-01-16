@@ -144,7 +144,6 @@ module.exports = {
               totalConnectionTime.push(user);
             }
             saveTotalConnectionTimeFile();
-            console.log(totalConnectionTime);
 
             currectConnectionTime.splice(i, 1);
             saveCurrentConnectionFile();
