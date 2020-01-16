@@ -39,6 +39,9 @@ module.exports = {
                 if(chatMessage.content.charAt(0) == prefix){
                   messagesToDelete.push(chatMessage);
                 }
+                if(chatMessage.author.bot){
+                  messagesToDelete.push(chatMessage);
+                }
               });
               message.channel.bulkDelete(messagesToDelete);
             });
