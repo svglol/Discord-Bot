@@ -6,6 +6,7 @@ const sound = require('./src/sound.js');
 const gifs = require('./src/gifs.js');
 const misc = require('./src/misc.js');
 const intro = require('./src/intro.js');
+const stats = require('./src/stats.js');
 
 const intros = require('./commands/intros.json').intros;
 const exits = require('./commands/exits.json').exits;
@@ -26,6 +27,7 @@ client.on('ready', () => {
   gifs.listen(client,gifCommands);
   misc.listen(client,sound,soundCommands,gifCommands);
   intro.listen(client,intros,exits,cooldown);
+  stats.listen(client);
 });
 
 client.login(process.env.TOKEN);
