@@ -136,7 +136,7 @@ module.exports = {
             var updated = false;
             totalConnectionTime.forEach(obj => {
               if(obj.userid === newMember.id){
-                obj.totalTime =+ connectedTime;
+                obj.totalTime += connectedTime;
                 updated = true;
               }
             });
