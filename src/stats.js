@@ -33,7 +33,7 @@ module.exports = {
           } else if (splitCommands[1] == "total") {
             totalConnectionTime.forEach(obj => {
               if (obj.userid === message.member.id) {
-                var currentConnectedTime;
+                var currentConnectedTime = 0;
                 currectConnectionTime.forEach(currentObj => {
                   if (currentObj.userid === obj.userid) {
                     var date = new Date();
@@ -46,6 +46,7 @@ module.exports = {
                 var readableTotalConnectionTime = parseMillisecondsIntoReadableTime(
                   totalConnectionTime
                 );
+
                 message.reply(
                   "You have been connected for a total of " +
                     readableTotalConnectionTime
