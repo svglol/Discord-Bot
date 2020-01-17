@@ -21,6 +21,7 @@ module.exports = {
 
         if (splitCommands[0] == "stats") {
           if (splitCommands[1] == "current") {
+            var messageSent = false;
             currectConnectionTime.forEach(obj => {
               if (obj.userid === message.member.id) {
                 connectionLength = getReadableConnectedTime(obj.joinTime);
@@ -28,8 +29,10 @@ module.exports = {
                   "You have been connected to this session for " +
                     connectionLength
                 );
+                messageSent = true;
               }
             });
+            if(!messageSent) message.reply("Your arent connected");
           } else if (splitCommands[1] == "total") {
             totalConnectionTime.forEach(obj => {
               if (obj.userid === message.member.id) {
