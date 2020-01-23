@@ -30,7 +30,7 @@ module.exports = {
           const helpEmbed = new Discord.MessageEmbed()
           .setTitle("Commands")
           .setColor('#0099ff')
-          .addField(':blue_circle: Prefix',"`"+prefix+"`")
+          .addField(':blue_circle: Prefix',"`"+prefix+"`",true)
 
           var firstSoundMessage = true;
           soundsMessageArray.forEach((item, i) => {
@@ -68,13 +68,18 @@ module.exports = {
           }
 
           if(msg == "reset"){
-            message.delete(1000).catch(err => console.log(err));
-            sound.stop(message);
-            client.destroy();
+            reset(sound,message,client);
           }
         }
 
       }
     });
   }
+};
+
+async function reset(sound,message,client){
+  await message.delete(1000).catch(err => console.log(err));
+  await sound.stop(message);
+  client.destroy();
+  throw 'restarting'
 };
