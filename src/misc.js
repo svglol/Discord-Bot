@@ -24,7 +24,6 @@ module.exports = {
           .setColor('#0099ff')
           .addField(':blue_circle: Prefix',"`"+prefix+"`")
           .addField(':loud_sound: Sound Commands', soundsMessage)
-          .addField(':frame_photo: GIF Commands', gifMessage)
 
           message.channel.send(helpEmbed);
         }
