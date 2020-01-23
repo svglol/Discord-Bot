@@ -27,7 +27,7 @@ module.exports = {
                 connectionLength = getReadableConnectedTime(obj.joinTime);
                 message.reply(
                   "You have been connected to this session for " +
-                    connectionLength
+                  connectionLength
                 );
                 messageSent = true;
               }
@@ -45,21 +45,26 @@ module.exports = {
                   }
                 });
                 var totalConnectionTime =
-                  parseInt(currentConnectedTime) + parseInt(obj.totalTime);
+                parseInt(currentConnectedTime) + parseInt(obj.totalTime);
                 var readableTotalConnectionTime = parseMillisecondsIntoReadableTime(
                   totalConnectionTime
                 );
 
                 message.reply(
                   "You have been connected for a total of " +
-                    readableTotalConnectionTime
+                  readableTotalConnectionTime
                 );
               }
             });
           } else if (splitCommands[1] == "leaderboard") {
             const leaderboardEmbed = new Discord.MessageEmbed()
-              .setTitle("Leaderboard")
-              .setColor("#0099ff");
+            .setTitle("Leaderboard")
+            .setColor("#0099ff");
+
+            leaderboardLength = 10;
+            if(splitCommands[2] != null && Number.isInteger(parseInt(splitCommands[2]))){
+              leaderboardLength = parseInt(splitCommands[2]);
+            }
 
             //make temp array with totals including current connected time
             var leaderboardArray = new Array();
@@ -77,7 +82,7 @@ module.exports = {
               var totalConnectionTime;
               if (currentConnectedTime !== 0) {
                 totalConnectionTime =
-                  parseInt(currentConnectedTime) + parseInt(obj.totalTime);
+                parseInt(currentConnectedTime) + parseInt(obj.totalTime);
               } else {
                 totalConnectionTime = parseInt(obj.totalTime);
               }
@@ -105,20 +110,20 @@ module.exports = {
               var userName = "";
               try {
                 userName = message.guild.member(leaderboardArray[i].userid)
-                  .displayName;
+                .displayName;
               } catch (e) {
                 console.log(e);
               }
 
-              if (i <= 9) {
+              if (i <= (leaderboardLength - 1)) {
                 leaderboardMessage += "```";
                 leaderboardMessage +=
-                  "#" +
-                  (i + 1) +
-                  " " +
-                  userName +
-                  " " +
-                  readableTotalConnectionTime;
+                "#" +
+                (i + 1) +
+                " " +
+                userName +
+                " " +
+                readableTotalConnectionTime;
                 leaderboardMessage += "```";
               }
             }
