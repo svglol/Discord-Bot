@@ -8,11 +8,19 @@ module.exports = {
         var msg = message.content.substring(1);
 
         if(msg == "help"){
-
+          var soundsMessageArray = new Array();
           var soundsMessage = "";
           soundCommands.forEach((obj, key) => {
-            soundsMessage += "`"+obj.command+"` ";
+            addMessage = "`"+obj.command+"` ";
+            if(addMessage.length + soundsMessage.length < 1024){
+              soundsMessage += addMessage;
+            }else{
+              soundsMessageArray.push(soundsMessage);
+              soundsMessage ="";
+              soundsMessage += addMessage;
+            }
           });
+          soundsMessageArray.push(soundsMessage);
 
           var gifMessage = "";
           gifCommands.forEach((obj, key) => {
@@ -23,8 +31,13 @@ module.exports = {
           .setTitle("Commands")
           .setColor('#0099ff')
           .addField(':blue_circle: Prefix',"`"+prefix+"`")
-          .addField(':loud_sound: Sound Commands', soundsMessage)
-          .addField(':frame_photo: GIF Commands', gifMessage)
+
+          var firstSoundMessage = true;
+          soundsMessageArray.forEach((item, i) => {
+            helpEmbed.addField(':loud_sound: Sound Commands', item)
+          });
+
+          helpEmbed.addField(':frame_photo: GIF Commands', gifMessage)
 
           message.channel.send(helpEmbed);
         }
