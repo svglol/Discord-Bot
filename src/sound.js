@@ -80,12 +80,21 @@ var queue = function (message,obj,end) {
   }
 }
 
+var lastDisconTime = 0;
+
 var playNextInQueue = async function (){
   var message = soundQueue[0][0];
   var file = soundQueue[0][1].file;
   var end = soundQueue[0][2];
-
   voiceChannel = message.member.voice.channel;
+
+  var date = new Date();
+  var currentTime = date.getTime();
+
+  if(lastDisconTime > currentTime-500){
+    await PromiseTimeout(500);
+  }
+
   await voiceChannel.join().then(async connection => {
     dispatcher = await connection.play(file);
     dispatcher.on('end', () => {
@@ -103,10 +112,19 @@ var playNextInQueue = async function (){
       else{
         voiceChannel.leave();
         voiceChannel = null;
+        var date = new Date();
+        var currentTime = date.getTime();
+        lastDisconTime = currentTime;
       }
     });
   }).catch(err => {
     message.client.destroy();
     console.log(err)
   })
+}
+
+function PromiseTimeout(delayms) {
+  return new Promise(function (resolve, reject) {
+    setTimeout(resolve, delayms);
+  });
 }
