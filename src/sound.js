@@ -91,8 +91,9 @@ var playNextInQueue = async function (){
   var date = new Date();
   var currentTime = date.getTime();
 
-  if(lastDisconTime > currentTime-1000){
-    await PromiseTimeout(1000);
+  var reconWait = 500;
+  if(lastDisconTime > currentTime-reconWait){
+    await PromiseTimeout(lastDisconTime - (currentTime - reconWait));
   }
 
   await voiceChannel.join().then(async connection => {
@@ -110,16 +111,16 @@ var playNextInQueue = async function (){
         playNextInQueue();
       }
       else{
-        voiceChannel.leave();
+        connection.disconnect();
         voiceChannel = null;
         var date = new Date();
         var currentTime = date.getTime();
         lastDisconTime = currentTime;
       }
     });
-  }).catch(err => {
-    message.client.destroy();
-    console.log(err)
+  }).catch(error => {
+    console.log('Reconnected too quickly');
+    process.exit(1);
   })
 }
 
