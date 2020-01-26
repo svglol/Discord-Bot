@@ -4,14 +4,17 @@ const prefix = require("../config.json").prefix;
 
 var currectConnectionTime = new Array();
 var totalConnectionTime = new Array();
+var userChatMessages = new Array();
 
 const currectConnectionTimeFile = "../currentConnectionFile.json";
 const totalConnectionTimeFile = "../totalConnectionTimeFile.json";
+const userChatMessagesFile = "../userChatMessagesFile.json";
 
 module.exports = {
   listen: function(client) {
     loadCurrentConnectionFile();
     loadTotalConnectionTimeFile();
+    loadUserChatMessagesFile();
     //Listen for stats commands
     client.on("message", message => {
       if (message.content.charAt(0) == prefix) {
@@ -180,10 +183,29 @@ module.exports = {
         }
       }
     });
+
+    //Listen for chat messages to be recorded as stats
+    client.on("message", message => {
+      if(!message.author.bot && message.content.charAt(0) != prefix){
+        var updated = false;
+        for (let i = 0; i < userChatMessages.length; i++) {
+          if(userChatMessages[i].userid === message.author.id){
+            userChatMessages[i].messages += 1;
+            updated = true;
+          }
+        }
+        if(!updated){
+          var user = { userid: message.author.id, messages: 1 };
+          userChatMessages.push(user);
+        }
+        saveUserChatMessagesFile();
+      }
+    });
   },
   destroy: function() {
     saveTotalConnectionTimeFile();
     saveCurrentConnectionFile();
+    saveUserChatMessagesFile();
   }
 };
 
@@ -238,6 +260,29 @@ function loadTotalConnectionTimeFile() {
       totalConnectionTime = JSON.parse(rawdata);
     }
   }
+}
+
+function loadUserChatMessagesFile(){
+  if (fs.existsSync(userChatMessagesFile)) {
+    var rawdata = fs.readFileSync(userChatMessagesFile, function(
+      err,
+      data
+    ) {});
+
+    if (rawdata != null) {
+      userChatMessages = JSON.parse(rawdata);
+    }
+  }
+}
+
+function saveUserChatMessagesFile(){
+  fs.writeFileSync(
+    userChatMessagesFile,
+    JSON.stringify(userChatMessages),
+    function(err) {
+      if (err) throw err;
+    }
+  );
 }
 
 function saveTotalConnectionTimeFile() {
