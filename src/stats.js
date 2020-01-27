@@ -424,13 +424,13 @@ function setVoiceEmbedField(internalPage,embed){
       console.log(e);
     }
     if (i >= start && i< end) {
-      positions += "#" +  (i + 1) + " \n";
+      positions += (i + 1) + " \n";
       names += userName + "\n";
       times += readableTotalConnectionTime+ " \n"
     }
   }
 
-  embed.addField('Position',positions,true);
+  embed.addField('#',positions,true);
   embed.addField('Name',names,true);
   embed.addField('Time',times,true);
 
@@ -474,13 +474,13 @@ function setMessagesEmbedField(internalPage,embed){
     }
 
     if (i >= start && i< end) {
-      positions += "#" +  (i + 1) + " \n";
+      positions += (i + 1) + " \n";
       names += userName + "\n";
       messages +=  leaderboardArray[i].messages+ " \n"
     }
   }
 
-  embed.addField('Position',positions,true);
+  embed.addField('#',positions,true);
   embed.addField('Name',names,true);
   embed.addField('Messages',messages,true);
 }
@@ -516,13 +516,13 @@ function setSoundboardEmbedField(internalPage,embed){
   for (let i = 0; i < leaderboardArray.length; i++) {
 
     if (i >= start && i< end) {
-      positions += "#" +  (i + 1) + " \n";
+      positions += (i + 1) + " \n";
       names += leaderboardArray[i].command + "\n";
       plays +=  leaderboardArray[i].uses+ " \n"
     }
   }
 
-  embed.addField('Position',positions,true);
+  embed.addField('#',positions,true);
   embed.addField('Name',names,true);
   embed.addField('Plays',plays,true);
 
