@@ -82,11 +82,15 @@ module.exports = {
 
               msg.react('⬇');
               msg.react('⬆');
-              msg.react('⬅');
-              msg.react('➡');
+              msg.react('🗣️');
+              msg.react('⌨️');
+              msg.react('🔊');
+              msg.react('❌');
+              // msg.react('⬅');
+              // msg.react('➡');
 
               const filter = (reaction, user) => {
-                return ['⬅', '➡','⬇','⬆'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
+                return ['⬅', '➡','⬇','⬆','🗣️','⌨️','🔊','❌'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
               };
 
               var leaderboardEmbeds = generateLeaderboardEmbeds();
@@ -123,6 +127,25 @@ module.exports = {
                     internalPage--;
                   }
                   msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+                }
+                else if(reaction.emoji.name === '🗣️'){
+                  page = 0;
+                  internalPage = 0;
+                  msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+                }
+                else if(reaction.emoji.name === '⌨️'){
+                  page = 1;
+                  internalPage = 0;
+                  msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+                }
+                else if(reaction.emoji.name === '🔊'){
+                  page = 2;
+                  internalPage = 0;
+                  msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+                }
+                else if(reaction.emoji.name === '❌'){
+                  message.delete(1000).catch(err => console.log(err));
+                  msg.delete(1000).catch(err => console.log(err));
                 }
               });
               collector.on('end', collection =>{
