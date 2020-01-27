@@ -90,7 +90,7 @@ module.exports = {
                 return ['⬅', '➡','⬇','⬆'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
               };
 
-              const collector = msg.createReactionCollector(filter, { time: 30000 });
+              const collector = msg.createReactionCollector(filter, { time: 60000 });
               collector.on('collect', (reaction,user) =>{
                 reaction.users.remove(user);
                 if(reaction.emoji.name === '⬅'){
