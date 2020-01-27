@@ -8,38 +8,7 @@ module.exports = {
         var msg = message.content.substring(1);
 
         if(msg == "help"){
-          var soundsMessageArray = new Array();
-          var soundsMessage = "";
-          soundCommands.forEach((obj, key) => {
-            addMessage = "`"+obj.command+"` ";
-            if(addMessage.length + soundsMessage.length < 1024){
-              soundsMessage += addMessage;
-            }else{
-              soundsMessageArray.push(soundsMessage);
-              soundsMessage ="";
-              soundsMessage += addMessage;
-            }
-          });
-          soundsMessageArray.push(soundsMessage);
-
-          var gifMessage = "";
-          gifCommands.forEach((obj, key) => {
-            gifMessage += "`"+obj.command+"` ";
-          });
-
-          const helpEmbed = new Discord.MessageEmbed()
-          .setTitle("Commands")
-          .setColor('#0099ff')
-          .addField(':blue_circle: Prefix',"`"+prefix+"`",true)
-
-          var firstSoundMessage = true;
-          soundsMessageArray.forEach((item, i) => {
-            helpEmbed.addField(':loud_sound: Sound Commands', item)
-          });
-
-          helpEmbed.addField(':frame_photo: GIF Commands', gifMessage)
-
-          message.channel.send(helpEmbed);
+          helpMessage(message,client,soundCommands,gifCommands);
         }
 
         //Limit these commands to admin only
@@ -83,3 +52,139 @@ async function reset(sound,message,client){
   client.destroy();
   throw 'restarting'
 };
+
+
+function helpMessage(message, client,soundCommands,gifCommands){
+
+  var soundboardEmbeds = generateSoundboardEmbeds(soundCommands);
+  var gifEmbeds = generateGifEmbeds(gifCommands);
+
+  var embeds = soundboardEmbeds.concat(gifEmbeds);
+
+  message.channel.send(embeds[0]).then((msg)=>{
+    var page = 0;
+
+    // msg.react('⬅');
+    // msg.react('➡');
+    msg.react('🔊');
+    msg.react('🖼');
+    msg.react('❌');
+
+    const filter = (reaction, user) => {
+      return ['⬅', '➡','🔊','🖼','❌'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
+    };
+
+    const collector = msg.createReactionCollector(filter, { time: 60000 });
+    collector.on('collect', (reaction,user) =>{
+      reaction.users.remove(user);
+      if(reaction.emoji.name === '⬅'){
+        //go back a page
+        if(page != 0){
+          page--;
+        }
+        msg.edit(embeds[page]);
+      }
+      else if (reaction.emoji.name === '➡') {
+        //go to next page
+        if(page < embeds.length-1){
+          page++;
+        }
+        msg.edit(embeds[page]);
+      }
+      else if(reaction.emoji.name === '🔊'){
+        page = 0;
+        msg.edit(embeds[page]);
+      }
+      else if (reaction.emoji.name === '🖼') {
+        page = soundboardEmbeds.length;
+        msg.edit(embeds[page]);
+      }
+      else if(reaction.emoji.name === '❌'){
+        message.delete(1000).catch(err => console.log(err));
+        msg.delete(1000).catch(err => console.log(err));
+      }
+    });
+    collector.on('end', collection =>{
+      //remove reactions once reaction collector has ended
+      msg.reactions.removeAll();
+    })
+  });
+
+}
+
+function generateSoundboardEmbeds(soundCommands){
+  soundboardEmbeds = new Array();
+
+  var cmdLength = 0;
+  soundCommands.forEach((item, i) => {
+    cmdLength += item.command.length;
+    cmdLength += 4;
+  });
+
+  var start = 0;
+  var pages = Math.ceil(cmdLength/2048);
+
+  for (var i = 0; i < pages; i++){
+
+    var currentPage = i+1;
+    const embed = new Discord.MessageEmbed()
+    .setTitle(":loud_sound: Sound Commands")
+    .setColor('#0099ff')
+    .setFooter(currentPage+"/"+pages)
+    .addField(':blue_circle: Prefix',"`"+prefix+"`")
+
+    var soundsMessage = "";
+    for (var j = start; j < soundCommands.length; j++) {
+      addMessage = "`"+soundCommands[j].command+"` ";
+      if(addMessage.length + soundsMessage.length < 2048){
+        soundsMessage += addMessage;
+      }else{
+        start = j;
+        break;
+      }
+    }
+    embed.setDescription(soundsMessage);
+    soundboardEmbeds.push(embed);
+  }
+
+  return soundboardEmbeds;
+}
+
+function generateGifEmbeds(gifCommands){
+  gifEmbeds = new Array();
+
+  var cmdLength = 0;
+  gifCommands.forEach((item, i) => {
+    cmdLength += item.command.length;
+    cmdLength += 4;
+  });
+
+  var start = 0;
+  var pages = Math.ceil(cmdLength/2048);
+
+  for (var i = 0; i < pages; i++){
+
+    var currentPage = i+1;
+    const embed = new Discord.MessageEmbed()
+    .setTitle(":frame_photo: Gif Commands")
+    .setColor('#0099ff')
+    .setFooter(currentPage+"/"+pages)
+    .addField(':blue_circle: Prefix',"`"+prefix+"`")
+
+    var soundsMessage = "";
+    for (var j = start; j < gifCommands.length; j++) {
+      addMessage = "`"+gifCommands[j].command+"` ";
+      if(addMessage.length + soundsMessage.length < 2048){
+        soundsMessage += addMessage;
+      }else{
+        start = j;
+        break;
+      }
+    }
+    embed.setDescription(soundsMessage);
+    gifEmbeds.push(embed);
+  }
+
+
+  return gifEmbeds;
+}
