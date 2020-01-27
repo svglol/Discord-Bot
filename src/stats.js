@@ -84,13 +84,11 @@ module.exports = {
               msg.react('⬆');
               msg.react('⬅');
               msg.react('➡');
-              console.log()
 
               const filter = (reaction, user) => {
                 return ['⬅', '➡','⬇','⬆'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
               };
 
-              // console.log(generateLeaderboardEmbeds());
               var leaderboardEmbeds = generateLeaderboardEmbeds();
 
               const collector = msg.createReactionCollector(filter, { time: 60000 });
