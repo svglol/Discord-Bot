@@ -69,14 +69,12 @@ module.exports = {
               }
             });
           } else if (splitCommands[1] == "leaderboard") {
-            const leaderboardEmbed = new Discord.MessageEmbed()
-            .setTitle("Voice Leaderboard")
-            .setColor("#0099ff");
+
 
             guild = message.guild;
-            leaderboardEmbed.setFooter(getVoiceEmbedFooter(0));
-            leaderboardEmbed.setDescription(getVoiceEmbedDescription(0));
-            message.channel.send(leaderboardEmbed).then((msg)=>{
+            var leaderboardEmbeds = generateLeaderboardEmbeds();
+
+            message.channel.send(leaderboardEmbeds.get(0)[0]).then((msg)=>{
               var page = 0;
               var internalPage = 0;
 
@@ -93,7 +91,7 @@ module.exports = {
                 return ['⬅', '➡','⬇','⬆','🗣️','⌨️','🔊','❌'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
               };
 
-              var leaderboardEmbeds = generateLeaderboardEmbeds();
+
 
               const collector = msg.createReactionCollector(filter, { time: 60000 });
               collector.on('collect', (reaction,user) =>{
@@ -370,7 +368,7 @@ function getVoiceEmbedFooter(internalPage){
   return current + "/" + Math.ceil(totalSize/leaderboardSize);
 }
 
-function getVoiceEmbedDescription(internalPage){
+function setVoiceEmbedField(internalPage,embed){
   var leaderboardLength = 10;
   var leaderboardArray = new Array();
 
@@ -407,9 +405,13 @@ function getVoiceEmbedDescription(internalPage){
     return 0;
   });
 
-  var leaderboardMessage = "";
   var start = leaderboardSize * internalPage;
   var end = start + leaderboardSize;
+
+  var positions = "";
+  var names = "";
+  var times = "";
+
   for (let i = 0; i < leaderboardArray.length; i++) {
     var readableTotalConnectionTime = parseMillisecondsIntoReadableTime(
       leaderboardArray[i].totalTime
@@ -422,19 +424,16 @@ function getVoiceEmbedDescription(internalPage){
       console.log(e);
     }
     if (i >= start && i< end) {
-      leaderboardMessage += "```";
-      leaderboardMessage +=
-      "#" +
-      (i + 1) +
-      " " +
-      userName +
-      " " +
-      readableTotalConnectionTime;
-      leaderboardMessage += "```";
+      positions += "#" +  (i + 1) + " \n";
+      names += userName + "\n";
+      times += readableTotalConnectionTime+ " \n"
     }
   }
 
-  return leaderboardMessage;
+  embed.addField('Position',positions,true);
+  embed.addField('Name',names,true);
+  embed.addField('Time',times,true);
+
 }
 
 function getMessagesEmbedFooter(internalPage){
@@ -444,8 +443,7 @@ function getMessagesEmbedFooter(internalPage){
   return current + "/" + Math.ceil(totalSize/leaderboardSize);
 }
 
-function getMessagesEmbedDescription(internalPage){
-  var messagesDescription = "";
+function setMessagesEmbedField(internalPage,embed){
   var leaderboardLength = 10;
   var leaderboardArray = userChatMessages;
 
@@ -462,6 +460,10 @@ function getMessagesEmbedDescription(internalPage){
   var start = leaderboardSize * internalPage;
   var end = start + leaderboardSize;
 
+  var positions = "";
+  var names = "";
+  var messages = "";
+
   for (let i = 0; i < leaderboardArray.length; i++) {
     var userName = "";
     try {
@@ -472,19 +474,15 @@ function getMessagesEmbedDescription(internalPage){
     }
 
     if (i >= start && i< end) {
-      messagesDescription += "```";
-      messagesDescription +=
-      "#" +
-      (i + 1) +
-      " " +
-      userName +
-      " " +
-      leaderboardArray[i].messages;
-      messagesDescription += "```";
+      positions += "#" +  (i + 1) + " \n";
+      names += userName + "\n";
+      messages +=  leaderboardArray[i].messages+ " \n"
     }
   }
 
-  return messagesDescription;
+  embed.addField('Position',positions,true);
+  embed.addField('Name',names,true);
+  embed.addField('Messages',messages,true);
 }
 
 function getSoundboardEmbedFooter(internalPage){
@@ -494,8 +492,7 @@ function getSoundboardEmbedFooter(internalPage){
   return current + "/" + Math.ceil(totalSize/leaderboardSize);
 }
 
-function getSoundboardEmbedDescription(internalPage){
-  var soundboardDescription = "";
+function setSoundboardEmbedField(internalPage,embed){
   var leaderboardLength = 10;
   var leaderboardArray = soundboardUsage;
 
@@ -512,22 +509,23 @@ function getSoundboardEmbedDescription(internalPage){
   var start = leaderboardSize * internalPage;
   var end = start + leaderboardSize;
 
+  var positions = "";
+  var names = "";
+  var plays = "";
+
   for (let i = 0; i < leaderboardArray.length; i++) {
 
     if (i >= start && i< end) {
-      soundboardDescription += "```";
-      soundboardDescription +=
-      "#" +
-      (i + 1) +
-      " " +
-      leaderboardArray[i].command +
-      " " +
-      leaderboardArray[i].uses;
-      soundboardDescription += "```";
+      positions += "#" +  (i + 1) + " \n";
+      names += leaderboardArray[i].command + "\n";
+      plays +=  leaderboardArray[i].uses+ " \n"
     }
   }
 
-  return soundboardDescription;
+  embed.addField('Position',positions,true);
+  embed.addField('Name',names,true);
+  embed.addField('Plays',plays,true);
+
 }
 
 function generateLeaderboardEmbeds(){
@@ -544,7 +542,7 @@ function generateLeaderboardEmbeds(){
         var embed = new Discord.MessageEmbed()
         .setTitle(title +' '+'Leaderboard')
         .setColor("#0099ff");
-        embed.setDescription(getVoiceEmbedDescription(o));
+        setVoiceEmbedField(o,embed);
         embed.setFooter(getVoiceEmbedFooter(o));
         voiceLeaderboardEmbeds.push(embed);
       }
@@ -557,7 +555,7 @@ function generateLeaderboardEmbeds(){
         var embed = new Discord.MessageEmbed()
         .setTitle(title +' '+'Leaderboard')
         .setColor("#0099ff");
-        embed.setDescription(getMessagesEmbedDescription(o));
+        setMessagesEmbedField(o,embed);
         embed.setFooter(getMessagesEmbedFooter(o));
         messagesLeaderboardEmbeds.push(embed);
       }
@@ -570,7 +568,7 @@ function generateLeaderboardEmbeds(){
         var embed = new Discord.MessageEmbed()
         .setTitle(title +' '+'Leaderboard')
         .setColor("#0099ff");
-        embed.setDescription(getSoundboardEmbedDescription(o));
+        setSoundboardEmbedField(o,embed);
         embed.setFooter(getSoundboardEmbedFooter(o));
         soundboardLeaderboardEmbeds.push(embed);
       }
