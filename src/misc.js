@@ -72,7 +72,7 @@ function helpMessage(message, client,soundCommands,gifCommands){
 
     msg.react('🔊');
     msg.react('🖼');
-    msg.react('❌');
+    // msg.react('❌');
 
     const filter = (reaction, user) => {
       return ['⬆', '⬇','🔊','🖼','❌'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
@@ -122,10 +122,10 @@ function helpMessage(message, client,soundCommands,gifCommands){
         currentPage = "Gifs"
         msg.edit(gifEmbeds[page]);
       }
-      else if(reaction.emoji.name === '❌'){
-        message.delete(1000).catch(err => console.log(err));
-        msg.delete(1000).catch(err => console.log(err));
-      }
+      // else if(reaction.emoji.name === '❌'){
+      //   message.delete(1000).catch(err => console.log(err));
+      //   msg.delete(1000).catch(err => console.log(err));
+      // }
     });
     collector.on('end', collection =>{
       //remove reactions once reaction collector has ended

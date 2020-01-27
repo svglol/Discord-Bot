@@ -83,7 +83,7 @@ module.exports = {
               msg.react('🗣️');
               msg.react('⌨️');
               msg.react('🔊');
-              msg.react('❌');
+              // msg.react('❌');
               // msg.react('⬅');
               // msg.react('➡');
 
@@ -141,10 +141,10 @@ module.exports = {
                   internalPage = 0;
                   msg.edit(leaderboardEmbeds.get(page)[internalPage]);
                 }
-                else if(reaction.emoji.name === '❌'){
-                  message.delete(1000).catch(err => console.log(err));
-                  msg.delete(1000).catch(err => console.log(err));
-                }
+                // else if(reaction.emoji.name === '❌'){
+                //   message.delete(1000).catch(err => console.log(err));
+                //   msg.delete(1000).catch(err => console.log(err));
+                // }
               });
               collector.on('end', collection =>{
                 //remove reactions once reaction collector has ended
