@@ -61,43 +61,66 @@ function helpMessage(message, client,soundCommands,gifCommands){
 
   var embeds = soundboardEmbeds.concat(gifEmbeds);
 
+  var currentPage = 'Sound';
+
   message.channel.send(embeds[0]).then((msg)=>{
     var page = 0;
 
-    // msg.react('⬅');
-    // msg.react('➡');
+
+    msg.react('⬇');
+    msg.react('⬆');
+
     msg.react('🔊');
     msg.react('🖼');
     msg.react('❌');
 
     const filter = (reaction, user) => {
-      return ['⬅', '➡','🔊','🖼','❌'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
+      return ['⬆', '⬇','🔊','🖼','❌'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
     };
 
     const collector = msg.createReactionCollector(filter, { time: 60000 });
     collector.on('collect', (reaction,user) =>{
       reaction.users.remove(user);
-      if(reaction.emoji.name === '⬅'){
-        //go back a page
+      if(reaction.emoji.name === '⬆'){
         if(page != 0){
           page--;
         }
-        msg.edit(embeds[page]);
+        var embed;
+        if(currentPage === "Sound")
+        embed = soundboardEmbeds[page];
+
+        if(currentPage === "Gifs")
+        embed = gifEmbeds[page];
+
+        msg.edit(embed);
       }
-      else if (reaction.emoji.name === '➡') {
-        //go to next page
-        if(page < embeds.length-1){
-          page++;
+      else if (reaction.emoji.name === '⬇') {
+        var embed;
+        if(currentPage === "Sound"){
+          if(page < soundboardEmbeds.length-1){
+            page++;
+          }
+          embed = soundboardEmbeds[page];
         }
-        msg.edit(embeds[page]);
+
+        if(currentPage === "Gifs"){
+          if(page < gifEmbeds.length-1){
+            page++;
+          }
+          embed = gifEmbeds[page];
+        }
+
+        msg.edit(embed);
       }
       else if(reaction.emoji.name === '🔊'){
         page = 0;
-        msg.edit(embeds[page]);
+        currentPage = "Sound";
+        msg.edit(soundboardEmbeds[page]);
       }
       else if (reaction.emoji.name === '🖼') {
-        page = soundboardEmbeds.length;
-        msg.edit(embeds[page]);
+        page = 0;
+        currentPage = "Gifs"
+        msg.edit(gifEmbeds[page]);
       }
       else if(reaction.emoji.name === '❌'){
         message.delete(1000).catch(err => console.log(err));
