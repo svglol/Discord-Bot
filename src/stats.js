@@ -11,7 +11,7 @@ var guild;
 var internalMax = 0;
 const leaderboardSize = 10;
 
-const pages = ['Voice', 'Messages', 'Soundboard'];
+const pages = ['🗣️ Voice', '⌨️ Messages', '🔊 Soundboard'];
 
 const currectConnectionTimeFile = "../currentConnectionFile.json";
 const totalConnectionTimeFile = "../totalConnectionTimeFile.json";
@@ -535,7 +535,7 @@ function generateLeaderboardEmbeds(){
   pages.forEach((item, i) => {
 
     var title = pages[i];
-    if(title === "Voice"){
+    if(title === "🗣️ Voice"){
       //loop through each internal page
       var voiceLeaderboardEmbeds = new Array();
       for (var o = 0; o < Math.ceil(totalConnectionTime.length/leaderboardSize); o++) {
@@ -548,7 +548,7 @@ function generateLeaderboardEmbeds(){
       }
       leaderboardEmbeds.set(i,voiceLeaderboardEmbeds);
 
-    }else if(title === "Messages"){
+    }else if(title === "⌨️ Messages"){
       //loop through each internal page
       var messagesLeaderboardEmbeds = new Array();
       for (var o = 0; o < Math.ceil(userChatMessages.length/leaderboardSize); o++) {
@@ -561,7 +561,7 @@ function generateLeaderboardEmbeds(){
       }
       leaderboardEmbeds.set(i,messagesLeaderboardEmbeds);
 
-    }else if (title === "Soundboard") {
+    }else if (title === "🔊 Soundboard") {
       //loop through each internal page
       var soundboardLeaderboardEmbeds = new Array();
       for (var o = 0; o < Math.ceil(soundboardUsage.length/leaderboardSize); o++) {
