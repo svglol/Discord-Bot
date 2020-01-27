@@ -3,9 +3,11 @@ var deletedMessages = new Array();
 var dispatcher;
 var voiceChannel;
 const prefix = require('../config.json').prefix;
+var stats;
 
 module.exports = {
-  listen:function(client,soundCommands,adminSoundCommands){
+  listen:function(client,soundCommands,adminSoundCommands,sStats){
+    stats = sStats;
     client.on('message', message => {
       if(message.content.charAt(0) == prefix){
         var msg = message.content.substring(1);
@@ -72,6 +74,7 @@ module.exports = {
 var queue = function (message,obj,end) {
   var userVoiceChannel = message.member.voice.channel;
   if(userVoiceChannel != undefined){
+    stats.addSoundBoardUse(obj.command);
     soundQueueItem = [message,obj,end];
     soundQueue.push(soundQueueItem);
     if(dispatcher == null && voiceChannel == null){

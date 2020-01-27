@@ -23,11 +23,15 @@ client.on('ready', () => {
   client.user.setActivity(prefix + 'help for commands', { type: 'PLAYING' })
   .catch(console.error);
 
-  sound.listen(client,soundCommands,adminSoundCommands);
+  sound.listen(client,soundCommands,adminSoundCommands,stats);
   gifs.listen(client,gifCommands);
   misc.listen(client,sound,soundCommands,gifCommands);
   intro.listen(client,intros,exits,cooldown);
   stats.listen(client);
+});
+
+client.on('error', () => {
+  console.log("destroy");
 });
 
 client.login(process.env.TOKEN);

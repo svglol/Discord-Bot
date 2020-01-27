@@ -5,16 +5,25 @@ const prefix = require("../config.json").prefix;
 var currectConnectionTime = new Array();
 var totalConnectionTime = new Array();
 var userChatMessages = new Array();
+var soundboardUsage = new Array();
+
+var guild;
+var internalMax = 0;
+const leaderboardSize = 10;
+
+const pages = ['Voice', 'Messages', 'Soundboard'];
 
 const currectConnectionTimeFile = "../currentConnectionFile.json";
 const totalConnectionTimeFile = "../totalConnectionTimeFile.json";
 const userChatMessagesFile = "../userChatMessagesFile.json";
+const soundboardUsageFile = "../soundboardUsageFile.json";
 
 module.exports = {
   listen: function(client) {
     loadCurrentConnectionFile();
     loadTotalConnectionTimeFile();
     loadUserChatMessagesFile();
+    loadSoundboardUsageFile();
     //Listen for stats commands
     client.on("message", message => {
       if (message.content.charAt(0) == prefix) {
@@ -61,77 +70,69 @@ module.exports = {
             });
           } else if (splitCommands[1] == "leaderboard") {
             const leaderboardEmbed = new Discord.MessageEmbed()
-            .setTitle("Leaderboard")
+            .setTitle("Voice Leaderboard")
             .setColor("#0099ff");
 
-            leaderboardLength = 10;
-            if(splitCommands[2] != null && Number.isInteger(parseInt(splitCommands[2]))){
-              leaderboardLength = parseInt(splitCommands[2]);
-            }
+            guild = message.guild;
+            leaderboardEmbed.setFooter(getVoiceEmbedFooter(0));
+            leaderboardEmbed.setDescription(getVoiceEmbedDescription(0));
+            message.channel.send(leaderboardEmbed).then((msg)=>{
+              var page = 0;
+              var internalPage = 0;
 
-            //make temp array with totals including current connected time
-            var leaderboardArray = new Array();
+              msg.react('⬇');
+              msg.react('⬆');
+              msg.react('⬅');
+              msg.react('➡');
+              console.log()
 
-            totalConnectionTime.forEach(obj => {
-              var currentConnectedTime = 0;
-              currectConnectionTime.forEach(currentObj => {
-                if (currentObj.userid === obj.userid) {
-                  var date = new Date();
-                  var currentTime = date.getTime();
-                  currentConnectedTime = currentTime - currentObj.joinTime;
+              const filter = (reaction, user) => {
+                return ['⬅', '➡','⬇','⬆'].includes(reaction.emoji.name) && !user.bot;
+              };
+
+              const collector = msg.createReactionCollector(filter, { time: 60000 });
+              collector.on('collect', (reaction,user) =>{
+                reaction.users.remove(user);
+                if(reaction.emoji.name === '⬅'){
+                  //go back a page
+                  if(page != 0){
+                    page--;
+                  }
+                  internalPage = 0;
+                  var embed = getEmbedForCurrentPage(page,internalPage);
+                  msg.edit(embed);
+                }
+                else if (reaction.emoji.name === '➡') {
+                  //go to next page
+                  if(page != pages.length-1){
+                    page++;
+                  }
+                  internalPage = 0;
+                  var embed = getEmbedForCurrentPage(page,internalPage);
+                  msg.edit(embed);
+                }
+                else if(reaction.emoji.name === '⬇'){
+                  //scroll down current page
+                  if(internalPage < Math.ceil(internalMax/leaderboardSize)-1){
+                    internalPage++;
+                  }
+                  var embed = getEmbedForCurrentPage(page,internalPage);
+                  msg.edit(embed);
+                }
+                else if(reaction.emoji.name === '⬆'){
+                  //scroll up current page
+                  if(internalPage != 0){
+                    internalPage--;
+                  }
+                  var embed = getEmbedForCurrentPage(page,internalPage);
+                  msg.edit(embed);
                 }
               });
-
-              var totalConnectionTime;
-              if (currentConnectedTime !== 0) {
-                totalConnectionTime =
-                parseInt(currentConnectedTime) + parseInt(obj.totalTime);
-              } else {
-                totalConnectionTime = parseInt(obj.totalTime);
-              }
-              var user = { userid: obj.userid, totalTime: totalConnectionTime };
-
-              leaderboardArray.push(user);
+              collector.on('end', collection =>{
+                //remove reactions once reaction collector has ended
+                msg.reactions.removeAll();
+              })
             });
-
-            //sort array by length
-            leaderboardArray.sort(function(a, b) {
-              if (a.totalTime > b.totalTime) {
-                return -1;
-              }
-              if (a.totalTime < b.totalTime) {
-                return 1;
-              }
-              return 0;
-            });
-
-            var leaderboardMessage = "";
-            for (let i = 0; i < leaderboardArray.length; i++) {
-              var readableTotalConnectionTime = parseMillisecondsIntoReadableTime(
-                leaderboardArray[i].totalTime
-              );
-              var userName = "";
-              try {
-                userName = message.guild.member(leaderboardArray[i].userid)
-                .displayName;
-              } catch (e) {
-                console.log(e);
-              }
-
-              if (i <= (leaderboardLength - 1)) {
-                leaderboardMessage += "```";
-                leaderboardMessage +=
-                "#" +
-                (i + 1) +
-                " " +
-                userName +
-                " " +
-                readableTotalConnectionTime;
-                leaderboardMessage += "```";
-              }
-            }
-            leaderboardEmbed.setDescription(leaderboardMessage);
-            message.channel.send(leaderboardEmbed);
           }
         }
       }
@@ -206,6 +207,20 @@ module.exports = {
     saveTotalConnectionTimeFile();
     saveCurrentConnectionFile();
     saveUserChatMessagesFile();
+  },
+  addSoundBoardUse: function(sound){
+    var updated = false;
+    for (let i = 0; i < soundboardUsage.length; i++) {
+      if(soundboardUsage[i].command === sound){
+        soundboardUsage[i].uses += 1;
+        updated = true;
+      }
+    }
+    if(!updated){
+      var soundUse = { command: sound, uses: 1 };
+      soundboardUsage.push(soundUse);
+    }
+    saveSoundboardUsageFile();
   }
 };
 
@@ -275,6 +290,29 @@ function loadUserChatMessagesFile(){
   }
 }
 
+function loadSoundboardUsageFile(){
+  if (fs.existsSync(soundboardUsageFile)) {
+    var rawdata = fs.readFileSync(soundboardUsageFile, function(
+      err,
+      data
+    ) {});
+
+    if (rawdata != null) {
+      soundboardUsage = JSON.parse(rawdata);
+    }
+  }
+}
+
+function saveSoundboardUsageFile(){
+  fs.writeFileSync(
+    soundboardUsageFile,
+    JSON.stringify(soundboardUsage),
+    function(err) {
+      if (err) throw err;
+    }
+  );
+}
+
 function saveUserChatMessagesFile(){
   fs.writeFileSync(
     userChatMessagesFile,
@@ -303,4 +341,191 @@ function saveCurrentConnectionFile() {
       if (err) throw err;
     }
   );
+}
+
+function getEmbedForCurrentPage(page,internalPage){
+  title = pages[page];
+
+  const embed = new Discord.MessageEmbed()
+  .setTitle(title +' '+'Leaderboard')
+  .setColor("#0099ff");
+
+  if(title === "Voice"){
+    embed.setDescription(getVoiceEmbedDescription(internalPage));
+    embed.setFooter(getVoiceEmbedFooter(internalPage));
+  }else if(title === "Messages"){
+    embed.setDescription(getMessagesEmbedDescription(internalPage));
+    embed.setFooter(getMessagesEmbedFooter(internalPage));
+  }else if (title === "Soundboard") {
+    embed.setDescription(getSoundboardEmbedDescription(internalPage));
+    embed.setFooter(getSoundboardEmbedFooter(internalPage));
+  }
+  return embed;
+}
+
+function getVoiceEmbedFooter(internalPage){
+  var totalSize = totalConnectionTime.length;
+  internalMax = totalSize;
+  var current = (internalPage +1);
+  return current + "/" + Math.ceil(totalSize/leaderboardSize);
+}
+
+function getVoiceEmbedDescription(internalPage){
+  var leaderboardLength = 10;
+  var leaderboardArray = new Array();
+
+  totalConnectionTime.forEach(obj => {
+    var currentConnectedTime = 0;
+    currectConnectionTime.forEach(currentObj => {
+      if (currentObj.userid === obj.userid) {
+        var date = new Date();
+        var currentTime = date.getTime();
+        currentConnectedTime = currentTime - currentObj.joinTime;
+      }
+    });
+
+    var totalConnectionTime;
+    if (currentConnectedTime !== 0) {
+      totalConnectionTime =
+      parseInt(currentConnectedTime) + parseInt(obj.totalTime);
+    } else {
+      totalConnectionTime = parseInt(obj.totalTime);
+    }
+    var user = { userid: obj.userid, totalTime: totalConnectionTime };
+
+    leaderboardArray.push(user);
+  });
+
+  //sort array by length
+  leaderboardArray.sort(function(a, b) {
+    if (a.totalTime > b.totalTime) {
+      return -1;
+    }
+    if (a.totalTime < b.totalTime) {
+      return 1;
+    }
+    return 0;
+  });
+
+  var leaderboardMessage = "";
+  var start = leaderboardSize * internalPage;
+  var end = start + leaderboardSize;
+  for (let i = 0; i < leaderboardArray.length; i++) {
+    var readableTotalConnectionTime = parseMillisecondsIntoReadableTime(
+      leaderboardArray[i].totalTime
+    );
+    var userName = "";
+    try {
+      userName = guild.member(leaderboardArray[i].userid)
+      .displayName;
+    } catch (e) {
+      console.log(e);
+    }
+    if (i >= start && i< end) {
+      leaderboardMessage += "```";
+      leaderboardMessage +=
+      "#" +
+      (i + 1) +
+      " " +
+      userName +
+      " " +
+      readableTotalConnectionTime;
+      leaderboardMessage += "```";
+    }
+  }
+
+  return leaderboardMessage;
+}
+
+function getMessagesEmbedFooter(internalPage){
+  var totalSize = userChatMessages.length;
+  internalMax = totalSize;
+  var current = (internalPage +1);
+  return current + "/" + Math.ceil(totalSize/leaderboardSize);
+}
+
+function getMessagesEmbedDescription(internalPage){
+  var messagesDescription = "";
+  var leaderboardLength = 10;
+  var leaderboardArray = userChatMessages;
+
+  leaderboardArray.sort(function(a, b) {
+    if (a.messages > b.messages) {
+      return -1;
+    }
+    if (a.messages < b.messages) {
+      return 1;
+    }
+    return 0;
+  });
+
+  var start = leaderboardSize * internalPage;
+  var end = start + leaderboardSize;
+
+  for (let i = 0; i < leaderboardArray.length; i++) {
+    var userName = "";
+    try {
+      userName = guild.member(leaderboardArray[i].userid)
+      .displayName;
+    } catch (e) {
+      console.log(e);
+    }
+
+    if (i >= start && i< end) {
+      messagesDescription += "```";
+      messagesDescription +=
+      "#" +
+      (i + 1) +
+      " " +
+      userName +
+      " " +
+      leaderboardArray[i].messages;
+      messagesDescription += "```";
+    }
+  }
+
+  return messagesDescription;
+}
+
+function getSoundboardEmbedFooter(internalPage){
+  var totalSize = soundboardUsage.length;
+  internalMax = totalSize;
+  var current = (internalPage +1);
+  return current + "/" + Math.ceil(totalSize/leaderboardSize);
+}
+
+function getSoundboardEmbedDescription(internalPage){
+  var soundboardDescription = "";
+  var leaderboardLength = 10;
+  var leaderboardArray = soundboardUsage;
+
+  leaderboardArray.sort(function(a, b) {
+    if (a.uses > b.uses) {
+      return -1;
+    }
+    if (a.uses < b.uses) {
+      return 1;
+    }
+    return 0;
+  });
+
+  var start = leaderboardSize * internalPage;
+  var end = start + leaderboardSize;
+
+  for (let i = 0; i < leaderboardArray.length; i++) {
+
+    if (i >= start && i< end) {
+      soundboardDescription += "```";
+      soundboardDescription +=
+      "#" +
+      (i + 1) +
+      " " +
+      leaderboardArray[i].command +
+      " " +
+      leaderboardArray[i].uses;
+      soundboardDescription += "```";
+    }
+  }
+
+  return soundboardDescription;
 }
