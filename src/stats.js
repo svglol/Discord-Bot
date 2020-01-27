@@ -1,6 +1,7 @@
 const fs = require("fs");
 const Discord = require("discord.js");
 const prefix = require("../config.json").prefix;
+const tools = require('./tools.js');
 
 var currectConnectionTime = new Array();
 var totalConnectionTime = new Array();
@@ -408,9 +409,10 @@ function setVoiceEmbedField(internalPage,embed){
   var start = leaderboardSize * internalPage;
   var end = start + leaderboardSize;
 
-  var positions = "";
-  var names = "";
-  var times = "";
+  var data = new Map();
+  var posData = new Array();
+  var namesData = new Array();
+  var timesData = new Array();
 
   for (let i = 0; i < leaderboardArray.length; i++) {
     var readableTotalConnectionTime = parseMillisecondsIntoReadableTime(
@@ -424,16 +426,17 @@ function setVoiceEmbedField(internalPage,embed){
       console.log(e);
     }
     if (i >= start && i< end) {
-      positions += (i + 1) + " \n";
-      names += userName + "\n";
-      times += readableTotalConnectionTime+ " \n"
+      posData.push((i + 1).toString());
+      namesData.push(userName);
+      timesData.push(readableTotalConnectionTime);
     }
   }
 
-  embed.addField('#',positions,true);
-  embed.addField('Name',names,true);
-  embed.addField('Time',times,true);
+  data.set('#',posData);
+  data.set('Name',namesData);
+  data.set('Time',timesData);
 
+  embed.setDescription(tools.generateTable(data));
 }
 
 function getMessagesEmbedFooter(internalPage){
@@ -460,9 +463,10 @@ function setMessagesEmbedField(internalPage,embed){
   var start = leaderboardSize * internalPage;
   var end = start + leaderboardSize;
 
-  var positions = "";
-  var names = "";
-  var messages = "";
+  var data = new Map();
+  var posData = new Array();
+  var namesData = new Array();
+  var messagesData = new Array();
 
   for (let i = 0; i < leaderboardArray.length; i++) {
     var userName = "";
@@ -474,15 +478,16 @@ function setMessagesEmbedField(internalPage,embed){
     }
 
     if (i >= start && i< end) {
-      positions += (i + 1) + " \n";
-      names += userName + "\n";
-      messages +=  leaderboardArray[i].messages+ " \n"
+      posData.push((i + 1).toString());
+      namesData.push(userName);
+      messagesData.push(leaderboardArray[i].messages);
     }
   }
+  data.set('#',posData);
+  data.set('Name',namesData);
+  data.set('Messages',messagesData);
 
-  embed.addField('#',positions,true);
-  embed.addField('Name',names,true);
-  embed.addField('Messages',messages,true);
+  embed.setDescription(tools.generateTable(data));
 }
 
 function getSoundboardEmbedFooter(internalPage){
@@ -509,23 +514,24 @@ function setSoundboardEmbedField(internalPage,embed){
   var start = leaderboardSize * internalPage;
   var end = start + leaderboardSize;
 
-  var positions = "";
-  var names = "";
-  var plays = "";
+  var data = new Map();
+  var posData = new Array();
+  var namesData = new Array();
+  var playsData = new Array();
 
   for (let i = 0; i < leaderboardArray.length; i++) {
 
     if (i >= start && i< end) {
-      positions += (i + 1) + " \n";
-      names += leaderboardArray[i].command + "\n";
-      plays +=  leaderboardArray[i].uses+ " \n"
+      posData.push((i + 1).toString());
+      namesData.push(leaderboardArray[i].command);
+      playsData.push(leaderboardArray[i].uses);
     }
   }
+  data.set('#',posData);
+  data.set('Name',namesData);
+  data.set('Plays',playsData);
 
-  embed.addField('#',positions,true);
-  embed.addField('Name',names,true);
-  embed.addField('Plays',plays,true);
-
+  embed.setDescription(tools.generateTable(data));
 }
 
 function generateLeaderboardEmbeds(){
