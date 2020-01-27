@@ -90,6 +90,9 @@ module.exports = {
                 return ['⬅', '➡','⬇','⬆'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
               };
 
+              // console.log(generateLeaderboardEmbeds());
+              var leaderboardEmbeds = generateLeaderboardEmbeds();
+
               const collector = msg.createReactionCollector(filter, { time: 60000 });
               collector.on('collect', (reaction,user) =>{
                 reaction.users.remove(user);
@@ -99,8 +102,7 @@ module.exports = {
                     page--;
                   }
                   internalPage = 0;
-                  var embed = getEmbedForCurrentPage(page,internalPage);
-                  msg.edit(embed);
+                  msg.edit(leaderboardEmbeds.get(page)[internalPage]);
                 }
                 else if (reaction.emoji.name === '➡') {
                   //go to next page
@@ -108,24 +110,21 @@ module.exports = {
                     page++;
                   }
                   internalPage = 0;
-                  var embed = getEmbedForCurrentPage(page,internalPage);
-                  msg.edit(embed);
+                  msg.edit(leaderboardEmbeds.get(page)[internalPage]);
                 }
                 else if(reaction.emoji.name === '⬇'){
                   //scroll down current page
                   if(internalPage < Math.ceil(internalMax/leaderboardSize)-1){
                     internalPage++;
                   }
-                  var embed = getEmbedForCurrentPage(page,internalPage);
-                  msg.edit(embed);
+                  msg.edit(leaderboardEmbeds.get(page)[internalPage]);
                 }
                 else if(reaction.emoji.name === '⬆'){
                   //scroll up current page
                   if(internalPage != 0){
                     internalPage--;
                   }
-                  var embed = getEmbedForCurrentPage(page,internalPage);
-                  msg.edit(embed);
+                  msg.edit(leaderboardEmbeds.get(page)[internalPage]);
                 }
               });
               collector.on('end', collection =>{
@@ -343,26 +342,6 @@ function saveCurrentConnectionFile() {
   );
 }
 
-function getEmbedForCurrentPage(page,internalPage){
-  title = pages[page];
-
-  const embed = new Discord.MessageEmbed()
-  .setTitle(title +' '+'Leaderboard')
-  .setColor("#0099ff");
-
-  if(title === "Voice"){
-    embed.setDescription(getVoiceEmbedDescription(internalPage));
-    embed.setFooter(getVoiceEmbedFooter(internalPage));
-  }else if(title === "Messages"){
-    embed.setDescription(getMessagesEmbedDescription(internalPage));
-    embed.setFooter(getMessagesEmbedFooter(internalPage));
-  }else if (title === "Soundboard") {
-    embed.setDescription(getSoundboardEmbedDescription(internalPage));
-    embed.setFooter(getSoundboardEmbedFooter(internalPage));
-  }
-  return embed;
-}
-
 function getVoiceEmbedFooter(internalPage){
   var totalSize = totalConnectionTime.length;
   internalMax = totalSize;
@@ -528,4 +507,56 @@ function getSoundboardEmbedDescription(internalPage){
   }
 
   return soundboardDescription;
+}
+
+function generateLeaderboardEmbeds(){
+
+  var leaderboardEmbeds = new Map();
+
+  pages.forEach((item, i) => {
+
+    var title = pages[i];
+    if(title === "Voice"){
+      //loop through each internal page
+      var voiceLeaderboardEmbeds = new Array();
+      for (var o = 0; o < Math.ceil(totalConnectionTime.length/leaderboardSize); o++) {
+        var embed = new Discord.MessageEmbed()
+        .setTitle(title +' '+'Leaderboard')
+        .setColor("#0099ff");
+        embed.setDescription(getVoiceEmbedDescription(o));
+        embed.setFooter(getVoiceEmbedFooter(o));
+        voiceLeaderboardEmbeds.push(embed);
+      }
+      leaderboardEmbeds.set(i,voiceLeaderboardEmbeds);
+
+    }else if(title === "Messages"){
+      //loop through each internal page
+      var messagesLeaderboardEmbeds = new Array();
+      for (var o = 0; o < Math.ceil(userChatMessages.length/leaderboardSize); o++) {
+        var embed = new Discord.MessageEmbed()
+        .setTitle(title +' '+'Leaderboard')
+        .setColor("#0099ff");
+        embed.setDescription(getMessagesEmbedDescription(o));
+        embed.setFooter(getMessagesEmbedFooter(o));
+        messagesLeaderboardEmbeds.push(embed);
+      }
+      leaderboardEmbeds.set(i,messagesLeaderboardEmbeds);
+
+    }else if (title === "Soundboard") {
+      //loop through each internal page
+      var soundboardLeaderboardEmbeds = new Array();
+      for (var o = 0; o < Math.ceil(soundboardUsage.length/leaderboardSize); o++) {
+        var embed = new Discord.MessageEmbed()
+        .setTitle(title +' '+'Leaderboard')
+        .setColor("#0099ff");
+        embed.setDescription(getSoundboardEmbedDescription(o));
+        embed.setFooter(getSoundboardEmbedFooter(o));
+        soundboardLeaderboardEmbeds.push(embed);
+      }
+      leaderboardEmbeds.set(i,soundboardLeaderboardEmbeds);
+    }
+
+  });
+
+  return leaderboardEmbeds;
 }
