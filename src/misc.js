@@ -2,13 +2,13 @@ const Discord = require('discord.js');
 const prefix = require('../config.json').prefix;
 
 module.exports = {
-  listen:function(client,sound,soundCommands,gifCommands){
+  listen:function(client,sound,soundCommands,gifCommands,newSoundCommands){
     client.on('message', message => {
       if(message.content.charAt(0) == prefix){
         var msg = message.content.substring(1);
 
         if(msg == "help"){
-          helpMessage(message,client,soundCommands,gifCommands);
+          helpMessage(message,client,soundCommands,gifCommands,newSoundCommands);
         }
 
         //Limit these commands to admin only
@@ -54,10 +54,11 @@ async function reset(sound,message,client){
 };
 
 
-function helpMessage(message, client,soundCommands,gifCommands){
+function helpMessage(message, client,soundCommands,gifCommands,newSoundCommands){
 
   var soundboardEmbeds = generateSoundboardEmbeds(soundCommands);
   var gifEmbeds = generateGifEmbeds(gifCommands);
+  var newSoundEmbeds = generateNewSoundboardEmbed(newSoundCommands);
 
   var embeds = soundboardEmbeds.concat(gifEmbeds);
 
@@ -71,11 +72,12 @@ function helpMessage(message, client,soundCommands,gifCommands){
     msg.react('⬆');
 
     msg.react('🔊');
+    msg.react('🆕');
     msg.react('🖼');
     // msg.react('❌');
 
     const filter = (reaction, user) => {
-      return ['⬆', '⬇','🔊','🖼','❌'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
+      return ['⬆', '⬇','🔊','🖼','❌','🆕'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
     };
 
     const collector = msg.createReactionCollector(filter, { time: 60000 });
@@ -91,6 +93,9 @@ function helpMessage(message, client,soundCommands,gifCommands){
 
         if(currentPage === "Gifs")
         embed = gifEmbeds[page];
+
+        if(currentPage === "New")
+        embed = newSoundEmbeds[page];
 
         msg.edit(embed);
       }
@@ -110,6 +115,13 @@ function helpMessage(message, client,soundCommands,gifCommands){
           embed = gifEmbeds[page];
         }
 
+        if(currentPage === "New"){
+          if(page < newSoundEmbeds.length-1){
+            page++;
+          }
+          embed = soundboardEmbeds[page];
+        }
+
         msg.edit(embed);
       }
       else if(reaction.emoji.name === '🔊'){
@@ -122,6 +134,11 @@ function helpMessage(message, client,soundCommands,gifCommands){
         currentPage = "Gifs"
         msg.edit(gifEmbeds[page]);
       }
+      else if (reaction.emoji.name === '🆕') {
+        page = 0;
+        currentPage = "New"
+        msg.edit(newSoundEmbeds[page]);
+      }
       // else if(reaction.emoji.name === '❌'){
       //   message.delete(1000).catch(err => console.log(err));
       //   msg.delete(1000).catch(err => console.log(err));
@@ -133,6 +150,44 @@ function helpMessage(message, client,soundCommands,gifCommands){
     })
   });
 
+}
+
+function generateNewSoundboardEmbed(newSoundCommands){
+  soundboardEmbeds = new Array();
+
+  var cmdLength = 0;
+  newSoundCommands.forEach((item, i) => {
+    cmdLength += item.length;
+    cmdLength += 4;
+  });
+
+  var start = 0;
+  var pages = Math.ceil(cmdLength/2048);
+
+  for (var i = 0; i < pages; i++){
+
+    var currentPage = i+1;
+    const embed = new Discord.MessageEmbed()
+    .setTitle("🆕 New Sound Commands")
+    .setColor('#0099ff')
+    .setFooter(currentPage+"/"+pages)
+    .addField(':blue_circle: Prefix',"`"+prefix+"`")
+
+    var soundsMessage = "";
+    for (var j = start; j < newSoundCommands.length; j++) {
+      addMessage = "`"+newSoundCommands[j]+"` ";
+      if(addMessage.length + soundsMessage.length < 2048){
+        soundsMessage += addMessage;
+      }else{
+        start = j;
+        break;
+      }
+    }
+    embed.setDescription(soundsMessage);
+    soundboardEmbeds.push(embed);
+  }
+
+  return soundboardEmbeds;
 }
 
 function generateSoundboardEmbeds(soundCommands){

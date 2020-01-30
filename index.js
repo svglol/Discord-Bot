@@ -15,8 +15,9 @@ const prefix = require('./config.json').prefix;
 const cooldown = require('./config.json').cooldown;
 var soundCommands = [];
 var adminSoundCommands = [];
+var newSoundCommands = [];
 
-tools.loadSoundCommands(soundCommands,adminSoundCommands);
+tools.loadSoundCommands(soundCommands,adminSoundCommands,newSoundCommands);
 tools.sort(soundCommands,gifCommands);
 
 client.on('ready', () => {
@@ -25,7 +26,7 @@ client.on('ready', () => {
 
   sound.listen(client,soundCommands,adminSoundCommands,stats);
   gifs.listen(client,gifCommands);
-  misc.listen(client,sound,soundCommands,gifCommands);
+  misc.listen(client,sound,soundCommands,gifCommands,newSoundCommands);
   intro.listen(client,intros,exits,cooldown);
   stats.listen(client);
 });

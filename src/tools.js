@@ -16,16 +16,28 @@ module.exports = {
       return 0;
     })
   },
-  loadSoundCommands: function(soundCommands,adminSoundCommands){
+  loadSoundCommands: function(soundCommands,adminSoundCommands,newSoundCommands){
     fs.readdirSync(soundFolder).forEach(file => {
       var sound = {file:'./resources/sound/'+file, command:createCommand(file)};
       soundCommands.push(sound);
+
+      var date = new Date();
+      var modTime = fs.statSync(soundFolder + '/' + file).mtime.getTime();
+
+      var diff = Math.abs(modTime - date.getTime());
+      var days = diff / (1000 * 60 * 60 * 24);
+      if(days < 7){
+        newSoundCommands.push(createCommand(file));
+      }
+
     });
 
     fs.readdirSync(adminSoundFolder).forEach(file => {
       var sound = {file:'./resources/admin-sound/'+file, command:createCommand(file)};
       adminSoundCommands.push(sound);
     });
+
+
   },
   generateTable: function(data){
     var tableString = "";
