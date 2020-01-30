@@ -1,7 +1,9 @@
 const prefix = require('../config.json').prefix;
 
 module.exports = {
-  listen:function(client,gifCommands){
+  listen:function(client){
+    const gifCommands = client.getGifCommands();
+
     client.on('message', message => {
       if(message.content.charAt(0) == prefix){
         var msg = message.content.substring(1);

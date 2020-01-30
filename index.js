@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
-const client = new Discord.Client();
 
+//Modules
 const tools = require('./src/tools.js');
 const sound = require('./src/sound.js');
 const gifs = require('./src/gifs.js');
@@ -8,31 +8,57 @@ const misc = require('./src/misc.js');
 const intro = require('./src/intro.js');
 const stats = require('./src/stats.js');
 
-const intros = require('./commands/intros.json').intros;
-const exits = require('./commands/exits.json').exits;
 const gifCommands = require('./commands/gifcommands.json').commands;
 const prefix = require('./config.json').prefix;
-const cooldown = require('./config.json').cooldown;
+
 var soundCommands = [];
 var adminSoundCommands = [];
 var newSoundCommands = [];
 
-tools.loadSoundCommands(soundCommands,adminSoundCommands,newSoundCommands);
-tools.sort(soundCommands,gifCommands);
+class Client extends Discord.Client {
 
-client.on('ready', () => {
-  client.user.setActivity(prefix + 'help for commands', { type: 'PLAYING' })
-  .catch(console.error);
+  constructor(...args) {
+    super(...args);
 
-  sound.listen(client,soundCommands,adminSoundCommands,stats);
-  gifs.listen(client,gifCommands);
-  misc.listen(client,sound,soundCommands,gifCommands,newSoundCommands);
-  intro.listen(client,intros,exits,cooldown);
-  stats.listen(client);
-});
+    this.once("ready", () => {
+      console.log('ready');
+      client.user.setActivity(prefix + 'help for commands', { type: 'PLAYING' })
+      .catch(console.error);
 
-client.on('error', () => {
-  console.log("destroy");
-});
+      sound.listen(this);
+      gifs.listen(this);
+      misc.listen(this);
+      intro.listen(this);
+      stats.listen(this);
+    })
+  }
 
-client.login(process.env.TOKEN);
+  async init() {
+    this.login(process.env.TOKEN);
+
+    tools.loadSoundCommands(soundCommands,adminSoundCommands,newSoundCommands);
+    tools.sort(soundCommands,gifCommands);
+  }
+
+  getSoundCommands(){
+    return soundCommands;
+  }
+  getAdminSoundCommands(){
+    return adminSoundCommands;
+  }
+  getGifCommands(){
+    return gifCommands;
+  }
+  getStats(){
+    return stats;
+  }
+  getSound(){
+    return sound;
+  }
+  getNewSoundCommands(){
+    return newSoundCommands;
+  }
+}
+
+const client = new Client();
+client.init();

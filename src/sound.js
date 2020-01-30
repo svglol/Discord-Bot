@@ -6,8 +6,12 @@ const prefix = require('../config.json').prefix;
 var stats;
 
 module.exports = {
-  listen:function(client,soundCommands,adminSoundCommands,sStats){
-    stats = sStats;
+  listen:function(client){
+
+    const soundCommands = client.getSoundCommands();
+    const adminSoundCommands = client.getAdminSoundCommands();
+    stats = client.getStats();
+
     client.on('message', message => {
       if(message.content.charAt(0) == prefix){
         var msg = message.content.substring(1);

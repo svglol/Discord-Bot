@@ -2,7 +2,13 @@ const Discord = require('discord.js');
 const prefix = require('../config.json').prefix;
 
 module.exports = {
-  listen:function(client,sound,soundCommands,gifCommands,newSoundCommands){
+  listen:function(client){
+
+    const sound = client.getSound();
+    const soundCommands = client.getSoundCommands();
+    const gifCommands = client.getGifCommands();
+    const newSoundCommands = client.getNewSoundCommands();
+
     client.on('message', message => {
       if(message.content.charAt(0) == prefix){
         var msg = message.content.substring(1);

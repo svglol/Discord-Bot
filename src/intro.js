@@ -1,8 +1,12 @@
 var lastUsedIntroArray = new Array();
 var lastUsedExitArray = new Array();
 
+const intros = require('../commands/intros.json').intros;
+const exits = require('../commands/exits.json').exits;
+const cooldown = require('../config.json').cooldown;
+
 module.exports = {
-  listen:function(client,intros,exits,cooldown){
+  listen:function(client){
     client.on('voiceStateUpdate', (oldMember, newMember) => {
       let newUserChannel = newMember.channel;
       let oldUserChannel = oldMember.channel;
