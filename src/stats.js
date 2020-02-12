@@ -2,11 +2,17 @@ const fs = require("fs");
 const Discord = require("discord.js");
 const prefix = require("../config.json").prefix;
 const tools = require('./tools.js');
+const cron = require('node-cron');
 
 var currectConnectionTime = new Array();
 var totalConnectionTime = new Array();
 var userChatMessages = new Array();
 var soundboardUsage = new Array();
+
+var monthlyConnectionTime = new Array();
+var monthlyUserChatMessages = new Array();
+var monthlySoundboardUsage = new Array();
+
 
 var guild;
 var internalMax = 0;
@@ -19,12 +25,18 @@ const totalConnectionTimeFile = "../totalConnectionTimeFile.json";
 const userChatMessagesFile = "../userChatMessagesFile.json";
 const soundboardUsageFile = "../soundboardUsageFile.json";
 
+const monthlyConnectionTimeFile = "../monthlyConnectionTimeFile.json";
+const monthlyUserChatMessagesFile = "../monthlyUserChatMessagesFile.json";
+const monthlySoundboardUsageFile = "../monthlySoundboardUsageFile.json";
+
+var client;
+
 module.exports = {
-  listen: function(client) {
-    loadCurrentConnectionFile();
-    loadTotalConnectionTimeFile();
-    loadUserChatMessagesFile();
-    loadSoundboardUsageFile();
+  listen: function(cClient) {
+    client = cClient;
+
+    loadFiles();
+
     //Listen for stats commands
     client.on("message", message => {
       if (message.content.charAt(0) == prefix) {
@@ -33,126 +45,131 @@ module.exports = {
         splitCommands = msg.split(" ");
 
         if (splitCommands[0] == "stats") {
-          if (splitCommands[1] == "current") {
-            var messageSent = false;
-            currectConnectionTime.forEach(obj => {
-              if (obj.userid === message.member.id) {
-                connectionLength = getReadableConnectedTime(obj.joinTime);
-                message.reply(
-                  "You have been connected to this session for " +
-                  connectionLength
-                );
-                messageSent = true;
+
+          var totalVoice = 0;
+          var monthlyVoice = 0;
+          var totalMessages = 0;
+          var monthlyMessages = 0;
+
+          var currentConnectedTime = 0;
+          currectConnectionTime.forEach((item, i) => {
+            if (item.userid === message.member.id) {
+              var date = new Date();
+              var currentTime = date.getTime();
+              currentConnectedTime = currentTime - item.joinTime;
+            }
+          });
+
+          totalConnectionTime.forEach((item, i) => {
+            if(item.userid == message.author.id){
+              var totalConnectionTime = parseInt(currentConnectedTime) + parseInt(item.totalTime);
+              totalVoice = parseMillisecondsIntoReadableTime(totalConnectionTime)
+            }
+          });
+
+          monthlyConnectionTime.forEach((item, i) => {
+            if(item.userid == message.author.id){
+              var totalConnectionTime = parseInt(currentConnectedTime) + parseInt(item.totalTime);
+              monthlyVoice = parseMillisecondsIntoReadableTime(totalConnectionTime)
+            }
+          });
+
+          userChatMessages.forEach((item, i) => {
+            if(item.userid == message.author.id){
+              totalMessages = item.messages;
+            }
+          });
+
+          monthlyUserChatMessages.forEach((item, i) => {
+            if(item.userid == message.author.id){
+              monthlyMessages = item.messages;
+            }
+          });
+
+          var embed = new Discord.MessageEmbed()
+          .setTitle('Stats')
+          .setAuthor(message.member.displayName, message.author.defaultAvatarURL)
+          .setColor("#0099ff")
+          .addField('Total Voice Connection Time',totalVoice)
+          .addField('Monthly Voice Connection Time',monthlyVoice)
+          .addField('Total Messages Sent',totalMessages)
+          .addField('Monthly Messages Sent',monthlyMessages)
+
+          message.reply(embed);
+
+        } else if (splitCommands[0] == "leaderboard") {
+
+          guild = message.guild;
+
+          var monthlyLeaderboardEmbeds = generateLeaderboardEmbeds(false);
+          var lifetimeLeaderboardEmbeds = generateLeaderboardEmbeds(true);
+
+          var leaderboardEmbeds = monthlyLeaderboardEmbeds;
+
+          message.channel.send(leaderboardEmbeds.get(0)[0]).then((msg)=>{
+            var page = 0;
+            var internalPage = 0;
+
+            msg.react('📆');
+            msg.react('♾️');
+            msg.react('⬇');
+            msg.react('⬆');
+            msg.react('🗣️');
+            msg.react('⌨️');
+            msg.react('🔊');
+
+
+            const filter = (reaction, user) => {
+              return ['⬇','⬆','🗣️','⌨️','🔊','📆','♾️'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
+            };
+
+            const collector = msg.createReactionCollector(filter, { time: 60000 });
+            collector.on('collect', (reaction,user) =>{
+              reaction.users.remove(user);
+              if(reaction.emoji.name === '⬇'){
+                //scroll down current page
+                if(internalPage < Math.ceil(leaderboardEmbeds.get(page).length)-1){
+                  internalPage++;
+                }
+              }
+              else if(reaction.emoji.name === '⬆'){
+                //scroll up current page
+                if(internalPage != 0){
+                  internalPage--;
+                }
+                msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+              }
+              else if(reaction.emoji.name === '🗣️'){
+                page = 0;
+                internalPage = 0;
+                msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+              }
+              else if(reaction.emoji.name === '⌨️'){
+                page = 1;
+                internalPage = 0;
+                msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+              }
+              else if(reaction.emoji.name === '🔊'){
+                page = 2;
+                internalPage = 0;
+                msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+              }
+              else if(reaction.emoji.name === '📆'){
+                internalPage = 0;
+                leaderboardEmbeds = monthlyLeaderboardEmbeds;
+                msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+              }
+              else if(reaction.emoji.name === '♾️'){
+                internalPage = 0;
+                leaderboardEmbeds = lifetimeLeaderboardEmbeds;
+                msg.edit(leaderboardEmbeds.get(page)[internalPage]);
               }
             });
-            if(!messageSent) message.reply("Your arent connected");
-          } else if (splitCommands[1] == "total") {
-            totalConnectionTime.forEach(obj => {
-              if (obj.userid === message.member.id) {
-                var currentConnectedTime = 0;
-                currectConnectionTime.forEach(currentObj => {
-                  if (currentObj.userid === obj.userid) {
-                    var date = new Date();
-                    var currentTime = date.getTime();
-                    currentConnectedTime = currentTime - currentObj.joinTime;
-                  }
-                });
-                var totalConnectionTime =
-                parseInt(currentConnectedTime) + parseInt(obj.totalTime);
-                var readableTotalConnectionTime = parseMillisecondsIntoReadableTime(
-                  totalConnectionTime
-                );
-
-                message.reply(
-                  "You have been connected for a total of " +
-                  readableTotalConnectionTime
-                );
-              }
-            });
-          } else if (splitCommands[1] == "leaderboard") {
-
-
-            guild = message.guild;
-            var leaderboardEmbeds = generateLeaderboardEmbeds();
-
-            message.channel.send(leaderboardEmbeds.get(0)[0]).then((msg)=>{
-              var page = 0;
-              var internalPage = 0;
-
-              msg.react('⬇');
-              msg.react('⬆');
-              msg.react('🗣️');
-              msg.react('⌨️');
-              msg.react('🔊');
-              // msg.react('❌');
-              // msg.react('⬅');
-              // msg.react('➡');
-
-              const filter = (reaction, user) => {
-                return ['⬅', '➡','⬇','⬆','🗣️','⌨️','🔊','❌'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
-              };
-
-
-
-              const collector = msg.createReactionCollector(filter, { time: 60000 });
-              collector.on('collect', (reaction,user) =>{
-                reaction.users.remove(user);
-                if(reaction.emoji.name === '⬅'){
-                  //go back a page
-                  if(page != 0){
-                    page--;
-                  }
-                  internalPage = 0;
-                  msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-                }
-                else if (reaction.emoji.name === '➡') {
-                  //go to next page
-                  if(page != pages.length-1){
-                    page++;
-                  }
-                  internalPage = 0;
-                  msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-                }
-                else if(reaction.emoji.name === '⬇'){
-                  //scroll down current page
-                  if(internalPage < Math.ceil(internalMax/leaderboardSize)-1){
-                    internalPage++;
-                  }
-                  msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-                }
-                else if(reaction.emoji.name === '⬆'){
-                  //scroll up current page
-                  if(internalPage != 0){
-                    internalPage--;
-                  }
-                  msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-                }
-                else if(reaction.emoji.name === '🗣️'){
-                  page = 0;
-                  internalPage = 0;
-                  msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-                }
-                else if(reaction.emoji.name === '⌨️'){
-                  page = 1;
-                  internalPage = 0;
-                  msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-                }
-                else if(reaction.emoji.name === '🔊'){
-                  page = 2;
-                  internalPage = 0;
-                  msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-                }
-                // else if(reaction.emoji.name === '❌'){
-                //   message.delete(1000).catch(err => console.log(err));
-                //   msg.delete(1000).catch(err => console.log(err));
-                // }
-              });
-              collector.on('end', collection =>{
-                //remove reactions once reaction collector has ended
-                msg.reactions.removeAll();
-              })
-            });
-          }
+            collector.on('end', collection =>{
+              //remove reactions once reaction collector has ended
+              msg.reactions.removeAll();
+            })
+          });
         }
       }
     });
@@ -185,16 +202,29 @@ module.exports = {
             var currentTime = date.getTime();
             var connectedTime = currentTime - currectConnectionTime[i].joinTime;
             var user = { userid: newMember.id, totalTime: connectedTime };
-            var updated = false;
+            var monthlyUpdated = false;
+            monthlyConnectionTime.forEach(obj => {
+              if (obj.userid === newMember.id) {
+                obj.totalTime += connectedTime;
+                monthlyUpdated = true;
+              }
+            });
+
+            var totalUpdated = false;
             totalConnectionTime.forEach(obj => {
               if (obj.userid === newMember.id) {
                 obj.totalTime += connectedTime;
-                updated = true;
+                totalUpdated = true;
               }
             });
-            if (!updated) {
+            if (!totalUpdated) {
               totalConnectionTime.push(user);
             }
+            if (!monthlyUpdated) {
+              monthlyConnectionTime.push(user);
+            }
+
+            saveMonthlyConnectionTimeFile();
             saveTotalConnectionTimeFile();
 
             currectConnectionTime.splice(i, 1);
@@ -207,17 +237,29 @@ module.exports = {
     //Listen for chat messages to be recorded as stats
     client.on("message", message => {
       if(!message.author.bot && message.content.charAt(0) != prefix){
-        var updated = false;
+        var monthlyUpdated = false;
+        for (let i = 0; i < monthlyUserChatMessages.length; i++) {
+          if(monthlyUserChatMessages[i].userid === message.author.id){
+            monthlyUserChatMessages[i].messages += 1;
+            monthlyUpdated = true;
+          }
+        }
+        var totalUpdated = false;
         for (let i = 0; i < userChatMessages.length; i++) {
           if(userChatMessages[i].userid === message.author.id){
             userChatMessages[i].messages += 1;
-            updated = true;
+            totalUpdated = true;
           }
         }
-        if(!updated){
+        if(!totalUpdated){
           var user = { userid: message.author.id, messages: 1 };
           userChatMessages.push(user);
         }
+        if(!monthlyUpdated){
+          var user = { userid: message.author.id, messages: 1 };
+          monthlyUserChatMessages.push(user);
+        }
+        saveMonthlyUserChatMessagesFile();
         saveUserChatMessagesFile();
       }
     });
@@ -226,20 +268,36 @@ module.exports = {
     saveTotalConnectionTimeFile();
     saveCurrentConnectionFile();
     saveUserChatMessagesFile();
+    saveMonthlyConnectionTimeFile();
+    saveMonthlyUserChatMessagesFile();
   },
   addSoundBoardUse: function(sound){
-    var updated = false;
+    var monthlyUpdated = false;
+    for (let i = 0; i < monthlySoundboardUsage.length; i++) {
+      if(monthlySoundboardUsage[i].command === sound){
+        monthlySoundboardUsage[i].uses += 1;
+        monthlyUpdated = true;
+      }
+    }
+
+    var totalUpdated = false;
     for (let i = 0; i < soundboardUsage.length; i++) {
       if(soundboardUsage[i].command === sound){
         soundboardUsage[i].uses += 1;
-        updated = true;
+        totalUpdated = true;
       }
     }
-    if(!updated){
+    if(!totalUpdated){
       var soundUse = { command: sound, uses: 1 };
       soundboardUsage.push(soundUse);
     }
+
+    if(!monthlyUpdated){
+      var soundUse = { command: sound, uses: 1 };
+      monthlySoundboardUsage.push(soundUse);
+    }
     saveSoundboardUsageFile();
+    saveMonthlySoundboardUsageFile();
   }
 };
 
@@ -270,7 +328,8 @@ function parseMillisecondsIntoReadableTime(millisec) {
   return minutes + ":" + seconds;
 }
 
-function loadCurrentConnectionFile() {
+function loadFiles(){
+  //load current connection time
   if (fs.existsSync(currectConnectionTimeFile)) {
     var rawdata = fs.readFileSync(currectConnectionTimeFile, function(
       err,
@@ -281,9 +340,8 @@ function loadCurrentConnectionFile() {
       currectConnectionTime = JSON.parse(rawdata);
     }
   }
-}
 
-function loadTotalConnectionTimeFile() {
+  //load total connection time
   if (fs.existsSync(totalConnectionTimeFile)) {
     var rawdata = fs.readFileSync(totalConnectionTimeFile, function(
       err,
@@ -294,9 +352,20 @@ function loadTotalConnectionTimeFile() {
       totalConnectionTime = JSON.parse(rawdata);
     }
   }
-}
 
-function loadUserChatMessagesFile(){
+  //Load monthly connection time
+  if (fs.existsSync(monthlyConnectionTimeFile)) {
+    var rawdata = fs.readFileSync(monthlyConnectionTimeFile, function(
+      err,
+      data
+    ) {});
+
+    if (rawdata != null) {
+      monthlyConnectionTime = JSON.parse(rawdata);
+    }
+  }
+
+  //load total user chat messages
   if (fs.existsSync(userChatMessagesFile)) {
     var rawdata = fs.readFileSync(userChatMessagesFile, function(
       err,
@@ -307,9 +376,20 @@ function loadUserChatMessagesFile(){
       userChatMessages = JSON.parse(rawdata);
     }
   }
-}
 
-function loadSoundboardUsageFile(){
+  //load monthly user chat messages
+  if (fs.existsSync(monthlyUserChatMessagesFile)) {
+    var rawdata = fs.readFileSync(monthlyUserChatMessagesFile, function(
+      err,
+      data
+    ) {});
+
+    if (rawdata != null) {
+      monthlyUserChatMessages = JSON.parse(rawdata);
+    }
+  }
+
+  //load soundboard usage
   if (fs.existsSync(soundboardUsageFile)) {
     var rawdata = fs.readFileSync(soundboardUsageFile, function(
       err,
@@ -318,6 +398,18 @@ function loadSoundboardUsageFile(){
 
     if (rawdata != null) {
       soundboardUsage = JSON.parse(rawdata);
+    }
+  }
+
+  //load monthly soundboard usage
+  if (fs.existsSync(monthlySoundboardUsageFile)) {
+    var rawdata = fs.readFileSync(monthlySoundboardUsageFile, function(
+      err,
+      data
+    ) {});
+
+    if (rawdata != null) {
+      monthlySoundboardUsage = JSON.parse(rawdata);
     }
   }
 }
@@ -332,10 +424,40 @@ function saveSoundboardUsageFile(){
   );
 }
 
+function saveMonthlySoundboardUsageFile(){
+  fs.writeFileSync(
+    monthlySoundboardUsageFile,
+    JSON.stringify(monthlySoundboardUsage),
+    function(err) {
+      if (err) throw err;
+    }
+  );
+}
+
 function saveUserChatMessagesFile(){
   fs.writeFileSync(
     userChatMessagesFile,
     JSON.stringify(userChatMessages),
+    function(err) {
+      if (err) throw err;
+    }
+  );
+}
+
+function saveMonthlyUserChatMessagesFile(){
+  fs.writeFileSync(
+    monthlyUserChatMessagesFile,
+    JSON.stringify(monthlyUserChatMessages),
+    function(err) {
+      if (err) throw err;
+    }
+  );
+}
+
+function saveMonthlyConnectionTimeFile() {
+  fs.writeFileSync(
+    monthlyConnectionTimeFile,
+    JSON.stringify(monthlyConnectionTime),
     function(err) {
       if (err) throw err;
     }
@@ -362,38 +484,66 @@ function saveCurrentConnectionFile() {
   );
 }
 
-function getVoiceEmbedFooter(internalPage){
-  var totalSize = totalConnectionTime.length;
+function getVoiceEmbedFooter(internalPage,lifetime){
+  var totalSize = monthlyConnectionTime.length;
+  if(lifetime){
+    totalSize = totalConnectionTime.length
+  }
   internalMax = totalSize;
   var current = (internalPage +1);
   return current + "/" + Math.ceil(totalSize/leaderboardSize);
 }
 
-function setVoiceEmbedField(internalPage,embed){
+function setVoiceEmbedField(internalPage,embed,lifetime){
   var leaderboardLength = 10;
   var leaderboardArray = new Array();
 
-  totalConnectionTime.forEach(obj => {
-    var currentConnectedTime = 0;
-    currectConnectionTime.forEach(currentObj => {
-      if (currentObj.userid === obj.userid) {
-        var date = new Date();
-        var currentTime = date.getTime();
-        currentConnectedTime = currentTime - currentObj.joinTime;
+  if(lifetime){
+    totalConnectionTime.forEach(obj => {
+      var currentConnectedTime = 0;
+      currectConnectionTime.forEach(currentObj => {
+        if (currentObj.userid === obj.userid) {
+          var date = new Date();
+          var currentTime = date.getTime();
+          currentConnectedTime = currentTime - currentObj.joinTime;
+        }
+      });
+
+      var totalConnectionTime;
+      if (currentConnectedTime !== 0) {
+        totalConnectionTime =
+        parseInt(currentConnectedTime) + parseInt(obj.totalTime);
+      } else {
+        totalConnectionTime = parseInt(obj.totalTime);
       }
+      var user = { userid: obj.userid, totalTime: totalConnectionTime };
+
+      leaderboardArray.push(user);
     });
+  }
+  else{
+    monthlyConnectionTime.forEach(obj => {
+      var currentConnectedTime = 0;
+      currectConnectionTime.forEach(currentObj => {
+        if (currentObj.userid === obj.userid) {
+          var date = new Date();
+          var currentTime = date.getTime();
+          currentConnectedTime = currentTime - currentObj.joinTime;
+        }
+      });
 
-    var totalConnectionTime;
-    if (currentConnectedTime !== 0) {
-      totalConnectionTime =
-      parseInt(currentConnectedTime) + parseInt(obj.totalTime);
-    } else {
-      totalConnectionTime = parseInt(obj.totalTime);
-    }
-    var user = { userid: obj.userid, totalTime: totalConnectionTime };
+      var totalConnectionTime;
+      if (currentConnectedTime !== 0) {
+        totalConnectionTime =
+        parseInt(currentConnectedTime) + parseInt(obj.totalTime);
+      } else {
+        totalConnectionTime = parseInt(obj.totalTime);
+      }
+      var user = { userid: obj.userid, totalTime: totalConnectionTime };
 
-    leaderboardArray.push(user);
-  });
+      leaderboardArray.push(user);
+    });
+  }
 
   //sort array by length
   leaderboardArray.sort(function(a, b) {
@@ -439,16 +589,25 @@ function setVoiceEmbedField(internalPage,embed){
   embed.setDescription(tools.generateTable(data));
 }
 
-function getMessagesEmbedFooter(internalPage){
-  var totalSize = userChatMessages.length;
+function getMessagesEmbedFooter(internalPage,lifetime){
+  var totalSize = monthlyUserChatMessages.length;
+  if(lifetime){
+    totalSize = userChatMessages.length;
+  }
   internalMax = totalSize;
   var current = (internalPage +1);
   return current + "/" + Math.ceil(totalSize/leaderboardSize);
 }
 
-function setMessagesEmbedField(internalPage,embed){
+function setMessagesEmbedField(internalPage,embed,lifetime){
   var leaderboardLength = 10;
-  var leaderboardArray = userChatMessages;
+  var leaderboardArray;
+  if(lifetime){
+    leaderboardArray = userChatMessages;
+  }
+  else{
+    leaderboardArray = monthlyUserChatMessages
+  }
 
   leaderboardArray.sort(function(a, b) {
     if (a.messages > b.messages) {
@@ -490,16 +649,22 @@ function setMessagesEmbedField(internalPage,embed){
   embed.setDescription(tools.generateTable(data));
 }
 
-function getSoundboardEmbedFooter(internalPage){
-  var totalSize = soundboardUsage.length;
+function getSoundboardEmbedFooter(internalPage,lifetime){
+  var totalSize = monthlySoundboardUsage.length;
+  if(lifetime){
+    soundboardUsage.length;
+  }
   internalMax = totalSize;
   var current = (internalPage +1);
   return current + "/" + Math.ceil(totalSize/leaderboardSize);
 }
 
-function setSoundboardEmbedField(internalPage,embed){
+function setSoundboardEmbedField(internalPage,embed,lifetime){
   var leaderboardLength = 10;
-  var leaderboardArray = soundboardUsage;
+  var leaderboardArray = monthlySoundboardUsage;
+  if(lifetime){
+    leaderboardArray = soundboardUsage;
+  }
 
   leaderboardArray.sort(function(a, b) {
     if (a.uses > b.uses) {
@@ -534,9 +699,15 @@ function setSoundboardEmbedField(internalPage,embed){
   embed.setDescription(tools.generateTable(data));
 }
 
-function generateLeaderboardEmbeds(){
+function generateLeaderboardEmbeds(lifetime){
 
   var leaderboardEmbeds = new Map();
+  var date = new Date();
+
+  var time =  getMonthName(date.getMonth());
+  if(lifetime){
+    time = 'All-time'
+  }
 
   pages.forEach((item, i) => {
 
@@ -547,9 +718,9 @@ function generateLeaderboardEmbeds(){
       for (var o = 0; o < Math.ceil(totalConnectionTime.length/leaderboardSize); o++) {
         var embed = new Discord.MessageEmbed()
         .setTitle(title +' '+'Leaderboard')
-        .setColor("#0099ff");
-        setVoiceEmbedField(o,embed);
-        embed.setFooter(getVoiceEmbedFooter(o));
+        .setColor("#0099ff")
+        setVoiceEmbedField(o,embed,lifetime);
+        embed.setFooter(time + " - "+ getVoiceEmbedFooter(o,lifetime));
         voiceLeaderboardEmbeds.push(embed);
       }
       leaderboardEmbeds.set(i,voiceLeaderboardEmbeds);
@@ -560,9 +731,9 @@ function generateLeaderboardEmbeds(){
       for (var o = 0; o < Math.ceil(userChatMessages.length/leaderboardSize); o++) {
         var embed = new Discord.MessageEmbed()
         .setTitle(title +' '+'Leaderboard')
-        .setColor("#0099ff");
-        setMessagesEmbedField(o,embed);
-        embed.setFooter(getMessagesEmbedFooter(o));
+        .setColor("#0099ff")
+        setMessagesEmbedField(o,embed,lifetime);
+        embed.setFooter(time + " - "+ getMessagesEmbedFooter(o,lifetime));
         messagesLeaderboardEmbeds.push(embed);
       }
       leaderboardEmbeds.set(i,messagesLeaderboardEmbeds);
@@ -573,9 +744,9 @@ function generateLeaderboardEmbeds(){
       for (var o = 0; o < Math.ceil(soundboardUsage.length/leaderboardSize); o++) {
         var embed = new Discord.MessageEmbed()
         .setTitle(title +' '+'Leaderboard')
-        .setColor("#0099ff");
-        setSoundboardEmbedField(o,embed);
-        embed.setFooter(getSoundboardEmbedFooter(o));
+        .setColor("#0099ff")
+        setSoundboardEmbedField(o,embed,lifetime);
+        embed.setFooter(time + " - "+ getSoundboardEmbedFooter(o,lifetime));
         soundboardLeaderboardEmbeds.push(embed);
       }
       leaderboardEmbeds.set(i,soundboardLeaderboardEmbeds);
@@ -584,4 +755,148 @@ function generateLeaderboardEmbeds(){
   });
 
   return leaderboardEmbeds;
+}
+
+
+// schedule reset of stats every month 0 6 1 * *
+cron.schedule('0 6 1 * *', () => {
+  console.log('Reset Stats');
+  //generate and post final leaderboard for month
+  guild = client.guilds.array()[0];
+  var channel = guild.channels.find(ch => ch.name === 'general-chat');
+
+  var date = new Date();
+  channel.send("This is the final leaderboard for "+getMonthName(date.getMonth()-1))
+
+  var embed = new Discord.MessageEmbed()
+  .setTitle(":speaking_head: Voice Leaderboard")
+  .setColor("#0099ff")
+  .setDescription(generateMonthlyVoiceLeaderboard());
+
+  channel.send(embed).then((msg)=>{
+    msg.pin();
+  });
+
+  var embed = new Discord.MessageEmbed()
+  .setTitle("⌨️ Messages Leaderboard")
+  .setColor("#0099ff")
+  .setDescription(generateMonthlyMessagesLeaderboard());
+
+  channel.send(embed).then((msg)=>{
+    msg.pin();
+  });
+
+  //reset leaderboard
+  monthlyConnectionTime = new Array();
+  monthlyUserChatMessages = new Array();
+  monthlySoundboardUsage = new Array();
+  saveMonthlyConnectionTimeFile();
+  saveMonthlyUserChatMessagesFile();
+  saveMonthlySoundboardUsageFile();
+});
+
+function getMonthName(monthNumber) {
+  var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  return months.slice(monthNumber)[0];
+}
+
+function generateMonthlyMessagesLeaderboard(){
+  var leaderboardArray = monthlyUserChatMessages;
+
+  leaderboardArray.sort(function(a, b) {
+    if (a.messages > b.messages) {
+      return -1;
+    }
+    if (a.messages < b.messages) {
+      return 1;
+    }
+    return 0;
+  });
+
+  var data = new Map();
+  var posData = new Array();
+  var namesData = new Array();
+  var messagesData = new Array();
+
+  for (let i = 0; i < leaderboardArray.length; i++) {
+    var userName = "";
+    try {
+      userName = guild.member(leaderboardArray[i].userid)
+      .displayName;
+    } catch (e) {
+      console.log(e);
+    }
+    posData.push((i + 1).toString());
+    namesData.push(userName);
+    messagesData.push(leaderboardArray[i].messages);
+  }
+
+  data.set('#',posData);
+  data.set('Name',namesData);
+  data.set('Messages',messagesData);
+  return tools.generateTable(data);
+}
+
+function generateMonthlyVoiceLeaderboard(){
+  var leaderboardArray = new Array();
+
+  monthlyConnectionTime.forEach(obj => {
+    var currentConnectedTime = 0;
+    currectConnectionTime.forEach(currentObj => {
+      if (currentObj.userid === obj.userid) {
+        var date = new Date();
+        var currentTime = date.getTime();
+        currentConnectedTime = currentTime - currentObj.joinTime;
+      }
+    });
+
+    var totalConnectionTime;
+    if (currentConnectedTime !== 0) {
+      totalConnectionTime =
+      parseInt(currentConnectedTime) + parseInt(obj.totalTime);
+    } else {
+      totalConnectionTime = parseInt(obj.totalTime);
+    }
+    var user = { userid: obj.userid, totalTime: totalConnectionTime };
+
+    leaderboardArray.push(user);
+  });
+
+  //sort array by length
+  leaderboardArray.sort(function(a, b) {
+    if (a.totalTime > b.totalTime) {
+      return -1;
+    }
+    if (a.totalTime < b.totalTime) {
+      return 1;
+    }
+    return 0;
+  });
+
+  var data = new Map();
+  var posData = new Array();
+  var namesData = new Array();
+  var timesData = new Array();
+
+  for (let i = 0; i < leaderboardArray.length; i++) {
+    var readableTotalConnectionTime = parseMillisecondsIntoReadableTime(
+      leaderboardArray[i].totalTime
+    );
+    var userName = "";
+    try {
+      userName = guild.member(leaderboardArray[i].userid)
+      .displayName;
+    } catch (e) {
+      console.log(e);
+    }
+    posData.push((i + 1).toString());
+    namesData.push(userName);
+    timesData.push(readableTotalConnectionTime);
+  }
+
+  data.set('#',posData);
+  data.set('Name',namesData);
+  data.set('Time',timesData);
+
+  return tools.generateTable(data);
 }
