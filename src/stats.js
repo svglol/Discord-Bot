@@ -652,7 +652,7 @@ function setMessagesEmbedField(internalPage,embed,lifetime){
 function getSoundboardEmbedFooter(internalPage,lifetime){
   var totalSize = monthlySoundboardUsage.length;
   if(lifetime){
-    soundboardUsage.length;
+    totalSize = soundboardUsage.length;
   }
   internalMax = totalSize;
   var current = (internalPage +1);
