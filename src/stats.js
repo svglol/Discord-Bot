@@ -131,6 +131,7 @@ module.exports = {
                 if(internalPage < Math.ceil(leaderboardEmbeds.get(page).length)-1){
                   internalPage++;
                 }
+                msg.edit(leaderboardEmbeds.get(page)[internalPage]);
               }
               else if(reaction.emoji.name === '⬆'){
                 //scroll up current page
