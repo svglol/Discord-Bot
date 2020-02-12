@@ -55,7 +55,7 @@ module.exports = {
 async function reset(sound,message,client){
   await message.delete(1000).catch(err => console.log(err));
   await sound.stop(message);
-  client.destroy();
+  process.exit(1);
   throw 'restarting'
 };
 
