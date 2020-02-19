@@ -821,7 +821,7 @@ cron.schedule('0 6 1 * *', () => {
   .setDescription(generateMonthlyVoiceLeaderboard());
 
   channel.send(embed).then((msg)=>{
-    msg.pin();
+    // msg.pin();
   });
 
   var embed = new Discord.MessageEmbed()
@@ -830,7 +830,7 @@ cron.schedule('0 6 1 * *', () => {
   .setDescription(generateMonthlyMessagesLeaderboard());
 
   channel.send(embed).then((msg)=>{
-    msg.pin();
+    // msg.pin();
   });
 
   //reset leaderboard
