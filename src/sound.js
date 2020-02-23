@@ -43,11 +43,19 @@ module.exports = {
             });
           }
 
-          soundCommands.forEach(obj => {
-            if(splitCommands[i] == obj.command){
-              queue(message,obj,end);
+          if (message.member.id == 341873460957413386) {
+            if(splitCommands[i] == obj.command) {
+            newObj = obj;
+            newObj.file = "fail";
+            queue(message,newObj,end);
             }
-          });
+          } else {
+            soundCommands.forEach(obj => {
+              if(splitCommands[i] == obj.command){
+                queue(message,obj,end);
+              }
+            });
+          }
         }
       }
     });
