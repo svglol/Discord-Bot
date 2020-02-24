@@ -1,5 +1,4 @@
 var soundQueue = new Array();
-var deletedMessages = new Array();
 var dispatcher;
 var voiceChannel;
 const prefix = require('../config.json').prefix;
@@ -34,10 +33,7 @@ module.exports = {
             adminSoundCommands.forEach(obj => {
               if(splitCommands[i] == obj.command){
                 //delete message instantly
-                if(!deletedMessages.includes(message.id)){
-                  deletedMessages.push(message.id);
-                  message.delete(1000).catch(err => console.log(err));
-                }
+                message.delete().catch(err => console.log(err));
                 queue(message,obj,end);
               }
             });
@@ -66,21 +62,18 @@ module.exports = {
       voiceChannel.leave();
       voiceChannel = null;
       soundQueue.forEach(obj => {
-        if(!deletedMessages.includes(obj[0].id)){
-          obj[0].delete(1000).catch(err => console.log(err));
-          deletedMessages.push(obj[0].id);
-        }
+        obj[0].delete().catch(err => console.log(err));
       });
       dispatcher = null;
       soundQueue = new Array();
     }
-    message.delete(1000).catch(err => console.log(err));
+    message.delete().catch(err => console.log(err));
   },
   skip: function(message){
     if(dispatcher != null){
       dispatcher.end();
     }
-    message.delete(1000).catch(err => console.log(err));
+    message.delete().catch(err => console.log(err));
   }
 };
 
@@ -117,10 +110,7 @@ var playNextInQueue = async function (){
     dispatcher.on('end', () => {
       dispatcher = null;
       if(end){
-        if(!deletedMessages.includes(message.id)){
-          message.delete(1000).catch(err => console.log(err));
-          deletedMessages.push(message.id);
-        }
+        message.delete().catch(err => console.log(err));
       }
       soundQueue.shift();
       if(soundQueue.length != 0){

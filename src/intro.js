@@ -11,7 +11,7 @@ module.exports = {
       let newUserChannel = newMember.channel;
       let oldUserChannel = oldMember.channel;
 
-      var channel = newMember.guild.channels.find(ch => ch.name === 'general-chat');
+      var channel = newMember.guild.channels.cache.find(ch => ch.name === 'general-chat');
       if (!channel) return;
 
       if(oldUserChannel === null && newUserChannel !== null) {
