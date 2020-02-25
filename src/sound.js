@@ -41,16 +41,16 @@ module.exports = {
 
           soundCommands.forEach(obj => {
             if(splitCommands[i] == obj.command){
-              if (message.author.id === '341873460957413386') {
-                soundCommands.forEach((obj, i) => {
-                  if(obj.command == "fail"){
-                    queue(message,obj,end);
-                  }
-                });
-              }
-              else{
+              // if (message.author.id === '341873460957413386') {
+              //   soundCommands.forEach((obj, i) => {
+              //     if(obj.command == "fail"){
+              //       queue(message,obj,end);
+              //     }
+              //   });
+              // }
+              // else{
                 queue(message,obj,end);
-              }
+              // }
             }
           });
         }
