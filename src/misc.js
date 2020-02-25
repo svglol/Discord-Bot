@@ -177,7 +177,7 @@ function generateNewSoundboardEmbed(newSoundCommands){
     .setTitle("🆕 New Sound Commands")
     .setColor('#0099ff')
     .setFooter(currentPage+"/"+pages)
-    .addField(':blue_circle: Prefix',"`"+prefix+"`")
+    // .addFields([':blue_circle: Prefix',"`"+prefix+"`"]);
 
     var soundsMessage = "";
     for (var j = start; j < newSoundCommands.length; j++) {
@@ -215,7 +215,7 @@ function generateSoundboardEmbeds(soundCommands){
     .setTitle(":loud_sound: Sound Commands")
     .setColor('#0099ff')
     .setFooter(currentPage+"/"+pages)
-    .addField(':blue_circle: Prefix',"`"+prefix+"`")
+    // .addFields(':blue_circle: Prefix',"`"+prefix+"`")
 
     var soundsMessage = "";
     for (var j = start; j < soundCommands.length; j++) {
@@ -253,7 +253,7 @@ function generateGifEmbeds(gifCommands){
     .setTitle(":frame_photo: Gif Commands")
     .setColor('#0099ff')
     .setFooter(currentPage+"/"+pages)
-    .addField(':blue_circle: Prefix',"`"+prefix+"`")
+    // .addFields(':blue_circle: Prefix',"`"+prefix+"`")
 
     var soundsMessage = "";
     for (var j = start; j < gifCommands.length; j++) {
