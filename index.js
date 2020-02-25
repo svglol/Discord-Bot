@@ -25,7 +25,7 @@ class Client extends Discord.Client {
       client.user.setActivity(prefix + 'help for commands', { type: 'PLAYING' })
       .catch(console.error);
 
-      sound.listen(this);
+      // sound.listen(this);
       gifs.listen(this);
       misc.listen(this);
       intro.listen(this);
