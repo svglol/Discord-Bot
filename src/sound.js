@@ -15,7 +15,8 @@ module.exports = {
       console.log('message');
       if(message.content.charAt(0) == prefix){
         var msg = message.content.substring(1);
-        splitCommands = msg.split(" ");
+        var splitCommands = msg.split(" ");
+        console.log(splitCommands);
         for (let i = 0; i < splitCommands.length; i++) {
           var end = false;
 
