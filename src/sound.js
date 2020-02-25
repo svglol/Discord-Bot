@@ -91,7 +91,7 @@ var queue = function (message,obj,end) {
 
 var lastDisconTime = 0;
 
-var playNextInQueue = async function (){
+async function playNextInQueue(){
   var message = soundQueue[0][0];
   var file = soundQueue[0][1].file;
   var end = soundQueue[0][2];
