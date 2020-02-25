@@ -102,7 +102,7 @@ var playNextInQueue = async function (){
 
   var reconWait = 500;
   if(lastDisconTime > currentTime-reconWait){
-    await PromiseTimeout(lastDisconTime - (currentTime - reconWait));
+    // await PromiseTimeout(lastDisconTime - (currentTime - reconWait));
   }
 
   await voiceChannel.join().then(async connection => {
