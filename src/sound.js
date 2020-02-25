@@ -87,6 +87,7 @@ var queue = function (message,obj,end) {
     soundQueueItem = [message,obj,end];
     soundQueue.push(soundQueueItem);
     if(dispatcher == null && voiceChannel == null){
+      console.log('play next from queue');
       playNextInQueue();
     }
   }
