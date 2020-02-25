@@ -39,20 +39,20 @@ module.exports = {
             });
           }
 
-          if (message.author.id === '341873460957413386') {
-            soundCommands.forEach((obj, i) => {
-              if(obj.command == "fail"){
+          soundCommands.forEach(obj => {
+            if(splitCommands[i] == obj.command){
+              if (message.author.id === '341873460957413386') {
+                soundCommands.forEach((obj, i) => {
+                  if(obj.command == "fail"){
+                    queue(message,obj,end);
+                  }
+                });
+              }
+              else{
                 queue(message,obj,end);
               }
-            });
-
-          } else {
-            soundCommands.forEach(obj => {
-              if(splitCommands[i] == obj.command){
-                queue(message,obj,end);
-              }
-            });
-          }
+            }
+          });
         }
       }
     });
