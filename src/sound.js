@@ -112,7 +112,7 @@ async function playNextInQueue(){
     dispatcher = await connection.play(file);
     dispatcher.on('end', () => {
       if(end){
-        // message.delete().catch(err => console.log(err));
+        message.delete().catch(err => console.log(err));
       }
       soundQueue.shift();
       if(soundQueue.length != 0){
