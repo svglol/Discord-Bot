@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm ci && node index.js"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +13,7 @@
   "dependencies": {
     "@discordjs/opus": "^0.1.0",
     "discord.js": "github:discordjs/discord.js",
-    "node-cron": "^2.0.3"
+    "node-cron": "^2.0.3",
+    "opusscript": "0.0.7"
   }
 }
