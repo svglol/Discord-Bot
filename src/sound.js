@@ -12,11 +12,9 @@ module.exports = {
     stats = client.getStats();
 
     client.on('message', message => {
-      console.log('message');
       if(message.content.charAt(0) == prefix){
         var msg = message.content.substring(1);
         var splitCommands = msg.split(" ");
-        console.log(splitCommands);
         for (let i = 0; i < splitCommands.length; i++) {
           var end = false;
 
@@ -80,14 +78,12 @@ module.exports = {
 };
 
 var queue = function (message,obj,end) {
-  console.log('queue');
   var userVoiceChannel = message.member.voice.channel;
   if(userVoiceChannel != undefined){
     stats.addSoundBoardUse(obj.command);
     soundQueueItem = [message,obj,end];
     soundQueue.push(soundQueueItem);
     if(dispatcher == null && voiceChannel == null){
-      console.log('play next from queue');
       playNextInQueue();
     }
   }
@@ -96,7 +92,6 @@ var queue = function (message,obj,end) {
 var lastDisconTime = 0;
 
 async function playNextInQueue(){
-  console.log('play next in queue');
   var message = soundQueue[0][0];
   var file = soundQueue[0][1].file;
   var end = soundQueue[0][2];
@@ -128,7 +123,6 @@ async function playNextInQueue(){
         lastDisconTime = currentTime;
       }
        dispatcher = null;
-       console.log('disconnect')
     });
   }).catch(error => {
     console.log('Reconnected too quickly');
@@ -138,7 +132,6 @@ async function playNextInQueue(){
 
 function PromiseTimeout(delayms) {
   return new Promise(function (resolve, reject) {
-    console.log('wait');
     setTimeout(resolve, delayms);
   });
 }
