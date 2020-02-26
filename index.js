@@ -6,6 +6,7 @@ const sound = require('./lib/sound.js');
 const gifs = require('./lib/gifs.js');
 const intro = require('./lib/intro.js');
 const stats = require('./lib/stats.js');
+const { Users } = require('./db/dbObjects.js');
 
 const gifCommands = require('./commands/gifcommands.json').commands;
 const prefix = require('./config.json').prefix;
@@ -86,6 +87,9 @@ class Client extends Discord.Client {
   getTools(){
     return tools;
   }
+  getUsers(){
+    return Users;
+  }
 }
 
 const client = new Client();
@@ -97,5 +101,8 @@ for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
   client.commands.set(command.name, command);
 }
+
+const dbInit =  require('./db/dbInit.js');
+dbInit.init();
 
 client.init();
