@@ -3,7 +3,11 @@ module.exports = (sequelize, DataTypes) => {
 		user_id: {
 			type: DataTypes.STRING,
 			primaryKey: true,
-		}
+		},
+		lastConnection: {
+			type: DataTypes.STRING,
+			defaultValue: '0'
+		},
 	}, {
 		timestamps: false,
 	});
