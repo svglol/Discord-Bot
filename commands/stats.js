@@ -6,10 +6,12 @@ var userChatMessages = new Array();
 var monthlyConnectionTime = new Array();
 var monthlyUserChatMessages = new Array();
 
+var userChatMessages = new Array();
+
 module.exports = {
   name: 'stats',
   description: 'stats',
-  execute(message, args,client) {
+  async execute(message, args,client) {
 
     currectConnectionTime = client.getStats().getCurrentConnectionTime();
     totalConnectionTime = client.getStats().getTotalConnectionTime();
@@ -26,6 +28,22 @@ module.exports = {
     var monthlyVoiceRank = getMonthlyVoiceRank(message.member.id);
     var totalMessagesRank = getAllTimeMessagesRank(message.member.id);
     var monthlyMessagesRank = getMonthlyMessagesRank(message.member.id);
+
+    await client.getDbHelper().getUserMessages(message.author.id).then(function(result){
+      userChatMessages = result;
+      totalMessages = userChatMessages.length;
+
+      var date = new Date();
+      var currentMonth = date.getMonth();
+      var currentYear = date.getYear();
+      userChatMessages.forEach((item, i) => {
+        messageDate = new Date(item.date);
+        if(currentMonth == messageDate.getMonth() && currentYear == messageDate.getYear()){
+          monthlyMessages++;
+        }
+      });
+
+    })
 
     var currentConnectedTime = 0;
     currectConnectionTime.forEach((item, i) => {
@@ -50,17 +68,17 @@ module.exports = {
       }
     });
 
-    userChatMessages.forEach((item, i) => {
-      if(item.userid == message.author.id){
-        totalMessages = item.messages;
-      }
-    });
+    // userChatMessages.forEach((item, i) => {
+    //   if(item.userid == message.author.id){
+    //     totalMessages = item.messages;
+    //   }
+    // });
 
-    monthlyUserChatMessages.forEach((item, i) => {
-      if(item.userid == message.author.id){
-        monthlyMessages = item.messages;
-      }
-    });
+    // monthlyUserChatMessages.forEach((item, i) => {
+    //   if(item.userid == message.author.id){
+    //     monthlyMessages = item.messages;
+    //   }
+    // });
 
     var embed = new Discord.MessageEmbed()
     .setTitle('Stats')
