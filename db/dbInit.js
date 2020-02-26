@@ -28,8 +28,6 @@ module.exports = {
 
     sequelize.sync({ force }).then(async () => {
 
-      //TODO sync old files into DB then delete them
-
       //Check if the user chat messages file exists
       if (fs.existsSync(userChatMessagesFile)) {
         var rawdata = fs.readFileSync(userChatMessagesFile, function(
