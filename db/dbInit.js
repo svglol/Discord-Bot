@@ -5,6 +5,9 @@ const userChatMessagesFile = "../userChatMessagesFile.json";
 const monthlyUserChatMessagesFile = "../monthlyUserChatMessagesFile.json";
 const soundboardUsageFile = "../soundboardUsageFile.json";
 const monthlySoundboardUsageFile = "../monthlySoundboardUsageFile.json";
+const currentConnectionTimeFile = "../currentConnectionFile.json";
+const totalConnectionTimeFile = "../totalConnectionTimeFile.json";
+const monthlyConnectionTimeFile = "../monthlyConnectionTimeFile.json";
 
 module.exports = {
   init: function(){
@@ -53,7 +56,30 @@ module.exports = {
         }
 
         fs.unlinkSync(soundboardUsageFile);
-         fs.unlinkSync(monthlySoundboardUsageFile);
+        fs.unlinkSync(monthlySoundboardUsageFile);
+      }
+
+      if (fs.existsSync(totalConnectionTimeFile)) {
+        var rawdata = fs.readFileSync(totalConnectionTimeFile, function(
+          err,
+          data
+        ) {});
+
+        if (rawdata != null) {
+          var connectionTime = JSON.parse(rawdata);
+        }
+
+        fs.unlinkSync(totalConnectionTimeFile);
+        fs.unlinkSync(monthlyConnectionTimeFile);
+        fs.unlinkSync(currentConnectionTimeFile);
+      }
+
+      if(connectionTime != null){
+        console.log('Transferring Connection Time File');
+        connectionTime.forEach(async (item, i) => {
+          await User.upsert({ user_id: item.userid, last_connection: ''});
+          await UserConnection.upsert({user_id: item.userid,connectTime:0,disconnectTime:0,connectionLength:item.totalTime})
+        });
       }
 
       if(soundboardUsage != null){
@@ -75,7 +101,7 @@ module.exports = {
         });
       }
 
-      if(soundboardUsage == null && userChatMessages == null){
+      if(soundboardUsage == null && userChatMessages == null && connectionTime == null){
         sequelize.close();
       }
       console.log('Database Initialized');
