@@ -80,6 +80,13 @@ module.exports = {
       await leaderboard.push({id:user.user_id,messages:count});
     }
     return sortMessagesLeaderboard(leaderboard);
+  },
+  updateUserLastConnection: async function(id, lastConnection){
+    var user = await Users.findOne({ where: { user_id: id } });
+    user.lastConnection = lastConnection;
+    user.save();
+    if(!user)
+    user = await Users.create({ user_id: message.author.id,lastConnection: lastConnection});
   }
 }
 

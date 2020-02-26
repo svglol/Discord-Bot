@@ -5,8 +5,8 @@ module.exports = (sequelize, DataTypes) => {
 			primaryKey: true,
 		},
 		lastConnection: {
-			type: DataTypes.STRING,
-			defaultValue: '0'
+			type: DataTypes.INTEGER,
+			defaultValue: 0
 		},
 	}, {
 		timestamps: false,
