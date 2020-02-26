@@ -21,4 +21,24 @@ Users.prototype.getMessages = function() {
 		where: { user_id: this.user_id }
 	});
 };
+
+Users.prototype.getConnections = function() {
+	return UserConnection.findAll({
+		where: { user_id: this.user_id }
+	});
+};
+
+Users.prototype.getSoundboards = function() {
+	return UserSoundboard.findAll({
+		where: { user_id: this.user_id }
+	});
+}
+
+Users.prototype.addConnection = async function(id,connectTime,disconnectTime,connectionLength) {
+	return UserConnection.create({ user_id: this.user_id, connectTime: connectTime,disconnectTime: disconnectTime, connectionLength: connectionLength});
+};
+
+Users.prototype.addSoundboard = async function(id,date,command) {
+	return UserSoundboard.create({ user_id: this.user_id, date: date,command: command});
+};
 module.exports = {Users};

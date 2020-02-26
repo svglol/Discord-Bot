@@ -83,10 +83,28 @@ module.exports = {
   },
   updateUserLastConnection: async function(id, lastConnection){
     var user = await Users.findOne({ where: { user_id: id } });
-    user.lastConnection = lastConnection;
-    user.save();
+    if(user != null){
+      user.lastConnection = lastConnection;
+      user.save();
+    }
+    else{
+      return Users.create({ user_id: id,lastConnection: lastConnection});
+    }
+  },
+  addUserConnection: async function(id,connectTime,disconnectTime,connectionLength){
+    var user = await Users.findOne({ where: { user_id: id } });
     if(!user)
-    user = await Users.create({ user_id: message.author.id,lastConnection: lastConnection});
+    user = await Users.create({ user_id: id});
+    var date = new Date();
+    user.addConnection(id,user.lastConnection,date.getTime(),date.getTime()-user.lastConnection);
+    this.updateUserLastConnection(id,0);
+  },
+  addUserSoundboard: async function(id,command){
+    var user = await Users.findOne({ where: { user_id: id } });
+    if(!user)
+    user = await Users.create({ user_id: id});
+    var date = new Date();
+    user.addSoundboard(id,date.getTime(),command);
   }
 }
 
