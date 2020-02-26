@@ -25,7 +25,7 @@ class Client extends Discord.Client {
     super(...args);
 
     this.once("ready", () => {
-      console.log('ready');
+      console.log('Discord-Bot Connected');
       client.user.setActivity(prefix + 'help for commands', { type: 'PLAYING' })
       .catch(console.error);
 
