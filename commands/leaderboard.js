@@ -26,81 +26,84 @@ module.exports = {
 
     currectConnectionTime = client.getStats().getCurrentConnectionTime();
     totalConnectionTime = client.getStats().getTotalConnectionTime();
-    userChatMessages = client.getStats().getUserChatMessages();
     monthlyConnectionTime = client.getStats().getMonthlyConnectionTime();
-    monthlyUserChatMessages = client.getStats().getMonthlyUserChatMessages();
     soundboardUsage = client.getStats().getSoundboardUsage();
     monthlySoundboardUsage = client.getStats().getMonthlySoundboardUsage();
 
-    var monthlyLeaderboardEmbeds = generateLeaderboardEmbeds(false);
-    var lifetimeLeaderboardEmbeds = generateLeaderboardEmbeds(true);
+    loadLeaderboards(client).then(function(){
 
-    var leaderboardEmbeds = monthlyLeaderboardEmbeds;
+      var monthlyLeaderboardEmbeds = generateLeaderboardEmbeds(false);
+      var lifetimeLeaderboardEmbeds = generateLeaderboardEmbeds(true);
 
-    message.channel.send(leaderboardEmbeds.get(0)[0]).then((msg)=>{
-      var page = 0;
-      var internalPage = 0;
+      var leaderboardEmbeds = monthlyLeaderboardEmbeds;
 
-      msg.react('📆');
-      msg.react('♾️');
-      msg.react('⬇');
-      msg.react('⬆');
-      msg.react('🗣️');
-      msg.react('⌨️');
-      msg.react('🔊');
+      message.channel.send(leaderboardEmbeds.get(0)[0]).then((msg)=>{
+        var page = 0;
+        var internalPage = 0;
 
-      const filter = (reaction, user) => {
-        return ['⬇','⬆','🗣️','⌨️','🔊','📆','♾️'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
-      };
+        msg.react('📆');
+        msg.react('♾️');
+        msg.react('⬇');
+        msg.react('⬆');
+        msg.react('🗣️');
+        msg.react('⌨️');
+        msg.react('🔊');
 
-      const collector = msg.createReactionCollector(filter, { time: 60000 });
-      collector.on('collect', (reaction,user) =>{
-        reaction.users.remove(user);
-        if(reaction.emoji.name === '⬇'){
-          //scroll down current page
-          if(internalPage < Math.ceil(leaderboardEmbeds.get(page).length)-1){
-            internalPage++;
+        const filter = (reaction, user) => {
+          return ['⬇','⬆','🗣️','⌨️','🔊','📆','♾️'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
+        };
+
+        const collector = msg.createReactionCollector(filter, { time: 60000 });
+        collector.on('collect', (reaction,user) =>{
+          reaction.users.remove(user);
+          if(reaction.emoji.name === '⬇'){
+            //scroll down current page
+            if(internalPage < Math.ceil(leaderboardEmbeds.get(page).length)-1){
+              internalPage++;
+            }
+            msg.edit(leaderboardEmbeds.get(page)[internalPage]);
           }
-          msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-        }
-        else if(reaction.emoji.name === '⬆'){
-          //scroll up current page
-          if(internalPage != 0){
-            internalPage--;
+          else if(reaction.emoji.name === '⬆'){
+            //scroll up current page
+            if(internalPage != 0){
+              internalPage--;
+            }
+            msg.edit(leaderboardEmbeds.get(page)[internalPage]);
           }
-          msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-        }
-        else if(reaction.emoji.name === '🗣️'){
-          page = 0;
-          internalPage = 0;
-          msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-        }
-        else if(reaction.emoji.name === '⌨️'){
-          page = 1;
-          internalPage = 0;
-          msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-        }
-        else if(reaction.emoji.name === '🔊'){
-          page = 2;
-          internalPage = 0;
-          msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-        }
-        else if(reaction.emoji.name === '📆'){
-          internalPage = 0;
-          leaderboardEmbeds = monthlyLeaderboardEmbeds;
-          msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-        }
-        else if(reaction.emoji.name === '♾️'){
-          internalPage = 0;
-          leaderboardEmbeds = lifetimeLeaderboardEmbeds;
-          msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-        }
+          else if(reaction.emoji.name === '🗣️'){
+            page = 0;
+            internalPage = 0;
+            msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+          }
+          else if(reaction.emoji.name === '⌨️'){
+            page = 1;
+            internalPage = 0;
+            msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+          }
+          else if(reaction.emoji.name === '🔊'){
+            page = 2;
+            internalPage = 0;
+            msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+          }
+          else if(reaction.emoji.name === '📆'){
+            internalPage = 0;
+            leaderboardEmbeds = monthlyLeaderboardEmbeds;
+            msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+          }
+          else if(reaction.emoji.name === '♾️'){
+            internalPage = 0;
+            leaderboardEmbeds = lifetimeLeaderboardEmbeds;
+            msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+          }
+        });
+        collector.on('end', collection =>{
+          //remove reactions once reaction collector has ended
+          msg.reactions.removeAll();
+        })
       });
-      collector.on('end', collection =>{
-        //remove reactions once reaction collector has ended
-        msg.reactions.removeAll();
-      })
-    });
+    })
+
+
   },
 };
 
@@ -251,7 +254,7 @@ function setMessagesEmbedField(internalPage,embed,lifetime){
   for (let i = 0; i < leaderboardArray.length; i++) {
     var userName = "";
     try {
-      userName = guild.member(leaderboardArray[i].userid)
+      userName = guild.member(leaderboardArray[i].id)
       .displayName;
     } catch (e) {
       console.log(e);
@@ -376,4 +379,14 @@ function generateLeaderboardEmbeds(lifetime){
   });
 
   return leaderboardEmbeds;
+}
+
+async function loadLeaderboards(client){
+  await client.getDbHelper().getAllTimeUserMessagesTotals().then(function(result){
+    userChatMessages = result;
+  })
+
+  await client.getDbHelper().getMonthlyUserMessagesTotals().then(function(result){
+    monthlyUserChatMessages = result;
+  })
 }

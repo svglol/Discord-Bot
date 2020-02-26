@@ -21,5 +21,77 @@ module.exports = {
     });
 
     return messagesNorm;
+  },
+  getUserMessageMonthlyRank: async function(id){
+    var rank = '#0';
+    await this.getMonthlyUserMessagesTotals().then(async function (result){
+      await result.forEach((item, i) => {
+        if(item.id == id){
+          rank =  "#"+(i+1);
+        }
+      });
+    })
+    return rank;
+  },
+  getUserMessageAllTimeRank: async function(id){
+    var rank = '#0';
+    await this.getAllTimeUserMessagesTotals().then(async function (result){
+      await result.forEach((item, i) => {
+        if(item.id == id){
+          rank =  "#"+(i+1);
+        }
+      });
+    })
+    return rank;
+  },
+  getMonthlyUserMessagesTotals: async function(){
+    var users = await Users.findAll();
+    var leaderboard = new Array();
+
+    var date = new Date();
+    var currentMonth = date.getMonth();
+    var currentYear = date.getYear();
+
+    for(const user of users){
+      var count = 0;
+      await this.getUserMessages(user.user_id).then(function(result){
+        result.forEach((item, i) => {
+          var messageDate = new Date(item.date);
+          if(currentMonth == messageDate.getMonth() && currentYear == messageDate.getYear()){
+            count++;
+          }
+        });
+      });
+      await leaderboard.push({id:user.user_id,messages:count});
+    }
+    return sortMessagesLeaderboard(leaderboard);
+  },
+  getAllTimeUserMessagesTotals: async function(){
+    var users = await Users.findAll();
+    var leaderboard = new Array();
+
+    for(const user of users){
+      var count = 0;
+      await this.getUserMessages(user.user_id).then(function(result){
+        result.forEach((item, i) => {
+          count++;
+        });
+      });
+      await leaderboard.push({id:user.user_id,messages:count});
+    }
+    return sortMessagesLeaderboard(leaderboard);
   }
+}
+
+function sortMessagesLeaderboard(leaderboard){
+  leaderboard.sort(function(a, b) {
+    if (a.messages > b.messages) {
+      return -1;
+    }
+    if (a.messages < b.messages) {
+      return 1;
+    }
+    return 0;
+  });
+  return leaderboard;
 }
