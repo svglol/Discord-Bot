@@ -1,64 +1,15 @@
 const Discord = require('discord.js');
-const prefix = require('../config.json').prefix;
+var prefix = '';
 
 module.exports = {
-  listen:function(client){
-
-    const sound = client.getSound();
-    const soundCommands = client.getSoundCommands();
-    const gifCommands = client.getGifCommands();
-    const newSoundCommands = client.getNewSoundCommands();
-
-    client.on('message', message => {
-      if(message.content.charAt(0) == prefix){
-        var msg = message.content.substring(1);
-
-        if(msg == "help"){
-          helpMessage(message,client,soundCommands,gifCommands,newSoundCommands);
-        }
-
-        //Limit these commands to admin only
-        if (message.member.hasPermission("ADMINISTRATOR")){
-          //clear any chatcommands in the channel
-          if(msg == "clear"){
-            message.channel.messages.fetch(20).then(messages => {
-              var messagesToDelete = new Array();
-              messages.forEach(chatMessage => {
-                if(chatMessage.content.charAt(0) == prefix){
-                  messagesToDelete.push(chatMessage);
-                }
-                if(chatMessage.author.bot){
-                  messagesToDelete.push(chatMessage);
-                }
-              });
-              message.channel.bulkDelete(messagesToDelete);
-            });
-          }
-
-          if(msg == "stop"){
-            sound.stop(message);
-          }
-          if(msg == "skip"){
-            sound.skip(message);
-          }
-
-          if(msg == "reset"){
-            reset(sound,message,client);
-          }
-        }
-
-      }
-    });
-  }
+  name: 'help',
+  aliases: ['commands'],
+  description: 'help',
+  execute(message, args,client) {
+    prefix = client.getPrefix();
+    helpMessage(message,client,client.getSoundCommands(),client.getGifCommands(),client.getNewSoundCommands());
+  },
 };
-
-async function reset(sound,message,client){
-  await message.delete(1000).catch(err => console.log(err));
-  await sound.stop(message);
-  process.exit(1);
-  throw 'restarting'
-};
-
 
 function helpMessage(message, client,soundCommands,gifCommands,newSoundCommands){
 
@@ -73,14 +24,12 @@ function helpMessage(message, client,soundCommands,gifCommands,newSoundCommands)
   message.channel.send(embeds[0]).then((msg)=>{
     var page = 0;
 
-
     msg.react('⬇');
     msg.react('⬆');
 
     msg.react('🔊');
     msg.react('🆕');
     msg.react('🖼');
-    // msg.react('❌');
 
     const filter = (reaction, user) => {
       return ['⬆', '⬇','🔊','🖼','❌','🆕'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
@@ -145,10 +94,6 @@ function helpMessage(message, client,soundCommands,gifCommands,newSoundCommands)
         currentPage = "New"
         msg.edit(newSoundEmbeds[page]);
       }
-      // else if(reaction.emoji.name === '❌'){
-      //   message.delete(1000).catch(err => console.log(err));
-      //   msg.delete(1000).catch(err => console.log(err));
-      // }
     });
     collector.on('end', collection =>{
       //remove reactions once reaction collector has ended
