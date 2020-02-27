@@ -23,7 +23,7 @@ module.exports = {
     return messagesNorm;
   },
   getUserMessageMonthlyRank: async function(id){
-    var rank = '#0';
+    var rank = 'N/A';
     await this.getMonthlyUserMessagesTotals().then(async function (result){
       await result.forEach((item, i) => {
         if(item.id == id){
@@ -34,7 +34,7 @@ module.exports = {
     return rank;
   },
   getUserMessageAllTimeRank: async function(id){
-    var rank = '#0';
+    var rank = 'N/A';
     await this.getAllTimeUserMessagesTotals().then(async function (result){
       await result.forEach((item, i) => {
         if(item.id == id){
@@ -62,7 +62,9 @@ module.exports = {
           }
         });
       });
-      await leaderboard.push({id:user.user_id,messages:count});
+      if(count!=0){
+        await leaderboard.push({id:user.user_id,messages:count});
+      }
     }
     return sortMessagesLeaderboard(leaderboard);
   },
@@ -75,7 +77,9 @@ module.exports = {
       await this.getUserMessages(user.user_id).then(function(result){
         count = result.length;
       });
-      await leaderboard.push({id:user.user_id,messages:count});
+      if(count!=0){
+        await leaderboard.push({id:user.user_id,messages:count});
+      }
     }
     return sortMessagesLeaderboard(leaderboard);
   },
@@ -129,7 +133,7 @@ module.exports = {
     return messagesNorm;
   },
   getUserConnectionMonthlyRank: async function(id){
-    var rank = '#0';
+    var rank = 'N/A';
     await this.getMonthlyUserConnectionsTotals().then(async function (result){
       await result.forEach((item, i) => {
         if(item.id == id){
@@ -140,7 +144,7 @@ module.exports = {
     return rank;
   },
   getUserConnectionAllTimeRank: async function(id){
-    var rank = '#0';
+    var rank = 'N/A';
     await this.getAllTimeUserConnectionsTotals().then(async function (result){
       await result.forEach((item, i) => {
         if(item.id == id){
@@ -181,7 +185,9 @@ module.exports = {
           }
         });
       });
-      await leaderboard.push({id:user.user_id,totalTime:totalMs});
+      if(totalMs!=0){
+        await leaderboard.push({id:user.user_id,totalTime:totalMs});
+      }
     }
     return sortConnectionsLeaderboard(leaderboard);
   },
@@ -199,7 +205,9 @@ module.exports = {
           totalMs += item.connectionLength;
         });
       });
-      await leaderboard.push({id:user.user_id,totalTime:totalMs});
+      if(totalMs!=0){
+        await leaderboard.push({id:user.user_id,totalTime:totalMs});
+      }
     }
     return sortConnectionsLeaderboard(leaderboard);
   },
