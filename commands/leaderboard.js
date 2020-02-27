@@ -21,6 +21,8 @@ module.exports = {
   name: 'leaderboard',
   description: 'leaderboard',
   async execute(message, args,client) {
+    var date = new Date();
+    var startTime = date.getTime();
     tools = client.getTools();
     guild = message.guild;
 
@@ -38,6 +40,11 @@ module.exports = {
     var leaderboardEmbeds = monthlyLeaderboardEmbeds;
 
     message.channel.send(leaderboardEmbeds.get(0)[0]).then((msg)=>{
+
+      date = new Date();
+      var total = date.getTime() - startTime;
+      console.log('Leaderboard took '+total+'ms');
+
       var page = 0;
       var internalPage = 0;
 

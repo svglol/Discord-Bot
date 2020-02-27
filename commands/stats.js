@@ -10,6 +10,8 @@ module.exports = {
   name: 'stats',
   description: 'stats',
   execute(message, args,client) {
+    var date = new Date();
+    var startTime = date.getTime();
 
     currectConnectionTime = client.getStats().getCurrentConnectionTime();
     totalConnectionTime = client.getStats().getTotalConnectionTime();
@@ -109,7 +111,9 @@ module.exports = {
     embed.setDescription(client.getTools().generateTable(data));
 
     message.reply(embed);
-
+    date = new Date();
+    var total = date.getTime() - startTime;
+    console.log('Stats took '+total+'ms');
   },
 };
 
