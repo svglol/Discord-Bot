@@ -9,7 +9,9 @@ module.exports = {
   name: 'stats',
   description: 'stats',
   async execute(message, args,client) {
-    
+    var date = new Date();
+    var startTime = date.getTime();
+
     var currentConnectedTime = 0;
     client.getDbHelper().getCurrentConnectionLength(message.author.id).then(function(result){
       currentConnectedTime = result;
@@ -124,5 +126,6 @@ module.exports = {
 
     message.reply(embed);
 
+    client.getLogger().log('info','Stats Command executed in '+client.getTools().calculateExecutionTime(startTime)+'ms');
   },
 };

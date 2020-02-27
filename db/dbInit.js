@@ -10,8 +10,8 @@ const totalConnectionTimeFile = "../totalConnectionTimeFile.json";
 const monthlyConnectionTimeFile = "../monthlyConnectionTimeFile.json";
 
 module.exports = {
-  init: function(){
-    console.log('Database Initializing');
+  init: function(client){
+    client.getLogger().log('info', 'Database Initializing')
     const sequelize = new Sequelize('database', 'user', 'password', {
       host: 'localhost',
       dialect: 'sqlite',
@@ -73,7 +73,7 @@ module.exports = {
       }
 
       if(connectionTime != null){
-        console.log('Transferring Connection Time File');
+        client.getLogger().log('info', 'Transferring Connection Time File')
         connectionTime.forEach(async (item, i) => {
           await User.upsert({ user_id: item.userid, last_connection: ''});
           await UserConnection.upsert({user_id: item.userid,connectTime:0,disconnectTime:0,connectionLength:item.totalTime})
@@ -81,7 +81,7 @@ module.exports = {
       }
 
       if(soundboardUsage != null){
-        console.log('Transferring Sounboard Usage File');
+        client.getLogger().log('info', 'Transferring Sounboard Usage File')
         soundboardUsage.forEach(async (item, i) => {
           for (var i = 0; i < item.uses; i++) {
             await UserSoundboard.upsert({ user_id: '0',date:'0',command:item.command});
@@ -90,7 +90,7 @@ module.exports = {
       }
 
       if(userChatMessages != null){
-        console.log('Transferring User Chat Messages File');
+        client.getLogger().log('info', 'Transferring User Chat Messages File')
         userChatMessages.forEach(async (item, i) => {
           await User.upsert({ user_id: item.userid, last_connection: ''});
           for (var i = 0; i < item.messages; i++) {
@@ -102,7 +102,7 @@ module.exports = {
       if(soundboardUsage == null && userChatMessages == null && connectionTime == null){
         sequelize.close();
       }
-      console.log('Database Initialized');
+      client.getLogger().log('info', 'Database Initialized')
       //
     }).catch(console.error);
   }
