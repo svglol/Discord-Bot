@@ -98,8 +98,7 @@ module.exports = {
           msg.reactions.removeAll();
         })
       });
-
-   client.getLogger().log('info','Leaderboard Command executed in '+client.getTools().calculateExecutionTime(startTime)+'ms');
+      client.getLogger().log('info','Leaderboard Command executed in '+client.getTools().calculateExecutionTime(startTime)+'ms');
     })
   },
 };
@@ -148,7 +147,6 @@ function setVoiceEmbedField(internalPage,embed,lifetime){
       userName = guild.member(leaderboardArray[i].userid)
       .displayName;
     } catch (e) {
-      console.log(e);
     }
     if (i >= start && i< end) {
       posData.push((i + 1).toString());
@@ -197,7 +195,6 @@ function setMessagesEmbedField(internalPage,embed,lifetime){
       userName = guild.member(leaderboardArray[i].id)
       .displayName;
     } catch (e) {
-      console.log(e);
     }
 
     if (i >= start && i< end) {
