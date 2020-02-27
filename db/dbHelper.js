@@ -13,11 +13,13 @@ module.exports = {
   },
   addUserMessage: async function (message){
     var user = await Users.findOne({ where: { user_id: message.author.id } });
-    if(!user)
-    user = await Users.create({ user_id: message.author.id});
+    if(!user){
+      user = await Users.create({ user_id: message.author.id});
+      await syncUsersCollection();
+    }
     var date = new Date();
-    user.addMessage(message.author.id,date.getTime());
-    syncUsersCollection();
+    var userMessage = await user.addMessage(message.author.id,date.getTime());
+    usersCollection.get(message.author.id).messages.push(userMessage);
   },
   getUserMessages: async function(id){
     var messagesNorm = new Array();
@@ -91,26 +93,32 @@ module.exports = {
       syncUsersCollection();
     }
     else{
-      Users.create({ user_id: id,lastConnection: lastConnection});
+      await Users.create({ user_id: id,lastConnection: lastConnection});
+      syncUsersCollection();
     }
   },
   addUserConnection: async function(id,connectTime,disconnectTime,connectionLength){
     var user = await Users.findOne({ where: { user_id: id } });
-    if(!user)
-    user = await Users.create({ user_id: id});
+    if(!user){
+      user = await Users.create({ user_id: id});
+      syncUsersCollection();
+    }
     var date = new Date();
-    await user.addConnection(id,user.lastConnection,date.getTime(),date.getTime()-user.lastConnection);
+    var userConnection = await user.addConnection(id,user.lastConnection,date.getTime(),date.getTime()-user.lastConnection);
     await this.updateUserLastConnection(id,0);
-    syncUsersCollection();
+    usersCollection.get(id).connections.push(userConnection);
+    usersCollection.get(id).lastConnection = 0;
   },
   addUserSoundboard: async function(id,command){
     var user = await Users.findOne({ where: { user_id: id } });
-    if(!user)
-    user = await Users.create({ user_id: id});
+    if(!user){
+      user = await Users.create({ user_id: id});
+      syncUsersCollection();
+    }
     var date = new Date();
-    await user.addSoundboard(id,date.getTime(),command);
+    var userSoundboard = await user.addSoundboard(id,date.getTime(),command);
+    usersCollection.get(id).soundboards.push(userSoundboard);
     syncUserSoundboard();
-    syncUsersCollection();
   },
   getUserSoundboard: async function(id){
     var messagesNorm = new Array();
@@ -223,7 +231,6 @@ module.exports = {
         leaderboard.push({command:userSoundboard.command,uses:1});
       }
     }
-    console.log(leaderboard)
     return sortSoundboardUsageLeaderboard(leaderboard);
   },
   getMonthlySoundboardTotals: async function(){
