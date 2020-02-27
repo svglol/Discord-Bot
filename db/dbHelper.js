@@ -12,7 +12,7 @@ module.exports = {
     await syncUserConnections();
     await syncUserSoundboard();
     await syncUsers();
-    client.getLogger().log('info', 'Syncd Database to Cache')
+    client.getLogger().log('info', 'Synced Database to Cache')
   },
   addUserMessage: async function (message){
     var user = await Users.findOne({ where: { user_id: message.author.id } });
