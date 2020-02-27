@@ -12,71 +12,49 @@ module.exports = {
     var date = new Date();
     var startTime = date.getTime();
 
-    var currentConnectedTime = 0;
-    client.getDbHelper().getCurrentConnectionLength(message.author.id).then(function(result){
-      currentConnectedTime = result;
-    });
-
-    var totalVoice = 0;
-    var monthlyVoice = 0;
-    await client.getDbHelper().getUserConnections(message.author.id).then(function(userConnections){
-      var date = new Date();
-      var currentMonth = date.getMonth();
-      var currentYear = date.getYear();
-
-      totalMs = 0;
-      monthlyMs = 0;
-
-      totalMs += currentConnectedTime;
-      monthlyMs += currentConnectedTime;
-      userConnections.forEach((item, i) => {
-        totalMs += item.connectionLength;
-        disconnectDate = new Date(item.disconnectTime);
-        if(currentMonth == disconnectDate.getMonth() && currentYear == disconnectDate.getYear()){
-          monthlyMs+= item.connectionLength;
-        }
-      });
-
-      totalVoice = client.getTools().parseMillisecondsIntoReadableTime(totalMs);
-      monthlyVoice = client.getTools().parseMillisecondsIntoReadableTime(monthlyMs);
-
-    })
-
     var monthlyVoiceRank = '#0';
+    var monthlyVoice = 0;
     await client.getDbHelper().getUserConnectionMonthlyRank(message.author.id).then(function(result){
-      monthlyVoiceRank = result;
+      monthlyVoiceRank = result.rank;
+      monthlyVoice = client.getTools().parseMillisecondsIntoReadableTime(result.time);
     })
 
     var totalVoiceRank = '#0';
+    var totalVoice = 0;
     await client.getDbHelper().getUserConnectionAllTimeRank(message.author.id).then(function(result){
-      totalVoiceRank = result;
+      totalVoiceRank = result.rank;
+      totalVoice = client.getTools().parseMillisecondsIntoReadableTime(result.time);
     })
 
+    var totalMessages = 0;
     var totalMessagesRank = '#0';
     await client.getDbHelper().getUserMessageAllTimeRank(message.author.id).then(function(result){
-      totalMessagesRank = result;
+      totalMessagesRank = result.rank;
+      totalMessages = result.messages;
     })
 
+    var monthlyMessages = 0;
     var monthlyMessagesRank = '#0';
     await client.getDbHelper().getUserMessageMonthlyRank(message.author.id).then(function(result){
-      monthlyMessagesRank = result;
+      monthlyMessagesRank = result.rank;
+      monthlyMessages = result.messages;
     })
 
     //get all time and monthly messages for user
-    var totalMessages = 0;
-    var monthlyMessages = 0;
-    await client.getDbHelper().getUserMessages(message.author.id).then(function(userChatMessages){
-      totalMessages = userChatMessages.length;
-      var date = new Date();
-      var currentMonth = date.getMonth();
-      var currentYear = date.getYear();
-      userChatMessages.forEach((item, i) => {
-        messageDate = new Date(item.date);
-        if(currentMonth == messageDate.getMonth() && currentYear == messageDate.getYear()){
-          monthlyMessages++;
-        }
-      });
-    })
+    // var totalMessages = 0;
+    // var monthlyMessages = 0;
+    // await client.getDbHelper().getUserMessages(message.author.id).then(function(userChatMessages){
+    //   totalMessages = userChatMessages.length;
+    //   var date = new Date();
+    //   var currentMonth = date.getMonth();
+    //   var currentYear = date.getYear();
+    //   userChatMessages.forEach((item, i) => {
+    //     messageDate = new Date(item.date);
+    //     if(currentMonth == messageDate.getMonth() && currentYear == messageDate.getYear()){
+    //       monthlyMessages++;
+    //     }
+    //   });
+    // })
 
     var embed = new Discord.MessageEmbed()
     .setTitle('Stats')

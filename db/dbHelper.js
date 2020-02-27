@@ -1,17 +1,14 @@
 const { Users, UserSoundboard,UserMessage,UserConnection } = require('./dbObjects.js');
 const Discord = require('discord.js');
 
-var usersCache = new Array();
-var userMessagesCache = new Array()
+var usersCollection = new Discord.Collection();
 var userSoundboardCache = new Array();
-var userConnectionCache = new Array();
 
 module.exports = {
   sync:async function(client){
-    await syncUserMessages();
-    await syncUserConnections();
+
+    await syncUsersCollection();
     await syncUserSoundboard();
-    await syncUsers();
     client.getLogger().log('info', 'Synced Database to Cache')
   },
   addUserMessage: async function (message){
@@ -20,74 +17,68 @@ module.exports = {
     user = await Users.create({ user_id: message.author.id});
     var date = new Date();
     user.addMessage(message.author.id,date.getTime());
-    syncUserMessages();
+    syncUsersCollection();
   },
   getUserMessages: async function(id){
     var messagesNorm = new Array();
-    userMessagesCache.forEach((item, i) => {
-      if(item.dataValues.user_id == id){
-        messagesNorm.push(item.dataValues);
-      }
-    });
+    var user = usersCollection.get(id);
+    if(user != null){
+      messagesNorm.push(user.messages);
+    }
     return messagesNorm;
   },
   getUserMessageMonthlyRank: async function(id){
     var rank = 'N/A';
+    var messages = 0;
     await this.getMonthlyUserMessagesTotals().then(async function (result){
       await result.forEach((item, i) => {
         if(item.id == id){
           rank =  "#"+(i+1);
+          messages = item.messages;
         }
       });
     })
-    return rank;
+    return {rank:rank,messages:messages};
   },
   getUserMessageAllTimeRank: async function(id){
     var rank = 'N/A';
+    var messages = 0;
     await this.getAllTimeUserMessagesTotals().then(async function (result){
       await result.forEach((item, i) => {
         if(item.id == id){
           rank =  "#"+(i+1);
+          messages = item.messages;
         }
       });
     })
-    return rank;
+    return {rank:rank,messages:messages};
   },
   getMonthlyUserMessagesTotals: async function(){
-    var users = await Users.findAll();
     var leaderboard = new Array();
-
     var date = new Date();
     var currentMonth = date.getMonth();
     var currentYear = date.getYear();
-
-    for(const user of users){
+    for (const [key, user] of usersCollection.entries()) {
       var count = 0;
-      await this.getUserMessages(user.user_id).then(function(result){
-        result.forEach((item, i) => {
-          var messageDate = new Date(item.date);
-          if(currentMonth == messageDate.getMonth() && currentYear == messageDate.getYear()){
-            count++;
-          }
-        });
+      user.messages.forEach((message, i) => {
+        var messageDate = new Date(message.date);
+        if(currentMonth == messageDate.getMonth() && currentYear == messageDate.getYear()){
+          count++;
+        }
       });
       if(count!=0){
-        await leaderboard.push({id:user.user_id,messages:count});
+        leaderboard.push({id:user.user_id,messages:count});
       }
     }
     return sortMessagesLeaderboard(leaderboard);
   },
   getAllTimeUserMessagesTotals: async function(){
-    var users = await Users.findAll();
     var leaderboard = new Array();
-
-    for(const user of users){
+    for (const [key, user] of usersCollection.entries()) {
       var count = 0;
-      await this.getUserMessages(user.user_id).then(function(result){
-        count = result.length;
-      });
+      count = user.messages.length;
       if(count!=0){
-        await leaderboard.push({id:user.user_id,messages:count});
+        leaderboard.push({id:user.user_id,messages:count});
       }
     }
     return sortMessagesLeaderboard(leaderboard);
@@ -96,11 +87,11 @@ module.exports = {
     var user = await Users.findOne({ where: { user_id: id } });
     if(user != null){
       user.lastConnection = lastConnection;
-      user.save();
-      syncUsers();
+      await user.save();
+      syncUsersCollection();
     }
     else{
-      return Users.create({ user_id: id,lastConnection: lastConnection});
+      Users.create({ user_id: id,lastConnection: lastConnection});
     }
   },
   addUserConnection: async function(id,connectTime,disconnectTime,connectionLength){
@@ -108,57 +99,60 @@ module.exports = {
     if(!user)
     user = await Users.create({ user_id: id});
     var date = new Date();
-    user.addConnection(id,user.lastConnection,date.getTime(),date.getTime()-user.lastConnection);
-    this.updateUserLastConnection(id,0);
-    syncUserConnections();
+    await user.addConnection(id,user.lastConnection,date.getTime(),date.getTime()-user.lastConnection);
+    await this.updateUserLastConnection(id,0);
+    syncUsersCollection();
   },
   addUserSoundboard: async function(id,command){
     var user = await Users.findOne({ where: { user_id: id } });
     if(!user)
     user = await Users.create({ user_id: id});
     var date = new Date();
-    user.addSoundboard(id,date.getTime(),command);
+    await user.addSoundboard(id,date.getTime(),command);
     syncUserSoundboard();
+    syncUsersCollection();
   },
   getUserSoundboard: async function(id){
     var messagesNorm = new Array();
-    userSoundboardCache.forEach((item, i) => {
-      if(item.dataValues.user_id == id){
-        messagesNorm.push(item.dataValues);
-      }
-    });
+    var user = usersCollection.get(id);
+    if(user != null){
+      messagesNorm.push(user.soundboard);
+    }
     return messagesNorm;
   },
   getUserConnections: async function(id){
     var messagesNorm = new Array();
-    userConnectionsCache.forEach((item, i) => {
-      if(item.dataValues.user_id == id){
-        messagesNorm.push(item.dataValues);
-      }
-    });
+    var user = usersCollection.get(id);
+    if(user != null){
+      messagesNorm.push(user.connections);
+    }
     return messagesNorm;
   },
   getUserConnectionMonthlyRank: async function(id){
     var rank = 'N/A';
+    var time = '-';
     await this.getMonthlyUserConnectionsTotals().then(async function (result){
       await result.forEach((item, i) => {
         if(item.id == id){
           rank =  "#"+(i+1);
+          time = item.totalTime;
         }
       });
     })
-    return rank;
+    return {rank:rank,time:time};
   },
   getUserConnectionAllTimeRank: async function(id){
     var rank = 'N/A';
+    var time = '-';
     await this.getAllTimeUserConnectionsTotals().then(async function (result){
       await result.forEach((item, i) => {
         if(item.id == id){
           rank =  "#"+(i+1);
+          time = item.totalTime;
         }
       });
     })
-    return rank;
+    return {rank:rank,time:time};
   },
   getUser: async function(id){
     var user = await Users.findOne({ where: { user_id: id } });
@@ -166,14 +160,12 @@ module.exports = {
   },
   getCurrentConnectionLength: async function(id){
     var total = 0;
-    usersCache.forEach((user, i) => {
-      if(user.dataValues.user_id == id){
-        if(user.dataValues.lastConnection == 0) return 0;
-        var date = new Date();
-        total = date.getTime()-user.dataValues.lastConnection;
-
-      }
-    });
+    var user = usersCollection.get(id)
+    if(user != null){
+      if(user.lastConnection == 0) return 0;
+      var date = new Date();
+      total = date.getTime()-user.lastConnection;
+    }
     return total;
   },
   getMonthlyUserConnectionsTotals: async function(){
@@ -184,18 +176,17 @@ module.exports = {
     var currentMonth = date.getMonth();
     var currentYear = date.getYear();
 
-    for(const user of users){
+
+    for (const [key, user] of usersCollection.entries()) {
       var totalMs = 0;
       await this.getCurrentConnectionLength(user.user_id).then(function (result){
         totalMs += result;
       })
-      await this.getUserConnections(user.user_id).then(function(result){
-        result.forEach((item, i) => {
-          disconnectDate = new Date(item.disconnectTime);
-          if(currentMonth == disconnectDate.getMonth() && currentYear == disconnectDate.getYear()){
-            totalMs+= item.connectionLength;
-          }
-        });
+      user.connections.forEach((item, i) => {
+        disconnectDate = new Date(item.disconnectTime);
+        if(currentMonth == disconnectDate.getMonth() && currentYear == disconnectDate.getYear()){
+          totalMs+= item.connectionLength;
+        }
       });
       if(totalMs!=0){
         await leaderboard.push({id:user.user_id,totalTime:totalMs});
@@ -204,18 +195,15 @@ module.exports = {
     return sortConnectionsLeaderboard(leaderboard);
   },
   getAllTimeUserConnectionsTotals: async function(){
-    var users = await Users.findAll();
     var leaderboard = new Array();
 
-    for(const user of users){
+    for (const [key, user] of usersCollection.entries()) {
       var totalMs = 0;
       await this.getCurrentConnectionLength(user.user_id).then(function (result){
         totalMs += result;
       })
-      await this.getUserConnections(user.user_id).then(function(result){
-        result.forEach((item, i) => {
-          totalMs += item.connectionLength;
-        });
+      user.connections.forEach((item, i) => {
+        totalMs += item.connectionLength;
       });
       if(totalMs!=0){
         await leaderboard.push({id:user.user_id,totalTime:totalMs});
@@ -226,7 +214,6 @@ module.exports = {
   getAllTimeSoundboardTotals: async function(){
     var soundboardUsage = userSoundboardCache;
     var leaderboard = new Array();
-
     for(const userSoundboard of soundboardUsage){
       var update = leaderboard.find(data => data.command == userSoundboard.command);
       if(update != null){
@@ -236,6 +223,7 @@ module.exports = {
         leaderboard.push({command:userSoundboard.command,uses:1});
       }
     }
+    console.log(leaderboard)
     return sortSoundboardUsageLeaderboard(leaderboard);
   },
   getMonthlySoundboardTotals: async function(){
@@ -260,7 +248,6 @@ module.exports = {
     }
     return sortSoundboardUsageLeaderboard(leaderboard);
   }
-
 }
 
 function sortMessagesLeaderboard(leaderboard){
@@ -302,26 +289,22 @@ function sortSoundboardUsageLeaderboard(leaderboard){
   return leaderboard;
 }
 
-async function syncUserMessages(){
-  var userMessages = await UserMessage.findAll();
-  userMessagesCache = new Array();
-  userMessages.forEach(i => userMessagesCache.push(i));
-}
-
-async function syncUserConnections(){
-  var userConnections = await UserConnection.findAll();
-  userConnectionsCache = new Array();
-  userConnections.forEach(i => userConnectionsCache.push(i));
-}
-
-async function syncUsers(){
-  var users = await Users.findAll();
-  usersCache = new Array();
-  users.forEach(i => usersCache.push(i));
-}
-
 async function syncUserSoundboard(){
   var userSoundboard = await UserSoundboard.findAll();
   userSoundboardCache = new Array();
   userSoundboard.forEach(i => userSoundboardCache.push(i));
+}
+
+async function syncUsersCollection(){
+  var users = await Users.findAll();
+  usersCollection.clear();
+
+  for(const user of users){
+    var messages = await user.getMessages();
+    var connections = await user.getConnections();
+    var soundboard = await user.getSoundboards();
+
+    var newUser = {user_id:user.dataValues.user_id,lastConnection:user.dataValues.lastConnection,messages:messages,connections:connections,soundboards:soundboard};
+    usersCollection.set(user.dataValues.user_id,newUser);
+  }
 }
