@@ -40,22 +40,6 @@ module.exports = {
       monthlyMessages = result.messages;
     })
 
-    //get all time and monthly messages for user
-    // var totalMessages = 0;
-    // var monthlyMessages = 0;
-    // await client.getDbHelper().getUserMessages(message.author.id).then(function(userChatMessages){
-    //   totalMessages = userChatMessages.length;
-    //   var date = new Date();
-    //   var currentMonth = date.getMonth();
-    //   var currentYear = date.getYear();
-    //   userChatMessages.forEach((item, i) => {
-    //     messageDate = new Date(item.date);
-    //     if(currentMonth == messageDate.getMonth() && currentYear == messageDate.getYear()){
-    //       monthlyMessages++;
-    //     }
-    //   });
-    // })
-
     var embed = new Discord.MessageEmbed()
     .setTitle('Stats')
     .setAuthor(message.member.displayName, message.author.displayAvatarURL())
