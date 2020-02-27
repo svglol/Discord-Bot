@@ -1,4 +1,4 @@
-const { Users } = require('./dbObjects.js');
+const { Users, UserSoundboard } = require('./dbObjects.js');
 const Discord = require('discord.js');
 const userSet = new Discord.Collection();
 
@@ -104,6 +104,18 @@ module.exports = {
     var date = new Date();
     user.addSoundboard(id,date.getTime(),command);
   },
+  getUserSoundboard: async function(id){
+    var user = await Users.findOne({ where: { user_id: id } });
+    if(!user) return;
+    var messages = await user.getSoundboards();
+    var messagesNorm = new Array();
+
+    messages.forEach((item, i) => {
+      messagesNorm.push(item.dataValues);
+    });
+
+    return messagesNorm;
+  },
   getUserConnections: async function(id){
     var user = await Users.findOne({ where: { user_id: id } });
     if(!user) return;
@@ -190,6 +202,43 @@ module.exports = {
       await leaderboard.push({id:user.user_id,totalTime:totalMs});
     }
     return sortConnectionsLeaderboard(leaderboard);
+  },
+  getAllTimeSoundboardTotals: async function(){
+    var soundboardUsage = await UserSoundboard.findAll();
+    var leaderboard = new Array();
+
+    for(const userSoundboard of soundboardUsage){
+      var update = leaderboard.find(data => data.command == userSoundboard.command);
+      if(update != null){
+        update.uses += 1;
+      }
+      else{
+        leaderboard.push({command:userSoundboard.command,uses:1});
+      }
+    }
+    return sortSoundboardUsageLeaderboard(leaderboard);
+  },
+  getMonthlySoundboardTotals: async function(){
+    var soundboardUsage = await UserSoundboard.findAll();
+    var leaderboard = new Array();
+
+    var date = new Date();
+    var currentMonth = date.getMonth();
+    var currentYear = date.getYear();
+
+    for(const userSoundboard of soundboardUsage){
+      useDate = new Date(userSoundboard.date);
+      if(currentMonth == useDate.getMonth() && currentYear == useDate.getYear()){
+        var update = leaderboard.find(data => data.command == userSoundboard.command);
+        if(update != null){
+          update.uses += 1;
+        }
+        else{
+          leaderboard.push({command:userSoundboard.command,uses:1});
+        }
+      }
+    }
+    return sortSoundboardUsageLeaderboard(leaderboard);
   }
 
 }
@@ -213,6 +262,19 @@ function sortConnectionsLeaderboard(leaderboard){
       return -1;
     }
     if (a.totalTime < b.totalTime) {
+      return 1;
+    }
+    return 0;
+  });
+  return leaderboard;
+}
+
+function sortSoundboardUsageLeaderboard(leaderboard){
+  leaderboard.sort(function(a, b) {
+    if (a.uses > b.uses) {
+      return -1;
+    }
+    if (a.uses < b.uses) {
       return 1;
     }
     return 0;

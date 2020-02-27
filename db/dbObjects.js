@@ -41,4 +41,4 @@ Users.prototype.addConnection = async function(id,connectTime,disconnectTime,con
 Users.prototype.addSoundboard = async function(id,date,command) {
 	return UserSoundboard.create({ user_id: this.user_id, date: date,command: command});
 };
-module.exports = {Users};
+module.exports = {Users,UserSoundboard};
