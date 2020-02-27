@@ -35,8 +35,6 @@ module.exports = {
       var leaderboardEmbeds = monthlyLeaderboardEmbeds;
 
       message.channel.send(leaderboardEmbeds.get(0)[0]).then((msg)=>{
-
-        client.getLogger().log('info','Leaderboard Command executed in '+client.getTools().calculateExecutionTime(startTime)+'ms');
         var page = 0;
         var internalPage = 0;
 
@@ -100,6 +98,8 @@ module.exports = {
           msg.reactions.removeAll();
         })
       });
+
+   client.getLogger().log('info','Leaderboard Command executed in '+client.getTools().calculateExecutionTime(startTime)+'ms');
     })
   },
 };
