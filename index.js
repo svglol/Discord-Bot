@@ -123,4 +123,5 @@ client.on('error', m => logger.log('error', m));
 process.on('uncaughtException', error => logger.log('error', error));
 
 dbInit.init(client);
+dbHelper.sync(client);
 client.init();
