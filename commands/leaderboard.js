@@ -223,7 +223,6 @@ function setSoundboardEmbedField(internalPage,embed,lifetime){
       rows.push([(i + 1).toString(),leaderboardArray[i].command,leaderboardArray[i].uses]);
     }
   }
-
   embed.setDescription(tools.generateTable(rows));
 }
 
@@ -243,7 +242,10 @@ function generateLeaderboardEmbeds(lifetime){
     if(title === "🗣️ Voice"){
       //loop through each internal page
       var voiceLeaderboardEmbeds = new Array();
-      for (var o = 0; o < Math.ceil(totalConnectionTime.length/leaderboardSize); o++) {
+      var length = 0;
+      if(lifetime)length = totalConnectionTime.length/leaderboardSize;
+      else length = monthlyConnectionTime.length/leaderboardSize
+      for (var o = 0; o < Math.ceil(length); o++) {
         var embed = new Discord.MessageEmbed()
         .setTitle(title +' '+'Leaderboard')
         .setColor("#0099ff")
@@ -256,7 +258,10 @@ function generateLeaderboardEmbeds(lifetime){
     }else if(title === "⌨️ Messages"){
       //loop through each internal page
       var messagesLeaderboardEmbeds = new Array();
-      for (var o = 0; o < Math.ceil(userChatMessages.length/leaderboardSize); o++) {
+      var length = 0;
+      if(lifetime)length = userChatMessages.length/leaderboardSize;
+      else length = monthlyUserChatMessages.length/leaderboardSize
+      for (var o = 0; o < Math.ceil(length); o++) {
         var embed = new Discord.MessageEmbed()
         .setTitle(title +' '+'Leaderboard')
         .setColor("#0099ff")
@@ -269,7 +274,10 @@ function generateLeaderboardEmbeds(lifetime){
     }else if (title === "🔊 Soundboard") {
       //loop through each internal page
       var soundboardLeaderboardEmbeds = new Array();
-      for (var o = 0; o < Math.ceil(soundboardUsage.length/leaderboardSize); o++) {
+      var length = 0;
+      if(lifetime)length = soundboardUsage.length/leaderboardSize;
+      else length = monthlySoundboardUsage.length/leaderboardSize
+      for (var o = 0; o < Math.ceil(length); o++) {
         var embed = new Discord.MessageEmbed()
         .setTitle(title +' '+'Leaderboard')
         .setColor("#0099ff")
