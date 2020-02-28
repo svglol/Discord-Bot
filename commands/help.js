@@ -108,7 +108,7 @@ function generateNewSoundboardEmbed(newSoundCommands){
 
   var cmdLength = 0;
   newSoundCommands.forEach((item, i) => {
-    cmdLength += item.length;
+    cmdLength += item[1].name.length;
     cmdLength += 4;
   });
 
@@ -119,14 +119,15 @@ function generateNewSoundboardEmbed(newSoundCommands){
 
     var currentPage = i+1;
     const embed = new Discord.MessageEmbed()
-    .setTitle("🆕 New Sound Commands")
+    .setTitle(":loud_sound: Sound Commands")
     .setColor('#0099ff')
     .setFooter(currentPage+"/"+pages)
     .addFields({ name: ':blue_circle: Prefix', value: "`"+prefix+"`" })
 
     var soundsMessage = "";
+
     for (var j = start; j < newSoundCommands.length; j++) {
-      addMessage = "`"+newSoundCommands[j]+"` ";
+      addMessage = "`"+newSoundCommands[j][1].name+"` ";
       if(addMessage.length + soundsMessage.length < 2048){
         soundsMessage += addMessage;
       }else{
@@ -146,7 +147,7 @@ function generateSoundboardEmbeds(soundCommands){
 
   var cmdLength = 0;
   soundCommands.forEach((item, i) => {
-    cmdLength += item.command.length;
+    cmdLength += item[1].name.length;
     cmdLength += 4;
   });
 
@@ -163,8 +164,9 @@ function generateSoundboardEmbeds(soundCommands){
     .addFields({ name: ':blue_circle: Prefix', value: "`"+prefix+"`" })
 
     var soundsMessage = "";
+
     for (var j = start; j < soundCommands.length; j++) {
-      addMessage = "`"+soundCommands[j].command+"` ";
+      addMessage = "`"+soundCommands[j][1].name+"` ";
       if(addMessage.length + soundsMessage.length < 2048){
         soundsMessage += addMessage;
       }else{

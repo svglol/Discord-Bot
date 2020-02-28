@@ -13,10 +13,6 @@ const dbInit =  require('./db/dbInit.js');
 const gifCommands = require('./commands/gifcommands.json').commands;
 const prefix = require('./config.json').prefix;
 
-var soundCommands = [];
-var adminSoundCommands = [];
-var newSoundCommands = [];
-
 const fs = require('fs');
 
 class Client extends Discord.Client {
@@ -70,14 +66,15 @@ class Client extends Discord.Client {
       }
 
     });
-
   }
 
   getSoundCommands(){
-    return soundCommands;
-  }
-  getAdminSoundCommands(){
-    return adminSoundCommands;
+    return Array.from(client.commands.filter(function (command){
+      if(typeof command.soundboard !== 'undefined'){
+        return true;
+      }
+      return false;
+    }));
   }
   getGifCommands(){
     return gifCommands;
@@ -89,7 +86,13 @@ class Client extends Discord.Client {
     return sound;
   }
   getNewSoundCommands(){
-    return newSoundCommands;
+    return Array.from(client.commands.filter(function (command){
+      if(typeof command.newSound !== 'undefined'){
+        if(command.newSound == true)return true;
+        else return false;
+      }
+      return false;
+    }));
   }
   getPrefix(){
     return prefix;
@@ -118,12 +121,24 @@ for (const file of commandFiles) {
 
 //generate soundboard commands
 fs.readdirSync('./resources/sound/').forEach(file => {
+
+  var newSound = false;
+  var date = new Date();
+  var modTime = fs.statSync('./resources/sound/' + '/' + file).mtime.getTime();
+
+  var diff = Math.abs(modTime - date.getTime());
+  var days = diff / (1000 * 60 * 60 * 24);
+  if(days < 7){
+    newSound = true;
+  }
+
   var command = {
     name: /[^.]*/.exec(file)[0],
     description: 'Play '+/[^.]*/.exec(file)[0]+ ' sound effect',
-    file:file,
+    file:'./resources/admin-sound/'+file,
     soundboard:true,
     guildOnly:true,
+    newSound:newSound,
     execute(message, args,client) {
       var end = false;
       var sound = {file:'./resources/sound/'+file, command:tools.createCommand(file)};
@@ -143,19 +158,6 @@ fs.readdirSync('./resources/sound/').forEach(file => {
     }
   };
   client.commands.set(command.name,command);
-
-  var sound = {file:'./resources/sound/'+file, command:tools.createCommand(file)};
-  soundCommands.push(sound);
-
-  var date = new Date();
-  var modTime = fs.statSync('./resources/sound/' + '/' + file).mtime.getTime();
-
-  var diff = Math.abs(modTime - date.getTime());
-  var days = diff / (1000 * 60 * 60 * 24);
-  if(days < 7){
-    newSoundCommands.push(tools.createCommand(file));
-  }
-
 });
 
 //generate admin soundboard commands
@@ -163,7 +165,7 @@ fs.readdirSync('./resources/admin-sound/').forEach(file => {
   var command = {
     name: /[^.]*/.exec(file)[0],
     description: 'Play '+tools.createCommand(file)+ ' sound effect',
-    file:file,
+    file:'./resources/admin-sound/'+file,
     adminSoundboard:true,
     guildOnly:true,
     execute(message, args,client) {
