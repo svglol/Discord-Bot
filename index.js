@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const winston = require('winston');
+var glob = require("glob")
 
 //Modules
 const tools = require('./lib/tools.js');
@@ -110,12 +111,23 @@ class Client extends Discord.Client {
 
 const client = new Client();
 
+const logger = winston.createLogger({
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: 'log' }),
+  ],
+  format: winston.format.printf(log => `[${log.level.toUpperCase()}] - ${log.message}`),
+});
+
+dbInit.init(client);
+dbHelper.sync(client);
+
 client.commands = new Discord.Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const commandFiles = glob.sync('./commands' + '/**/*.js');
 
 //generate commands from file
 for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
+  const command = require(`${file}`);
   client.commands.set(command.name, command);
 }
 
@@ -191,14 +203,6 @@ gifCommands.forEach((item, i) => {
   client.commands.set(command.name,command);
 });
 
-const logger = winston.createLogger({
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: 'log' }),
-  ],
-  format: winston.format.printf(log => `[${log.level.toUpperCase()}] - ${log.message}`),
-});
-
 client.on('ready', () => logger.log('info', 'Discord-Bot Connected'));
 client.on('debug', m => logger.log('debug', m));
 client.on('warn', m => logger.log('warn', m));
@@ -206,6 +210,4 @@ client.on('error', m => logger.log('error', m));
 
 process.on('uncaughtException', error => logger.log('error', error));
 
-dbInit.init(client);
-dbHelper.sync(client);
 client.init();
