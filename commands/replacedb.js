@@ -10,7 +10,7 @@ module.exports = {
       for (const [key, attachment] of message.attachments.entries()) {
         var x=/^[^.]+.sqlite$/;
         if(x.test(attachment.name)){
-          fs.renameSync("database.sqlite", "database-"+new Date().toTimeString()+".sqlite");
+          // fs.renameSync("database.sqlite", "database-"+new Date().toTimeString()+".sqlite");
           const file = fs.createWriteStream("database.sqlite");
           const request = https.get(attachment.url, async function(response) {
             await response.pipe(file);
