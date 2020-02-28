@@ -24,6 +24,8 @@ module.exports = {
     const UserMessage = sequelize.import('models/UserMessage');
     const UserSoundboard = sequelize.import('models/UserSoundboard');
 
+    const CommandVolume = sequelize.import('models/CommandVolume');
+
     const force = process.argv.includes('--force') || process.argv.includes('-f');
 
     sequelize.sync({ force }).then(async () => {

@@ -11,6 +11,7 @@ const Users = sequelize.import('models/Users');
 const UserConnection = sequelize.import('models/UserConnection');
 const UserMessage = sequelize.import('models/UserMessage');
 const UserSoundboard = sequelize.import('models/UserSoundboard');
+const CommandVolume = sequelize.import('models/CommandVolume');
 
 Users.prototype.addMessage = async function(id,date) {
 	return UserMessage.create({ user_id: this.user_id, date: date});
@@ -41,4 +42,4 @@ Users.prototype.addConnection = async function(id,connectTime,disconnectTime,con
 Users.prototype.addSoundboard = async function(id,date,command) {
 	return UserSoundboard.create({ user_id: this.user_id, date: date,command: command});
 };
-module.exports = {Users,UserSoundboard,UserMessage,UserConnection};
+module.exports = {Users,UserSoundboard,UserMessage,UserConnection,CommandVolume};

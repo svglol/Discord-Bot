@@ -1,12 +1,13 @@
-const { Users, UserSoundboard,UserMessage,UserConnection } = require('./dbObjects.js');
+const { Users, UserSoundboard,UserMessage,UserConnection,CommandVolume} = require('./dbObjects.js');
 const Discord = require('discord.js');
 
 var usersCollection = new Discord.Collection();
+var commandVolumeCache = new Discord.Collection();
 var userSoundboardCache = new Array();
 
 module.exports = {
   sync:async function(client){
-
+    await syncCommandVolumeCache();
     await syncUsersCollection();
     await syncUserSoundboard();
     client.getLogger().log('info', 'Synced Database to Cache')
@@ -264,10 +265,25 @@ module.exports = {
   syncGuildUsers: async function(client){
     for (const [key, guild] of client.guilds.cache.entries()) {
       for (const [id, member] of guild.members.cache.entries()) {
-         await this.addUser(member.user.id);
+        await this.addUser(member.user.id);
       }
     }
     await syncUsersCollection();
+  },
+  addCommandVolume:async function(command,volume){
+    var commandVolume = await CommandVolume.findOne({ where: { command: command} });
+    if(!commandVolume){
+      commandVolume = await CommandVolume.create({ command: command,volume:volume});
+    }
+    else{
+      commandVolume.volume = volume;
+      commandVolume.save();
+    }
+    commandVolumeCache.set(command,volume);
+  },
+  getCommandVolume:function(command){
+    if(!commandVolumeCache.get(command)) return 1;
+    return commandVolumeCache.get(command);
   }
 }
 
@@ -328,4 +344,10 @@ async function syncUsersCollection(){
     var newUser = {user_id:user.dataValues.user_id,lastConnection:user.dataValues.lastConnection,messages:messages,connections:connections,soundboards:soundboard};
     usersCollection.set(user.dataValues.user_id,newUser);
   }
+}
+
+async function syncCommandVolumeCache(){
+  var soundboardVolumes = await CommandVolume.findAll();
+  commandVolumeCache.clear();
+  soundboardVolumes.forEach(i => commandVolumeCache.set(i.dataValues.command,i.dataValues.volume));
 }

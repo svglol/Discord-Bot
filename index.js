@@ -59,6 +59,13 @@ class Client extends Discord.Client {
       if (command.guildOnly && message.channel.type !== 'text') return message.reply('I can\'t execute that command inside DMs!');
       if(command.adminOnly && !message.member.hasPermission("ADMINISTRATOR")) return;
       if(command.meOnly && message.author.id != '80282793766035456') return;
+      if (command.args && !args.length || command.args && args.length != command.numArgs) {
+        let reply = `You didn't provide any arguments, ${message.author}!`;
+        if (command.usage) {
+          reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
+        }
+        return message.channel.send(reply);
+      }
 
       try {
         command.execute(message, args, this);
