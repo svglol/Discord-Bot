@@ -106,3 +106,4 @@ dist
 *.sqlite
 
 log
+ecosystem.config.js
