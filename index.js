@@ -41,7 +41,7 @@ class Client extends Discord.Client {
 
     tools.loadSoundCommands(soundCommands,adminSoundCommands,newSoundCommands);
     tools.sort(soundCommands,gifCommands);
-    
+
     client.on('ready', () => {
       dbHelper.syncGuildUsers(this);
     });
@@ -56,7 +56,9 @@ class Client extends Discord.Client {
       const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
       if(!command) return;
+      if (command.guildOnly && message.channel.type !== 'text') return message.reply('I can\'t execute that command inside DMs!');
       if(command.adminOnly && !message.member.hasPermission("ADMINISTRATOR")) return;
+
 
       try {
         command.execute(message, args, this);

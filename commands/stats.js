@@ -8,6 +8,7 @@ var monthlyConnectionTime = new Array();
 module.exports = {
   name: 'stats',
   description: 'stats',
+  guildOnly: true,
   async execute(message, args,client) {
     var date = new Date();
     var startTime = date.getTime();

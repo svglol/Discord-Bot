@@ -20,6 +20,7 @@ const pages = ['🗣️ Voice', '⌨️ Messages', '🔊 Soundboard'];
 module.exports = {
   name: 'leaderboard',
   description: 'leaderboard',
+  guildOnly: true,
   async execute(message, args,cClient) {
     var date = new Date();
     var startTime = date.getTime();
