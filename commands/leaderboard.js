@@ -98,8 +98,7 @@ module.exports = {
           msg.reactions.removeAll();
         })
       });
-
-   client.getLogger().log('info','Leaderboard Command executed in '+client.getTools().calculateExecutionTime(startTime)+'ms');
+      client.getLogger().log('info','Leaderboard Command executed in '+client.getTools().calculateExecutionTime(startTime)+'ms');
     })
   },
 };
@@ -134,10 +133,8 @@ function setVoiceEmbedField(internalPage,embed,lifetime){
   var start = leaderboardSize * internalPage;
   var end = start + leaderboardSize;
 
-  var data = new Map();
-  var posData = new Array();
-  var namesData = new Array();
-  var timesData = new Array();
+  var rows = new Array();
+  rows.push(['#','Name','Time']);
 
   for (let i = 0; i < leaderboardArray.length; i++) {
     var readableTotalConnectionTime = tools.parseMillisecondsIntoReadableTime(
@@ -148,20 +145,13 @@ function setVoiceEmbedField(internalPage,embed,lifetime){
       userName = guild.member(leaderboardArray[i].userid)
       .displayName;
     } catch (e) {
-      console.log(e);
     }
     if (i >= start && i< end) {
-      posData.push((i + 1).toString());
-      namesData.push(userName);
-      timesData.push(readableTotalConnectionTime);
+      rows.push([(i + 1).toString(),userName,readableTotalConnectionTime]);
     }
   }
 
-  data.set('#',posData);
-  data.set('Name',namesData);
-  data.set('Time',timesData);
-
-  embed.setDescription(tools.generateTable(data));
+  embed.setDescription(tools.generateTable(rows));
 }
 
 function getMessagesEmbedFooter(internalPage,lifetime){
@@ -186,10 +176,8 @@ function setMessagesEmbedField(internalPage,embed,lifetime){
   var start = leaderboardSize * internalPage;
   var end = start + leaderboardSize;
 
-  var data = new Map();
-  var posData = new Array();
-  var namesData = new Array();
-  var messagesData = new Array();
+  var rows = new Array();
+  rows.push(['#','Name','Messages']);
 
   for (let i = 0; i < leaderboardArray.length; i++) {
     var userName = "";
@@ -197,20 +185,14 @@ function setMessagesEmbedField(internalPage,embed,lifetime){
       userName = guild.member(leaderboardArray[i].id)
       .displayName;
     } catch (e) {
-      console.log(e);
     }
 
     if (i >= start && i< end) {
-      posData.push((i + 1).toString());
-      namesData.push(userName);
-      messagesData.push(leaderboardArray[i].messages);
+      rows.push([(i + 1).toString(),userName,leaderboardArray[i].messages]);
     }
   }
-  data.set('#',posData);
-  data.set('Name',namesData);
-  data.set('Messages',messagesData);
 
-  embed.setDescription(tools.generateTable(data));
+  embed.setDescription(tools.generateTable(rows));
 }
 
 function getSoundboardEmbedFooter(internalPage,lifetime){
@@ -232,23 +214,16 @@ function setSoundboardEmbedField(internalPage,embed,lifetime){
   var start = leaderboardSize * internalPage;
   var end = start + leaderboardSize;
 
-  var data = new Map();
-  var posData = new Array();
-  var namesData = new Array();
-  var playsData = new Array();
+  var rows = new Array();
+  rows.push(['#','Name','Plays']);
 
   for (let i = 0; i < leaderboardArray.length; i++) {
     if (i >= start && i< end) {
-      posData.push((i + 1).toString());
-      namesData.push(leaderboardArray[i].command);
-      playsData.push(leaderboardArray[i].uses);
+      rows.push([(i + 1).toString(),leaderboardArray[i].command,leaderboardArray[i].uses]);
     }
   }
-  data.set('#',posData);
-  data.set('Name',namesData);
-  data.set('Plays',playsData);
 
-  embed.setDescription(tools.generateTable(data));
+  embed.setDescription(tools.generateTable(rows));
 }
 
 function generateLeaderboardEmbeds(lifetime){
