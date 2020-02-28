@@ -4,7 +4,6 @@ const winston = require('winston');
 //Modules
 const tools = require('./lib/tools.js');
 const sound = require('./lib/sound.js');
-const gifs = require('./lib/gifs.js');
 const intro = require('./lib/intro.js');
 const stats = require('./lib/stats.js');
 
@@ -30,7 +29,6 @@ class Client extends Discord.Client {
       .catch(console.error);
 
       sound.listen(this);
-      gifs.listen(this);
       intro.listen(this);
       stats.listen(this);
     })
@@ -172,6 +170,20 @@ fs.readdirSync('./resources/admin-sound/').forEach(file => {
       var end = true;
       var sound = {file:'./resources/admin-sound/'+file, command:tools.createCommand(file)};
       client.getSound().queue(message,sound,end);
+    }
+  };
+  client.commands.set(command.name,command);
+});
+
+//generate gif commands
+gifCommands.forEach((item, i) => {
+  var command = {
+    name: item.command,
+    description: 'Post '+item.command+" gif",
+    gif:true,
+    guildOnly:true,
+    execute(message, args,client) {
+      message.channel.send(item.link);
     }
   };
   client.commands.set(command.name,command);
