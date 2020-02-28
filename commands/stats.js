@@ -4,256 +4,70 @@ var currectConnectionTime = new Array();
 var totalConnectionTime = new Array();
 var userChatMessages = new Array();
 var monthlyConnectionTime = new Array();
-var monthlyUserChatMessages = new Array();
 
 module.exports = {
   name: 'stats',
   description: 'stats',
-  execute(message, args,client) {
+  async execute(message, args,client) {
     var date = new Date();
     var startTime = date.getTime();
 
-    currectConnectionTime = client.getStats().getCurrentConnectionTime();
-    totalConnectionTime = client.getStats().getTotalConnectionTime();
-    userChatMessages = client.getStats().getUserChatMessages();
-    monthlyConnectionTime = client.getStats().getMonthlyConnectionTime();
-    monthlyUserChatMessages = client.getStats().getMonthlyUserChatMessages();
-
-    var totalVoice = 0;
+    var monthlyVoiceRank = '#0';
     var monthlyVoice = 0;
+    await client.getDbHelper().getUserConnectionMonthlyRank(message.author.id).then(function(result){
+      monthlyVoiceRank = result.rank;
+      monthlyVoice = client.getTools().parseMillisecondsIntoReadableTime(result.time);
+    })
+
+    var totalVoiceRank = '#0';
+    var totalVoice = 0;
+    await client.getDbHelper().getUserConnectionAllTimeRank(message.author.id).then(function(result){
+      totalVoiceRank = result.rank;
+      totalVoice = client.getTools().parseMillisecondsIntoReadableTime(result.time);
+    })
+
     var totalMessages = 0;
+    var totalMessagesRank = '#0';
+    await client.getDbHelper().getUserMessageAllTimeRank(message.author.id).then(function(result){
+      totalMessagesRank = result.rank;
+      totalMessages = result.messages;
+    })
+
     var monthlyMessages = 0;
-
-    var totalVoiceRank = getAllTimeVoiceRank(message.member.id);
-    var monthlyVoiceRank = getMonthlyVoiceRank(message.member.id);
-    var totalMessagesRank = getAllTimeMessagesRank(message.member.id);
-    var monthlyMessagesRank = getMonthlyMessagesRank(message.member.id);
-
-    var currentConnectedTime = 0;
-    currectConnectionTime.forEach((item, i) => {
-      if (item.userid === message.member.id) {
-        var date = new Date();
-        var currentTime = date.getTime();
-        currentConnectedTime = currentTime - item.joinTime;
-      }
-    });
-
-    totalConnectionTime.forEach((item, i) => {
-      if(item.userid == message.author.id){
-        var totalConnectionTime = parseInt(currentConnectedTime) + parseInt(item.totalTime);
-        totalVoice = client.getTools().parseMillisecondsIntoReadableTime(totalConnectionTime)
-      }
-    });
-
-    monthlyConnectionTime.forEach((item, i) => {
-      if(item.userid == message.author.id){
-        var totalConnectionTime = parseInt(currentConnectedTime) + parseInt(item.totalTime);
-        monthlyVoice = client.getTools().parseMillisecondsIntoReadableTime(totalConnectionTime)
-      }
-    });
-
-    userChatMessages.forEach((item, i) => {
-      if(item.userid == message.author.id){
-        totalMessages = item.messages;
-      }
-    });
-
-    monthlyUserChatMessages.forEach((item, i) => {
-      if(item.userid == message.author.id){
-        monthlyMessages = item.messages;
-      }
-    });
+    var monthlyMessagesRank = '#0';
+    await client.getDbHelper().getUserMessageMonthlyRank(message.author.id).then(function(result){
+      monthlyMessagesRank = result.rank;
+      monthlyMessages = result.messages;
+    })
 
     var embed = new Discord.MessageEmbed()
     .setTitle('Stats')
     .setAuthor(message.member.displayName, message.author.displayAvatarURL())
     .setColor("#0099ff")
 
-    var data = new Map();
-    var row1 = new Array();
-    var row2 = new Array();
-
     var date = new Date();
     var month =  client.getTools().getMonthName(date.getMonth());
 
-    row1.push('Pos');
-    row2.push('Time');
-    row1.push(totalVoiceRank.toString());
-    row2.push(totalVoice.toString());
-    row1.push('');
-    row2.push('');
-    row1.push(month+' Voice');
-    row2.push('')
-    row1.push('Pos');
-    row2.push('Time');
-    row1.push(monthlyVoiceRank.toString());
-    row2.push(monthlyVoice.toString());
-    row1.push('');
-    row2.push('');
-    row1.push('All-time Messages');
-    row2.push('')
-    row1.push('Pos');
-    row2.push('Messages');
-    row1.push(totalMessagesRank.toString());
-    row2.push(totalMessages.toString());
-    row1.push('');
-    row2.push('');
-    row1.push(month+' Messages');
-    row2.push('')
-    row1.push('Pos');
-    row2.push('Messages');
-    row1.push(monthlyMessagesRank.toString());
-    row2.push(monthlyMessages.toString());
+    var rows = new Array();
+    rows.push(['All-time Voice','']);
+    rows.push(['Pos','Time']);
+    rows.push([totalVoiceRank.toString(),totalVoice.toString()]);
+    rows.push([' ',' ']);
+    rows.push([month+' Voice','']);
+    rows.push(['Pos','Time']);
+    rows.push([monthlyVoiceRank.toString(),monthlyVoice.toString()]);
+    rows.push([' ',' ']);
+    rows.push(['All-time Messages','']);
+    rows.push(['Pos','Messages']);
+    rows.push([totalMessagesRank.toString(),totalMessages.toString()]);
+    rows.push([' ',' ']);
+    rows.push([month+' Messages','']);
+    rows.push(['Pos','Messages']);
+    rows.push([monthlyMessagesRank.toString(),monthlyMessages.toString()]);
 
-    data.set('All-time Voice',row1);
-    data.set('',row2);
-
-    embed.setDescription(client.getTools().generateTable(data));
-
+    embed.setDescription(client.getTools().generateTable(rows));
     message.reply(embed);
-    date = new Date();
-    var total = date.getTime() - startTime;
-    console.log('Stats took '+total+'ms');
+
+    client.getLogger().log('info','Stats Command executed in '+client.getTools().calculateExecutionTime(startTime)+'ms');
   },
 };
-
-
-function getAllTimeVoiceRank(userid){
-  var leaderboardArray = new Array();
-
-  totalConnectionTime.forEach(obj => {
-    var currentConnectedTime = 0;
-    currectConnectionTime.forEach(currentObj => {
-      if (currentObj.userid === obj.userid) {
-        var date = new Date();
-        var currentTime = date.getTime();
-        currentConnectedTime = currentTime - currentObj.joinTime;
-      }
-    });
-
-    var totalConnectionTime;
-    if (currentConnectedTime !== 0) {
-      totalConnectionTime =
-      parseInt(currentConnectedTime) + parseInt(obj.totalTime);
-    } else {
-      totalConnectionTime = parseInt(obj.totalTime);
-    }
-    var user = { userid: obj.userid, totalTime: totalConnectionTime };
-
-    leaderboardArray.push(user);
-  });
-
-  //sort array by length
-  leaderboardArray.sort(function(a, b) {
-    if (a.totalTime > b.totalTime) {
-      return -1;
-    }
-    if (a.totalTime < b.totalTime) {
-      return 1;
-    }
-    return 0;
-  });
-
-  for (var i = 0; i < leaderboardArray.length; i++) {
-    if(leaderboardArray[i].userid == userid){
-      return "#"+(i+1);
-    }
-  }
-
-  return "#"+0;
-}
-
-function getMonthlyVoiceRank(userid){
-  var leaderboardArray = new Array();
-
-  monthlyConnectionTime.forEach(obj => {
-    var currentConnectedTime = 0;
-    currectConnectionTime.forEach(currentObj => {
-      if (currentObj.userid === obj.userid) {
-        var date = new Date();
-        var currentTime = date.getTime();
-        currentConnectedTime = currentTime - currentObj.joinTime;
-      }
-    });
-
-    var totalConnectionTime;
-    if (currentConnectedTime !== 0) {
-      totalConnectionTime =
-      parseInt(currentConnectedTime) + parseInt(obj.totalTime);
-    } else {
-      totalConnectionTime = parseInt(obj.totalTime);
-    }
-    var user = { userid: obj.userid, totalTime: totalConnectionTime };
-
-    leaderboardArray.push(user);
-  });
-
-  //sort array by length
-  leaderboardArray.sort(function(a, b) {
-    if (a.totalTime > b.totalTime) {
-      return -1;
-    }
-    if (a.totalTime < b.totalTime) {
-      return 1;
-    }
-    return 0;
-  });
-
-  for (var i = 0; i < leaderboardArray.length; i++) {
-    if(leaderboardArray[i].userid == userid){
-      return "#"+(i+1);
-    }
-  }
-
-  return "#"+0;
-}
-
-function getAllTimeMessagesRank(userid){
-  var leaderboardArray = new Array();
-
-  leaderboardArray = userChatMessages;
-
-  //sort array by length
-  leaderboardArray.sort(function(a, b) {
-    if (a.messages > b.messages) {
-      return -1;
-    }
-    if (a.messages < b.messages) {
-      return 1;
-    }
-    return 0;
-  });
-
-  for (var i = 0; i < leaderboardArray.length; i++) {
-    if(leaderboardArray[i].userid == userid){
-      return "#"+(i+1);
-    }
-  }
-
-  return "#"+0;
-}
-
-function getMonthlyMessagesRank(userid){
-  var leaderboardArray = new Array();
-
-  leaderboardArray = monthlyUserChatMessages;
-
-  //sort array by length
-  leaderboardArray.sort(function(a, b) {
-    if (a.messages > b.messages) {
-      return -1;
-    }
-    if (a.messages < b.messages) {
-      return 1;
-    }
-    return 0;
-  });
-
-  for (var i = 0; i < leaderboardArray.length; i++) {
-    if(leaderboardArray[i].userid == userid){
-      return "#"+(i+1);
-    }
-  }
-
-  return "#"+0;
-}

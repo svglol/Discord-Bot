@@ -1,6 +1,5 @@
 const Discord = require('discord.js');
 
-var currentConnectionTime = new Array();
 var totalConnectionTime = new Array();
 var userChatMessages = new Array();
 var soundboardUsage = new Array();
@@ -14,100 +13,93 @@ var internalMax = 0;
 const leaderboardSize = 10;
 
 var tools;
+var client;
 
 const pages = ['🗣️ Voice', '⌨️ Messages', '🔊 Soundboard'];
 
 module.exports = {
   name: 'leaderboard',
   description: 'leaderboard',
-  async execute(message, args,client) {
+  async execute(message, args,cClient) {
     var date = new Date();
     var startTime = date.getTime();
+    client = cClient;
     tools = client.getTools();
     guild = message.guild;
 
-    currectConnectionTime = client.getStats().getCurrentConnectionTime();
-    totalConnectionTime = client.getStats().getTotalConnectionTime();
-    userChatMessages = client.getStats().getUserChatMessages();
-    monthlyConnectionTime = client.getStats().getMonthlyConnectionTime();
-    monthlyUserChatMessages = client.getStats().getMonthlyUserChatMessages();
-    soundboardUsage = client.getStats().getSoundboardUsage();
-    monthlySoundboardUsage = client.getStats().getMonthlySoundboardUsage();
+    loadLeaderboards(client).then(function(){
 
-    var monthlyLeaderboardEmbeds = generateLeaderboardEmbeds(false);
-    var lifetimeLeaderboardEmbeds = generateLeaderboardEmbeds(true);
+      var monthlyLeaderboardEmbeds = generateLeaderboardEmbeds(false);
+      var lifetimeLeaderboardEmbeds = generateLeaderboardEmbeds(true);
 
-    var leaderboardEmbeds = monthlyLeaderboardEmbeds;
+      var leaderboardEmbeds = monthlyLeaderboardEmbeds;
 
-    message.channel.send(leaderboardEmbeds.get(0)[0]).then((msg)=>{
+      message.channel.send(leaderboardEmbeds.get(0)[0]).then((msg)=>{
+        var page = 0;
+        var internalPage = 0;
 
-      date = new Date();
-      var total = date.getTime() - startTime;
-      console.log('Leaderboard took '+total+'ms');
+        msg.react('📆');
+        msg.react('♾️');
+        msg.react('⬇');
+        msg.react('⬆');
+        msg.react('🗣️');
+        msg.react('⌨️');
+        msg.react('🔊');
 
-      var page = 0;
-      var internalPage = 0;
+        const filter = (reaction, user) => {
+          return ['⬇','⬆','🗣️','⌨️','🔊','📆','♾️'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
+        };
 
-      msg.react('📆');
-      msg.react('♾️');
-      msg.react('⬇');
-      msg.react('⬆');
-      msg.react('🗣️');
-      msg.react('⌨️');
-      msg.react('🔊');
-
-      const filter = (reaction, user) => {
-        return ['⬇','⬆','🗣️','⌨️','🔊','📆','♾️'].includes(reaction.emoji.name) && !user.bot && user.id === message.author.id;
-      };
-
-      const collector = msg.createReactionCollector(filter, { time: 60000 });
-      collector.on('collect', (reaction,user) =>{
-        reaction.users.remove(user);
-        if(reaction.emoji.name === '⬇'){
-          //scroll down current page
-          if(internalPage < Math.ceil(leaderboardEmbeds.get(page).length)-1){
-            internalPage++;
+        const collector = msg.createReactionCollector(filter, { time: 60000 });
+        collector.on('collect', (reaction,user) =>{
+          reaction.users.remove(user);
+          if(reaction.emoji.name === '⬇'){
+            //scroll down current page
+            if(internalPage < Math.ceil(leaderboardEmbeds.get(page).length)-1){
+              internalPage++;
+            }
+            msg.edit(leaderboardEmbeds.get(page)[internalPage]);
           }
-          msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-        }
-        else if(reaction.emoji.name === '⬆'){
-          //scroll up current page
-          if(internalPage != 0){
-            internalPage--;
+          else if(reaction.emoji.name === '⬆'){
+            //scroll up current page
+            if(internalPage != 0){
+              internalPage--;
+            }
+            msg.edit(leaderboardEmbeds.get(page)[internalPage]);
           }
-          msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-        }
-        else if(reaction.emoji.name === '🗣️'){
-          page = 0;
-          internalPage = 0;
-          msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-        }
-        else if(reaction.emoji.name === '⌨️'){
-          page = 1;
-          internalPage = 0;
-          msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-        }
-        else if(reaction.emoji.name === '🔊'){
-          page = 2;
-          internalPage = 0;
-          msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-        }
-        else if(reaction.emoji.name === '📆'){
-          internalPage = 0;
-          leaderboardEmbeds = monthlyLeaderboardEmbeds;
-          msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-        }
-        else if(reaction.emoji.name === '♾️'){
-          internalPage = 0;
-          leaderboardEmbeds = lifetimeLeaderboardEmbeds;
-          msg.edit(leaderboardEmbeds.get(page)[internalPage]);
-        }
+          else if(reaction.emoji.name === '🗣️'){
+            page = 0;
+            internalPage = 0;
+            msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+          }
+          else if(reaction.emoji.name === '⌨️'){
+            page = 1;
+            internalPage = 0;
+            msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+          }
+          else if(reaction.emoji.name === '🔊'){
+            page = 2;
+            internalPage = 0;
+            msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+          }
+          else if(reaction.emoji.name === '📆'){
+            internalPage = 0;
+            leaderboardEmbeds = monthlyLeaderboardEmbeds;
+            msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+          }
+          else if(reaction.emoji.name === '♾️'){
+            internalPage = 0;
+            leaderboardEmbeds = lifetimeLeaderboardEmbeds;
+            msg.edit(leaderboardEmbeds.get(page)[internalPage]);
+          }
+        });
+        collector.on('end', collection =>{
+          //remove reactions once reaction collector has ended
+          msg.reactions.removeAll();
+        })
       });
-      collector.on('end', collection =>{
-        //remove reactions once reaction collector has ended
-        msg.reactions.removeAll();
-      })
-    });
+      client.getLogger().log('info','Leaderboard Command executed in '+client.getTools().calculateExecutionTime(startTime)+'ms');
+    })
   },
 };
 
@@ -123,74 +115,26 @@ function getVoiceEmbedFooter(internalPage,lifetime){
 }
 
 function setVoiceEmbedField(internalPage,embed,lifetime){
-  var leaderboardLength = 10;
   var leaderboardArray = new Array();
 
   if(lifetime){
-    totalConnectionTime.forEach(obj => {
-      var currentConnectedTime = 0;
-      currentConnectionTime.forEach(currentObj => {
-        if (currentObj.userid === obj.userid) {
-          var date = new Date();
-          var currentTime = date.getTime();
-          currentConnectedTime = currentTime - currentObj.joinTime;
-        }
-      });
-
-      var totalConnectionTime;
-      if (currentConnectedTime !== 0) {
-        totalConnectionTime =
-        parseInt(currentConnectedTime) + parseInt(obj.totalTime);
-      } else {
-        totalConnectionTime = parseInt(obj.totalTime);
-      }
-      var user = { userid: obj.userid, totalTime: totalConnectionTime };
-
+    totalConnectionTime.forEach((item, i) => {
+      var user = { userid: item.id, totalTime: item.totalTime };
       leaderboardArray.push(user);
     });
   }
   else{
-    monthlyConnectionTime.forEach(obj => {
-      var currentConnectedTime = 0;
-      currentConnectionTime.forEach(currentObj => {
-        if (currentObj.userid === obj.userid) {
-          var date = new Date();
-          var currentTime = date.getTime();
-          currentConnectedTime = currentTime - currentObj.joinTime;
-        }
-      });
-
-      var totalConnectionTime;
-      if (currentConnectedTime !== 0) {
-        totalConnectionTime =
-        parseInt(currentConnectedTime) + parseInt(obj.totalTime);
-      } else {
-        totalConnectionTime = parseInt(obj.totalTime);
-      }
-      var user = { userid: obj.userid, totalTime: totalConnectionTime };
-
+    monthlyConnectionTime.forEach((item, i) => {
+      var user = { userid: item.id, totalTime: item.totalTime };
       leaderboardArray.push(user);
     });
   }
 
-  //sort array by length
-  leaderboardArray.sort(function(a, b) {
-    if (a.totalTime > b.totalTime) {
-      return -1;
-    }
-    if (a.totalTime < b.totalTime) {
-      return 1;
-    }
-    return 0;
-  });
-
   var start = leaderboardSize * internalPage;
   var end = start + leaderboardSize;
 
-  var data = new Map();
-  var posData = new Array();
-  var namesData = new Array();
-  var timesData = new Array();
+  var rows = new Array();
+  rows.push(['#','Name','Time']);
 
   for (let i = 0; i < leaderboardArray.length; i++) {
     var readableTotalConnectionTime = tools.parseMillisecondsIntoReadableTime(
@@ -201,20 +145,13 @@ function setVoiceEmbedField(internalPage,embed,lifetime){
       userName = guild.member(leaderboardArray[i].userid)
       .displayName;
     } catch (e) {
-      console.log(e);
     }
     if (i >= start && i< end) {
-      posData.push((i + 1).toString());
-      namesData.push(userName);
-      timesData.push(readableTotalConnectionTime);
+      rows.push([(i + 1).toString(),userName,readableTotalConnectionTime]);
     }
   }
 
-  data.set('#',posData);
-  data.set('Name',namesData);
-  data.set('Time',timesData);
-
-  embed.setDescription(tools.generateTable(data));
+  embed.setDescription(tools.generateTable(rows));
 }
 
 function getMessagesEmbedFooter(internalPage,lifetime){
@@ -228,7 +165,6 @@ function getMessagesEmbedFooter(internalPage,lifetime){
 }
 
 function setMessagesEmbedField(internalPage,embed,lifetime){
-  var leaderboardLength = 10;
   var leaderboardArray;
   if(lifetime){
     leaderboardArray = userChatMessages;
@@ -237,44 +173,26 @@ function setMessagesEmbedField(internalPage,embed,lifetime){
     leaderboardArray = monthlyUserChatMessages
   }
 
-  leaderboardArray.sort(function(a, b) {
-    if (a.messages > b.messages) {
-      return -1;
-    }
-    if (a.messages < b.messages) {
-      return 1;
-    }
-    return 0;
-  });
-
   var start = leaderboardSize * internalPage;
   var end = start + leaderboardSize;
 
-  var data = new Map();
-  var posData = new Array();
-  var namesData = new Array();
-  var messagesData = new Array();
+  var rows = new Array();
+  rows.push(['#','Name','Messages']);
 
   for (let i = 0; i < leaderboardArray.length; i++) {
     var userName = "";
     try {
-      userName = guild.member(leaderboardArray[i].userid)
+      userName = guild.member(leaderboardArray[i].id)
       .displayName;
     } catch (e) {
-      console.log(e);
     }
 
     if (i >= start && i< end) {
-      posData.push((i + 1).toString());
-      namesData.push(userName);
-      messagesData.push(leaderboardArray[i].messages);
+      rows.push([(i + 1).toString(),userName,leaderboardArray[i].messages]);
     }
   }
-  data.set('#',posData);
-  data.set('Name',namesData);
-  data.set('Messages',messagesData);
 
-  embed.setDescription(tools.generateTable(data));
+  embed.setDescription(tools.generateTable(rows));
 }
 
 function getSoundboardEmbedFooter(internalPage,lifetime){
@@ -288,43 +206,24 @@ function getSoundboardEmbedFooter(internalPage,lifetime){
 }
 
 function setSoundboardEmbedField(internalPage,embed,lifetime){
-  var leaderboardLength = 10;
   var leaderboardArray = monthlySoundboardUsage;
   if(lifetime){
     leaderboardArray = soundboardUsage;
   }
 
-  leaderboardArray.sort(function(a, b) {
-    if (a.uses > b.uses) {
-      return -1;
-    }
-    if (a.uses < b.uses) {
-      return 1;
-    }
-    return 0;
-  });
-
   var start = leaderboardSize * internalPage;
   var end = start + leaderboardSize;
 
-  var data = new Map();
-  var posData = new Array();
-  var namesData = new Array();
-  var playsData = new Array();
+  var rows = new Array();
+  rows.push(['#','Name','Plays']);
 
   for (let i = 0; i < leaderboardArray.length; i++) {
-
     if (i >= start && i< end) {
-      posData.push((i + 1).toString());
-      namesData.push(leaderboardArray[i].command);
-      playsData.push(leaderboardArray[i].uses);
+      rows.push([(i + 1).toString(),leaderboardArray[i].command,leaderboardArray[i].uses]);
     }
   }
-  data.set('#',posData);
-  data.set('Name',namesData);
-  data.set('Plays',playsData);
 
-  embed.setDescription(tools.generateTable(data));
+  embed.setDescription(tools.generateTable(rows));
 }
 
 function generateLeaderboardEmbeds(lifetime){
@@ -383,4 +282,30 @@ function generateLeaderboardEmbeds(lifetime){
   });
 
   return leaderboardEmbeds;
+}
+
+async function loadLeaderboards(client){
+  await client.getDbHelper().getAllTimeUserMessagesTotals().then(function(result){
+    userChatMessages = result;
+  });
+
+  await client.getDbHelper().getMonthlyUserMessagesTotals().then(function(result){
+    monthlyUserChatMessages = result;
+  });
+
+  await client.getDbHelper().getAllTimeUserConnectionsTotals().then(function(result){
+    totalConnectionTime = result;
+  });
+
+  await client.getDbHelper().getMonthlyUserConnectionsTotals().then(function(result){
+    monthlyConnectionTime = result;
+  });
+
+  await client.getDbHelper().getMonthlySoundboardTotals().then(function(result){
+    monthlySoundboardUsage = result;
+  });
+
+  await client.getDbHelper().getAllTimeSoundboardTotals().then(function(result){
+    soundboardUsage = result;
+  });
 }
