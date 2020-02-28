@@ -39,9 +39,6 @@ class Client extends Discord.Client {
   async init() {
     this.login(process.env.TOKEN);
 
-    tools.loadSoundCommands(soundCommands,adminSoundCommands,newSoundCommands);
-    tools.sort(soundCommands,gifCommands);
-
     client.on('ready', () => {
       dbHelper.syncGuildUsers(this);
     });
@@ -115,10 +112,70 @@ const client = new Client();
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
+//generate commands from file
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
   client.commands.set(command.name, command);
 }
+
+//generate soundboard commands
+fs.readdirSync('./resources/sound/').forEach(file => {
+  var command = {
+    name: /[^.]*/.exec(file)[0],
+    description: 'Play '+/[^.]*/.exec(file)[0]+ ' sound effect',
+    file:file,
+    soundboard:true,
+    guildOnly:true,
+    execute(message, args,client) {
+      var end = false;
+      var sound = {file:'./resources/sound/'+file, command:tools.createCommand(file)};
+
+      if(args.length == 0) end = true;
+      client.getSound().queue(message,sound,end);
+
+      end = false;
+      args.forEach((item, i) => {
+        if(args.length == i+1) end = true;
+        var cmd = client.commands.get(item);
+        if(cmd){
+          var sound = {file:'./resources/sound/'+cmd.file, command:cmd.name};
+          client.getSound().queue(message,sound,end);
+        }
+      });
+    }
+  };
+  client.commands.set(command.name,command);
+
+  var sound = {file:'./resources/sound/'+file, command:tools.createCommand(file)};
+  soundCommands.push(sound);
+
+  var date = new Date();
+  var modTime = fs.statSync('./resources/sound/' + '/' + file).mtime.getTime();
+
+  var diff = Math.abs(modTime - date.getTime());
+  var days = diff / (1000 * 60 * 60 * 24);
+  if(days < 7){
+    newSoundCommands.push(tools.createCommand(file));
+  }
+
+});
+
+//generate admin soundboard commands
+fs.readdirSync('./resources/admin-sound/').forEach(file => {
+  var command = {
+    name: /[^.]*/.exec(file)[0],
+    description: 'Play '+tools.createCommand(file)+ ' sound effect',
+    file:file,
+    adminSoundboard:true,
+    guildOnly:true,
+    execute(message, args,client) {
+      var end = true;
+      var sound = {file:'./resources/admin-sound/'+file, command:tools.createCommand(file)};
+      client.getSound().queue(message,sound,end);
+    }
+  };
+  client.commands.set(command.name,command);
+});
 
 const logger = winston.createLogger({
   transports: [
