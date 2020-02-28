@@ -16,14 +16,24 @@ module.exports = {
     var monthlyVoice = 0;
     await client.getDbHelper().getUserConnectionMonthlyRank(message.author.id).then(function(result){
       monthlyVoiceRank = result.rank;
-      monthlyVoice = client.getTools().parseMillisecondsIntoReadableTime(result.time);
+      if(Number.isInteger(result.time)){
+        monthlyVoice = client.getTools().parseMillisecondsIntoReadableTime(result.time);
+      }
+      else{
+        monthlyVoice = result.time;
+      }
     })
 
     var totalVoiceRank = '#0';
     var totalVoice = 0;
     await client.getDbHelper().getUserConnectionAllTimeRank(message.author.id).then(function(result){
       totalVoiceRank = result.rank;
-      totalVoice = client.getTools().parseMillisecondsIntoReadableTime(result.time);
+      if(Number.isInteger(result.time)){
+        totalVoice = client.getTools().parseMillisecondsIntoReadableTime(result.time);
+      }
+      else{
+        totalVoice = result.time;
+      }
     })
 
     var totalMessages = 0;
