@@ -11,6 +11,12 @@ module.exports = {
     await syncUserSoundboard();
     client.getLogger().log('info', 'Synced Database to Cache')
   },
+  addUser: async function (id){
+    var user = await Users.findOne({ where: { user_id: id} });
+    if(!user){
+      user = await Users.create({ user_id: id});
+    }
+  },
   addUserMessage: async function (message){
     var user = await Users.findOne({ where: { user_id: message.author.id } });
     if(!user){
@@ -254,6 +260,14 @@ module.exports = {
       }
     }
     return sortSoundboardUsageLeaderboard(leaderboard);
+  },
+  syncGuildUsers: async function(client){
+    for (const [key, guild] of client.guilds.cache.entries()) {
+      for (const [id, member] of guild.members.cache.entries()) {
+         await this.addUser(member.user.id);
+      }
+    }
+    await syncUsersCollection();
   }
 }
 

@@ -41,6 +41,10 @@ class Client extends Discord.Client {
 
     tools.loadSoundCommands(soundCommands,adminSoundCommands,newSoundCommands);
     tools.sort(soundCommands,gifCommands);
+    
+    client.on('ready', () => {
+      dbHelper.syncGuildUsers(this);
+    });
 
     client.on('message', message => {
 
@@ -108,11 +112,11 @@ for (const file of commandFiles) {
 }
 
 const logger = winston.createLogger({
-	transports: [
-		new winston.transports.Console(),
-		new winston.transports.File({ filename: 'log' }),
-	],
-	format: winston.format.printf(log => `[${log.level.toUpperCase()}] - ${log.message}`),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: 'log' }),
+  ],
+  format: winston.format.printf(log => `[${log.level.toUpperCase()}] - ${log.message}`),
 });
 
 client.on('ready', () => logger.log('info', 'Discord-Bot Connected'));
