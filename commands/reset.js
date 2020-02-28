@@ -5,7 +5,7 @@ module.exports = {
   async execute(message, args,client) {
     await message.delete().catch(err => console.log(err));
     await client.getSound().stop(message);
+    client.getLogger().log('info','Reset Initiated')
     process.exit(1);
-    throw 'restarting'
   },
 };
