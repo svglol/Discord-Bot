@@ -245,6 +245,7 @@ function generateLeaderboardEmbeds(lifetime){
       var length = 0;
       if(lifetime)length = totalConnectionTime.length/leaderboardSize;
       else length = monthlyConnectionTime.length/leaderboardSize
+      if(length == 0) length = 1;
       for (var o = 0; o < Math.ceil(length); o++) {
         var embed = new Discord.MessageEmbed()
         .setTitle(title +' '+'Leaderboard')
@@ -261,6 +262,7 @@ function generateLeaderboardEmbeds(lifetime){
       var length = 0;
       if(lifetime)length = userChatMessages.length/leaderboardSize;
       else length = monthlyUserChatMessages.length/leaderboardSize
+      if(length == 0) length = 1;
       for (var o = 0; o < Math.ceil(length); o++) {
         var embed = new Discord.MessageEmbed()
         .setTitle(title +' '+'Leaderboard')
@@ -277,6 +279,7 @@ function generateLeaderboardEmbeds(lifetime){
       var length = 0;
       if(lifetime)length = soundboardUsage.length/leaderboardSize;
       else length = monthlySoundboardUsage.length/leaderboardSize
+      if(length == 0) length = 1;
       for (var o = 0; o < Math.ceil(length); o++) {
         var embed = new Discord.MessageEmbed()
         .setTitle(title +' '+'Leaderboard')
