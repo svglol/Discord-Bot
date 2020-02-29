@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const fs = require("fs");
 
 module.exports = {
-  init: function(client){
+  init: async function(client){
     client.getLogger().log('info', 'Database Initializing')
     const sequelize = new Sequelize('database', 'user', 'password', {
       host: 'localhost',
@@ -32,6 +32,16 @@ module.exports = {
             gifCommand = await GifCommands.create({ command: command.command,link:command.link,date:0});
           }
         }
+      }
+
+      //add new columns to users table
+      var queryInterface = sequelize.getQueryInterface();
+      var table = await queryInterface.describeTable('users');
+      if(table.intro == undefined){
+        await queryInterface.addColumn('users', 'intro', Sequelize.STRING);
+      }
+      if(table.exit == undefined){
+        await queryInterface.addColumn('users', 'exit',Sequelize.STRING);
       }
 
       sequelize.close();

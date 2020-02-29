@@ -10,7 +10,6 @@ const stats = require('./lib/stats.js');
 const commandsLoader = require('./lib/commandsLoader.js');
 
 const dbHelper = require('./db/dbHelper.js');
-const dbInit =  require('./db/dbInit.js');
 
 const prefix = require('./config.json').prefix;
 
@@ -125,9 +124,7 @@ const logger = winston.createLogger({
 
 client.commands = new Discord.Collection();
 
-dbInit.init(client);
 dbHelper.sync(client);
-
 commandsLoader.loadCommands(client);
 
 const commandFiles = glob.sync('./commands' + '/**/*.js');

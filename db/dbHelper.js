@@ -1,12 +1,15 @@
 const { Users, UserSoundboard,UserMessage,UserConnection,CommandVolume,GifCommands} = require('./dbObjects.js');
 const Discord = require('discord.js');
 
+const dbInit =  require('./dbInit.js');
+
 var usersCollection = new Discord.Collection();
 var commandVolumeCache = new Discord.Collection();
 var userSoundboardCache = new Array();
 
 module.exports = {
   sync:async function(client){
+    await dbInit.init(client);
     await syncCommandVolumeCache();
     await syncUsersCollection();
     await syncUserSoundboard();
@@ -293,6 +296,25 @@ module.exports = {
   },
   getGifCommands: async function(){
     return await GifCommands.findAll();
+  },
+  getUsers:function(){
+    return usersCollection;
+  },
+  addUserIntro:async function(id,link){
+    var user = await Users.findOne({ where: { user_id: id } });
+    if(user != null){
+      user.intro = link;
+      await user.save();
+    }
+    usersCollection.get(id).intro = link;
+  },
+  addUserExit:async function(id,link){
+    var user = await Users.findOne({ where: { user_id: id } });
+    if(user != null){
+      user.exit = link;
+      await user.save();
+    }
+    usersCollection.get(id).intro = link;
   }
 }
 
@@ -350,7 +372,7 @@ async function syncUsersCollection(){
     var connections = await user.getConnections();
     var soundboard = await user.getSoundboards();
 
-    var newUser = {user_id:user.dataValues.user_id,lastConnection:user.dataValues.lastConnection,messages:messages,connections:connections,soundboards:soundboard};
+    var newUser = {user_id:user.dataValues.user_id,lastConnection:user.dataValues.lastConnection,messages:messages,connections:connections,soundboards:soundboard,intro:user.dataValues.intro,exit:user.dataValues.exit};
     usersCollection.set(user.dataValues.user_id,newUser);
   }
 }
