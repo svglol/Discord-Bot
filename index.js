@@ -7,11 +7,11 @@ const tools = require('./lib/tools.js');
 const sound = require('./lib/sound.js');
 const intro = require('./lib/intro.js');
 const stats = require('./lib/stats.js');
+const commandsLoader = require('./lib/commandsLoader.js');
 
 const dbHelper = require('./db/dbHelper.js');
 const dbInit =  require('./db/dbInit.js');
 
-const gifCommands = require('./commands/gifcommands.json').commands;
 const prefix = require('./config.json').prefix;
 
 const fs = require('fs');
@@ -71,14 +71,15 @@ class Client extends Discord.Client {
 
   getSoundCommands(){
     return Array.from(client.commands.filter(function (command){
-      if(typeof command.soundboard !== 'undefined'){
-        return true;
-      }
+      if(typeof command.soundboard !== 'undefined')return true;
       return false;
     }));
   }
   getGifCommands(){
-    return gifCommands;
+    return Array.from(client.commands.filter(function (command){
+      if(typeof command.gif !== 'undefined')return true;
+      return false;
+    }));
   }
   getStats(){
     return stats;
@@ -107,6 +108,9 @@ class Client extends Discord.Client {
   getLogger(){
     return logger;
   }
+  getCommandsLoader(){
+    return commandsLoader;
+  }
 }
 
 const client = new Client();
@@ -119,10 +123,13 @@ const logger = winston.createLogger({
   format: winston.format.printf(log => `[${log.level.toUpperCase()}] - ${log.message}`),
 });
 
+client.commands = new Discord.Collection();
+
 dbInit.init(client);
 dbHelper.sync(client);
 
-client.commands = new Discord.Collection();
+commandsLoader.loadCommands(client);
+
 const commandFiles = glob.sync('./commands' + '/**/*.js');
 
 //generate commands from file
@@ -184,20 +191,6 @@ fs.readdirSync('./resources/admin-sound/').forEach(file => {
       var end = true;
       var sound = {file:'./resources/admin-sound/'+file, command:tools.createCommand(file)};
       client.getSound().queue(message,sound,end);
-    }
-  };
-  client.commands.set(command.name,command);
-});
-
-//generate gif commands
-gifCommands.forEach((item, i) => {
-  var command = {
-    name: item.command,
-    description: 'Post '+item.command+" gif",
-    gif:true,
-    guildOnly:true,
-    execute(message, args,client) {
-      message.channel.send(item.link);
     }
   };
   client.commands.set(command.name,command);

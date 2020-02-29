@@ -1,4 +1,4 @@
-const { Users, UserSoundboard,UserMessage,UserConnection,CommandVolume} = require('./dbObjects.js');
+const { Users, UserSoundboard,UserMessage,UserConnection,CommandVolume,GifCommands} = require('./dbObjects.js');
 const Discord = require('discord.js');
 
 var usersCollection = new Discord.Collection();
@@ -284,6 +284,15 @@ module.exports = {
   getCommandVolume:function(command){
     if(!commandVolumeCache.get(command)) return 1;
     return commandVolumeCache.get(command);
+  },
+  addGifCommand:async function(command,link,date){
+    var gifCommand = await GifCommands.findOne({ where: { command: command} });
+    if(!gifCommand){
+      gifCommand = await GifCommands.create({ command: command,link:link,date:date});
+    }
+  },
+  getGifCommands: async function(){
+    return await GifCommands.findAll();
   }
 }
 
