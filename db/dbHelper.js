@@ -97,27 +97,28 @@ module.exports = {
   },
   updateUserLastConnection: async function(id, lastConnection){
     var user = await Users.findOne({ where: { user_id: id } });
+    usersCollection.get(id).lastConnection = lastConnection;
     if(user != null){
       user.lastConnection = lastConnection;
       await user.save();
-      syncUsersCollection();
     }
     else{
       await Users.create({ user_id: id,lastConnection: lastConnection});
       syncUsersCollection();
     }
   },
-  addUserConnection: async function(id,connectTime,disconnectTime,connectionLength){
+  addUserConnection: async function(id){
     var user = await Users.findOne({ where: { user_id: id } });
     if(!user){
       user = await Users.create({ user_id: id});
-      syncUsersCollection();
     }
     var date = new Date();
-    var userConnection = await user.addConnection(id,user.lastConnection,date.getTime(),date.getTime()-user.lastConnection);
-    await this.updateUserLastConnection(id,0);
-    usersCollection.get(id).connections.push(userConnection);
-    usersCollection.get(id).lastConnection = 0;
+    var lastConnection = usersCollection.get(id).lastConnection;
+    this.updateUserLastConnection(id,0);
+    if(lastConnection != 0){
+      var userConnection = await user.addConnection(id,lastConnection,date.getTime(),date.getTime()-lastConnection);
+      usersCollection.get(id).connections.push(userConnection);
+    }
   },
   addUserSoundboard: async function(id,command){
     var user = await Users.findOne({ where: { user_id: id } });
