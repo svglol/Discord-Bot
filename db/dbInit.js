@@ -11,7 +11,7 @@ module.exports = {
       storage: 'database.sqlite',
     })
 
-    const User = sequelize.import('models/Users');
+    const Users = sequelize.import('models/Users');
     const UserConnection = sequelize.import('models/UserConnection');
     const UserMessage = sequelize.import('models/UserMessage');
     const UserSoundboard = sequelize.import('models/UserSoundboard');
@@ -33,6 +33,32 @@ module.exports = {
           }
         }
       }
+
+      //add intro and exit gifs from old json files if it exists
+      if(fs.existsSync('./commands/intros.json')) {
+        const intros = require('../commands/intros.json').intros;
+        for(intro of intros){
+          var user = await Users.findOne({ where: { user_id: intro.userid} });
+          if(!user){
+            user = await Users.create({ user_id: intro.userid});
+          }
+          user.intro = intro.link;
+          user.save();
+        }
+      }
+
+      if(fs.existsSync('./commands/exits.json')) {
+        const exits = require('../commands/exits.json').exits;
+        for(exit of exits){
+          var user = await Users.findOne({ where: { user_id: exit.userid} });
+          if(!user){
+            user = await Users.create({ user_id: exit.userid});
+          }
+          user.exit = exit.link;
+          user.save();
+        }
+      }
+
 
       //add new columns to users table
       var queryInterface = sequelize.getQueryInterface();
