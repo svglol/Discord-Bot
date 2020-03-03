@@ -124,8 +124,12 @@ const logger = winston.createLogger({
 
 client.commands = new Discord.Collection();
 
-dbHelper.sync(client);
-commandsLoader.loadCommands(client);
+async function start(){
+  await dbHelper.sync(client);
+  await commandsLoader.loadCommands(client);
+  client.init();
+}
+
 
 const commandFiles = glob.sync('./commands' + '/**/*.js');
 
@@ -142,4 +146,4 @@ client.on('error', m => logger.log('error', m));
 
 process.on('uncaughtException', error => logger.log('error', error));
 
-client.init();
+start();

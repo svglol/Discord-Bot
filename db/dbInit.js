@@ -23,6 +23,16 @@ module.exports = {
 
     sequelize.sync({ force }).then(async () => {
 
+      //add new columns to users table
+      var queryInterface = sequelize.getQueryInterface();
+      var table = await queryInterface.describeTable('users');
+      if(table.intro == undefined){
+        await queryInterface.addColumn('users', 'intro', Sequelize.STRING);
+      }
+      if(table.exit == undefined){
+        await queryInterface.addColumn('users', 'exit',Sequelize.STRING);
+      }
+
       //add gifs to database from old json file if it exists
       if(fs.existsSync('./commands/gifcommands.json')) {
         const gifCommands = require('../commands/gifcommands.json').commands;
@@ -61,25 +71,13 @@ module.exports = {
 
       //load sound commands into database
       var soundCommands = await SoundCommands.findAll();
-      if(soundCommands.length == 0){
-        var files = fs.readdirSync('./resources/sound/');
-        for(file of files){
-          var command = client.getTools().createCommand(file);
-          var soundCommand = await SoundCommands.findOne({ where: { command: command} });
-          if(!soundCommand){
-            soundCommand = await SoundCommands.create({ command: command,file:'./resources/sound/'+file,volume:1,date:0});
-          }
+      var files = fs.readdirSync('./resources/sound/');
+      for(file of files){
+        var command = client.getTools().createCommand(file);
+        var soundCommand = await SoundCommands.findOne({ where: { command: command} });
+        if(!soundCommand){
+          soundCommand = await SoundCommands.create({ command: command,file:'./resources/sound/'+file,volume:1,date:0});
         }
-      }
-
-      //add new columns to users table
-      var queryInterface = sequelize.getQueryInterface();
-      var table = await queryInterface.describeTable('users');
-      if(table.intro == undefined){
-        await queryInterface.addColumn('users', 'intro', Sequelize.STRING);
-      }
-      if(table.exit == undefined){
-        await queryInterface.addColumn('users', 'exit',Sequelize.STRING);
       }
 
       sequelize.close();
