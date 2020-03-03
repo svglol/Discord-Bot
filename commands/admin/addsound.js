@@ -18,6 +18,11 @@ module.exports = {
       var mp3 =/^[^.]+.mp3$/;
       var ogg =/^[^.]+.ogg$/;
       if(wav.test(attachment.name) || mp3.test(attachment.name) || ogg.test(attachment.name)){
+        var dir = './resources/sound/';
+        if (!fs.existsSync(dir)){
+          fs.mkdirSync('./resources');
+          fs.mkdirSync('./resources/sound');
+        }
         var extension = attachment.name.substring(attachment.name.lastIndexOf('.')+1)
         var path = './resources/sound/'+commandName+'.'+extension;
         const file = fs.createWriteStream(path);
