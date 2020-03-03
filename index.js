@@ -135,64 +135,6 @@ for (const file of commandFiles) {
   client.commands.set(command.name, command);
 }
 
-//generate soundboard commands
-fs.readdirSync('./resources/sound/').forEach(file => {
-
-  var newSound = false;
-  var date = new Date();
-  var modTime = fs.statSync('./resources/sound/' + '/' + file).mtime.getTime();
-
-  var diff = Math.abs(modTime - date.getTime());
-  var days = diff / (1000 * 60 * 60 * 24);
-  if(days < 7){
-    newSound = true;
-  }
-
-  var command = {
-    name: /[^.]*/.exec(file)[0],
-    description: 'Play '+/[^.]*/.exec(file)[0]+ ' sound effect',
-    file:'./resources/admin-sound/'+file,
-    soundboard:true,
-    guildOnly:true,
-    newSound:newSound,
-    execute(message, args,client) {
-      var end = false;
-      var sound = {file:'./resources/sound/'+file, command:tools.createCommand(file)};
-
-      if(args.length == 0) end = true;
-      client.getSound().queue(message,sound,end);
-
-      end = false;
-      args.forEach((item, i) => {
-        if(args.length == i+1) end = true;
-        var cmd = client.commands.get(item);
-        if(cmd){
-          var sound = {file:'./resources/sound/'+cmd.file, command:cmd.name};
-          client.getSound().queue(message,sound,end);
-        }
-      });
-    }
-  };
-  client.commands.set(command.name,command);
-});
-
-//generate admin soundboard commands
-fs.readdirSync('./resources/admin-sound/').forEach(file => {
-  var command = {
-    name: /[^.]*/.exec(file)[0],
-    description: 'Play '+tools.createCommand(file)+ ' sound effect',
-    file:'./resources/admin-sound/'+file,
-    adminSoundboard:true,
-    guildOnly:true,
-    execute(message, args,client) {
-      var end = true;
-      var sound = {file:'./resources/admin-sound/'+file, command:tools.createCommand(file)};
-      client.getSound().queue(message,sound,end);
-    }
-  };
-  client.commands.set(command.name,command);
-});
-
 client.on('ready', () => logger.log('info', 'Discord-Bot Connected'));
 client.on('debug', m => logger.log('debug', m));
 client.on('warn', m => logger.log('warn', m));

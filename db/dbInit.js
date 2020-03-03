@@ -16,8 +16,8 @@ module.exports = {
     const UserMessage = sequelize.import('models/UserMessage');
     const UserSoundboard = sequelize.import('models/UserSoundboard');
 
-    const CommandVolume = sequelize.import('models/CommandVolume');
     const GifCommands = sequelize.import('models/GifCommands');
+    const SoundCommands = sequelize.import('models/SoundCommands');
 
     const force = process.argv.includes('--force') || process.argv.includes('-f');
 
@@ -59,6 +59,18 @@ module.exports = {
         }
       }
 
+      //load sound commands into database
+      var soundCommands = await SoundCommands.findAll();
+      if(soundCommands.length == 0){
+        var files = fs.readdirSync('./resources/sound/');
+        for(file of files){
+          var command = client.getTools().createCommand(file);
+          var soundCommand = await SoundCommands.findOne({ where: { command: command} });
+          if(!soundCommand){
+            soundCommand = await SoundCommands.create({ command: command,file:'./resources/sound/'+file,volume:1,date:0});
+          }
+        }
+      }
 
       //add new columns to users table
       var queryInterface = sequelize.getQueryInterface();

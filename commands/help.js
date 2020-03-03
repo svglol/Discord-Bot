@@ -13,6 +13,27 @@ module.exports = {
 
 function helpMessage(message, client,soundCommands,gifCommands,newSoundCommands){
 
+  soundCommands.sort(function(a, b) {
+    if (a[0] < b[0]) {
+           return -1;
+       }
+       if (b[0] < a[0]) {
+           return 1;
+       }
+       return 0;
+  });
+  gifCommands.sort(function(a, b) {
+    if (a[0] < b[0]) {
+           return -1;
+       }
+       if (b[0] < a[0]) {
+           return 1;
+       }
+       return 0;
+  });
+
+
+
   var soundboardEmbeds = generateSoundboardEmbeds(soundCommands);
   var gifEmbeds = generateGifEmbeds(gifCommands);
   var newSoundEmbeds = generateNewSoundboardEmbed(newSoundCommands);
