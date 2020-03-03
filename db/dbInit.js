@@ -76,7 +76,8 @@ module.exports = {
         var command = client.getTools().createCommand(file);
         var soundCommand = await SoundCommands.findOne({ where: { command: command} });
         if(!soundCommand){
-          soundCommand = await SoundCommands.create({ command: command,file:'./resources/sound/'+file,volume:1,date:0});
+          var mtime = fs.statSync('./resources/sound/'+file).mtime.getTime();
+          soundCommand = await SoundCommands.create({ command: command,file:'./resources/sound/'+file,volume:1,date:mtime});
         }
       }
 
