@@ -48,6 +48,7 @@ class Client extends Discord.Client {
 
       if(!command) return;
       if (command.guildOnly && message.channel.type !== 'text') return message.reply('I can\'t execute that command inside DMs!');
+      if(command.adminOnly && message.channel.type !== 'text')  return message.reply('I can\'t execute that command inside DMs!');
       if(command.adminOnly && !message.member.hasPermission("ADMINISTRATOR")) return;
       if(command.meOnly && message.author.id != '80282793766035456') return;
       if (command.args && !args.length || command.args && args.length != command.numArgs) {
