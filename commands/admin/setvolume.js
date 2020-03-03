@@ -8,7 +8,9 @@ module.exports = {
   execute(message, args,client) {
     var volume = args[1];
     if((volume-1)*(volume-0) <= 0){
-      client.getDbHelper().addCommandVolume(args[0],args[1]);
+      client.getDbHelper().setSoundCommandVolume(args[0],args[1]);
+      client.commands.get(args[0]).volume;
+      client.commands.get(args[0]).volume = volume;
       message.delete().catch(err => console.log(err));
     }
     else{

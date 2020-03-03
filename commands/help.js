@@ -13,6 +13,27 @@ module.exports = {
 
 function helpMessage(message, client,soundCommands,gifCommands,newSoundCommands){
 
+  soundCommands.sort(function(a, b) {
+    if (a[0] < b[0]) {
+           return -1;
+       }
+       if (b[0] < a[0]) {
+           return 1;
+       }
+       return 0;
+  });
+  gifCommands.sort(function(a, b) {
+    if (a[0] < b[0]) {
+           return -1;
+       }
+       if (b[0] < a[0]) {
+           return 1;
+       }
+       return 0;
+  });
+
+
+
   var soundboardEmbeds = generateSoundboardEmbeds(soundCommands);
   var gifEmbeds = generateGifEmbeds(gifCommands);
   var newSoundEmbeds = generateNewSoundboardEmbed(newSoundCommands);
@@ -186,7 +207,7 @@ function generateGifEmbeds(gifCommands){
 
   var cmdLength = 0;
   gifCommands.forEach((item, i) => {
-    cmdLength += item.command.length;
+    cmdLength += item[1].name.length;
     cmdLength += 4;
   });
 
@@ -204,7 +225,7 @@ function generateGifEmbeds(gifCommands){
 
     var soundsMessage = "";
     for (var j = start; j < gifCommands.length; j++) {
-      addMessage = "`"+gifCommands[j].command+"` ";
+      addMessage = "`"+gifCommands[j][1].name+"` ";
       if(addMessage.length + soundsMessage.length < 2048){
         soundsMessage += addMessage;
       }else{

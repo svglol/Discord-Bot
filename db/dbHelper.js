@@ -1,13 +1,14 @@
-const { Users, UserSoundboard,UserMessage,UserConnection,CommandVolume} = require('./dbObjects.js');
+const { Users, UserSoundboard,UserMessage,UserConnection,GifCommands,SoundCommands} = require('./dbObjects.js');
 const Discord = require('discord.js');
 
+const dbInit =  require('./dbInit.js');
+
 var usersCollection = new Discord.Collection();
-var commandVolumeCache = new Discord.Collection();
 var userSoundboardCache = new Array();
 
 module.exports = {
   sync:async function(client){
-    await syncCommandVolumeCache();
+    await dbInit.init(client);
     await syncUsersCollection();
     await syncUserSoundboard();
     client.getLogger().log('info', 'Synced Database to Cache')
@@ -271,20 +272,49 @@ module.exports = {
     }
     await syncUsersCollection();
   },
-  addCommandVolume:async function(command,volume){
-    var commandVolume = await CommandVolume.findOne({ where: { command: command} });
-    if(!commandVolume){
-      commandVolume = await CommandVolume.create({ command: command,volume:volume});
+  setSoundCommandVolume:async function(command,volume){
+    var soundCommand = await SoundCommands.findOne({ where: { command: command} });
+    if(soundCommand){
+      soundCommand.volume = volume;
+      soundCommand.save();
     }
-    else{
-      commandVolume.volume = volume;
-      commandVolume.save();
-    }
-    commandVolumeCache.set(command,volume);
   },
-  getCommandVolume:function(command){
-    if(!commandVolumeCache.get(command)) return 1;
-    return commandVolumeCache.get(command);
+  addGifCommand:async function(command,link,date){
+    var gifCommand = await GifCommands.findOne({ where: { command: command} });
+    if(!gifCommand){
+      gifCommand = await GifCommands.create({ command: command,link:link,date:date});
+    }
+  },
+  getGifCommands: async function(){
+    return await GifCommands.findAll();
+  },
+  getUsers:function(){
+    return usersCollection;
+  },
+  addUserIntro:async function(id,link){
+    var user = await Users.findOne({ where: { user_id: id } });
+    if(user != null){
+      user.intro = link;
+      await user.save();
+    }
+    usersCollection.get(id).intro = link;
+  },
+  addUserExit:async function(id,link){
+    var user = await Users.findOne({ where: { user_id: id } });
+    if(user != null){
+      user.exit = link;
+      await user.save();
+    }
+    usersCollection.get(id).intro = link;
+  },
+  getSoundCommands: async function(){
+    return await SoundCommands.findAll();
+  },
+  addSoundCommand:async function(command,file,volume,date){
+    var soundCommand = await SoundCommands.findOne({ where: { command: command} });
+    if(!soundCommand){
+      soundCommand = await SoundCommands.create({ command: command,file:file,volume:volume,date:date});
+    }
   }
 }
 
@@ -342,13 +372,7 @@ async function syncUsersCollection(){
     var connections = await user.getConnections();
     var soundboard = await user.getSoundboards();
 
-    var newUser = {user_id:user.dataValues.user_id,lastConnection:user.dataValues.lastConnection,messages:messages,connections:connections,soundboards:soundboard};
+    var newUser = {user_id:user.dataValues.user_id,lastConnection:user.dataValues.lastConnection,messages:messages,connections:connections,soundboards:soundboard,intro:user.dataValues.intro,exit:user.dataValues.exit};
     usersCollection.set(user.dataValues.user_id,newUser);
   }
-}
-
-async function syncCommandVolumeCache(){
-  var soundboardVolumes = await CommandVolume.findAll();
-  commandVolumeCache.clear();
-  soundboardVolumes.forEach(i => commandVolumeCache.set(i.dataValues.command,i.dataValues.volume));
 }
