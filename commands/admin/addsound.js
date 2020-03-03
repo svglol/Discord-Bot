@@ -29,7 +29,7 @@ module.exports = {
         const request = https.get(attachment.url, async function(response) {
           await response.pipe(file);
           client.getDbHelper().addSoundCommand(commandName,path,1,new Date().getTime());
-          client.getCommandsLoader().addSoundCommand(client,commandName,path,1);
+          client.getCommandsLoader().addSoundCommand(client,commandName,path,1,new Date().getTime());
           message.delete().catch(err => console.log(err));
         });
       }
