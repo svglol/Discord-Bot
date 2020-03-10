@@ -17,6 +17,7 @@ module.exports = {
     var user = await Users.findOne({ where: { user_id: id} });
     if(!user){
       user = await Users.create({ user_id: id});
+      await syncUsersCollection();
     }
   },
   addUserMessage: async function (message){
