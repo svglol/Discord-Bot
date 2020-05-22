@@ -316,6 +316,10 @@ module.exports = {
     if(!soundCommand){
       soundCommand = await SoundCommands.create({ command: command,file:file,volume:volume,date:date});
     }
+  },
+  deleteSoundCommand:async function(command){
+    var soundCommand = await SoundCommands.findOne({ where: { command: command} });
+    await soundCommand.destroy();
   }
 }
 
