@@ -6,9 +6,12 @@ const dbInit = require('./dbInit.js');
 var usersCollection = new Discord.Collection();
 var userSoundboardCache = [];
 
+var dclient;
+
 module.exports = {
   sync: async function (client) {
     await dbInit.init(client);
+    dclient = client;
     await syncUsersCollection();
     await syncUserSoundboard();
     client.getLogger().log('info', 'Synced Database to Cache');
@@ -376,8 +379,37 @@ async function syncUsersCollection () {
     var messages = await user.getMessages();
     var connections = await user.getConnections();
     var soundboard = await user.getSoundboards();
+    var newMessages = [];
+    messages.forEach((item, i) => {
+      var newMessage = {id: item.dataValues.id, user_id: item.dataValues.user_id, date: item.dataValues.date};
+      newMessages.push(newMessage);
+    });
 
-    var newUser = {user_id: user.dataValues.user_id, lastConnection: user.dataValues.lastConnection, messages: messages, connections: connections, soundboards: soundboard, intro: user.dataValues.intro, exit: user.dataValues.exit};
+    var newConnections = [];
+    connections.forEach((item, i) => {
+      var newConnection = {id: item.dataValues.id,
+        user_id: item.dataValues.user_id,
+        connectTime: item.dataValues.connectTime,
+        disconnectTime: item.dataValues.disconnectTime,
+        connectionLength: item.dataValues.connectionLength};
+      newConnections.push(newConnection);
+    });
+
+    var newSoundboards = [];
+    soundboard.forEach((item, i) => {
+      var newSoundboard = { id: item.dataValues.id,
+        user_id: item.dataValues.userid,
+        date: item.dataValues.date,
+        command: item.dataValues.command};
+      newSoundboards.push(newSoundboard);
+    });
+    var username = '';
+    var duser = dclient.users.cache.get(user.dataValues.user_id);
+    if (duser !== undefined) {
+      username = duser.username;
+    }
+
+    var newUser = {user_id: user.dataValues.user_id, lastConnection: user.dataValues.lastConnection, messages: newMessages, connections: newConnections, soundboards: newSoundboards, intro: user.dataValues.intro, exit: user.dataValues.exit, username: username};
     usersCollection.set(user.dataValues.user_id, newUser);
   }
 }

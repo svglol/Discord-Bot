@@ -1,15 +1,6 @@
 <template>
   <section class="container">
     <div>
-      <div class="links">
-        <ul class="users">
-          <li v-for="(user, index) in users" :key="index" class="user">
-            <nuxt-link :to="{ name: 'user-id', params: { id: index }}">
-              {{ user.name }}
-            </nuxt-link>
-          </li>
-        </ul>
-      </div>
     </div>
   </section>
 </template>
@@ -23,8 +14,8 @@ export default {
     Logo
   },
   async asyncData () {
-    let { data } = await axios.get('/api/users')
-    return { users: data }
+    // let { data } = await axios.get('/api/users')
+    return ;
   },
   head () {
     return {

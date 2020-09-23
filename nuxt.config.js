@@ -23,15 +23,6 @@ module.exports = {
   // Modules for dev and build (recommended) (https://go.nuxtjs.dev/config-modules)
   buildModules: [
   ],
-
-  io: {
-    // module options
-    sockets: [{
-      name: 'main',
-      url: 'http://localhost:3001'
-    }]
-  },
-
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
   },

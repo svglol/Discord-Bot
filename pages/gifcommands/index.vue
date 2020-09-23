@@ -1,29 +1,28 @@
 <template>
   <section class="container">
-    <b-table :data="gifcommands">
+    <h1>Gif Commands</h1>
+    <b-table :data="gifcommands" :bordered="true"
+    :striped='true' style="padding-top:1rem;padding-bottom:1rem">
 
-      <b-table-column field="id" label="ID" width="40" numeric v-slot="props">
-        {{ props.row.id }}
-      </b-table-column>
+    <b-table-column field="command" label="Command" v-slot="props">
+      {{ props.row.command }}
+    </b-table-column>
 
-      <b-table-column field="command" label="Command" v-slot="props">
-        {{ props.row.command }}
-      </b-table-column>
+    <b-table-column field="link" label="Link" v-slot="props">
+      {{ props.row.link }}
+    </b-table-column>
 
-      <b-table-column field="link" label="Link" v-slot="props">
-        {{ props.row.link }}
-      </b-table-column>
-
-      <b-table-column field="Actions" label="Actions" centered v-slot="props">
-        <b-button size="is-small is-success"
-        icon-left="pencil">
-      </b-button>
-      <b-button size="is-small is-danger"
-      icon-left="delete" @click="deleteGif(props.row,gifcommands)">
+    <b-table-column field="Actions" label="Actions" centered v-slot="props">
+      <b-button  type="is-success" size="is-small" inverted
+      icon-left="pencil">Edit
     </b-button>
-  </b-table-column>
+    <b-button type="is-danger" size="is-small" inverted
+    icon-left="delete" @click="deleteGif(props.row,gifcommands)">Delete
+  </b-button>
+</b-table-column>
 </b-table>
-<b-button type="is-primary" style="float:right" @click='addNew'>Add New</b-button>
+
+<b-button type="is-primary" @click='addNew'>Add New</b-button>
 </section>
 </template>
 
@@ -86,5 +85,9 @@ export default {
 </script>
 
 <style scoped>
-
+.button.is-small {
+  font-size: 1rem;
+  /* padding: 1rem; */
+  background: rgba(0,0,0,0);
+}
 </style>

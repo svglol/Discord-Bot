@@ -23,9 +23,6 @@
 
 <section class="main-content columns">
   <aside class="column is-2 section">
-    <p class="menu-label is-hidden-touch">
-      General
-    </p>
     <ul class="menu-list">
       <li
       v-for="(item, key) of items"
@@ -41,7 +38,8 @@
 </ul>
 </aside>
 
-<div class="container column is-10" style="height:calc(100vh - 55px);margin:0;">
+<div class="container column" style="height:calc(100vh - 55px);margin:0;max-width: 20000px;
+    width: 80vw;">
   <nuxt />
 </div>
 </section>

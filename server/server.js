@@ -28,6 +28,8 @@ class Client extends Discord.Client {
       sound.listen(this);
       intro.listen(this);
       stats.listen(this);
+
+      api.init(client);
     });
   }
 
@@ -142,9 +144,9 @@ const logger = winston.createLogger({
 client.commands = new Discord.Collection();
 
 async function start () {
+  client.init();
   await dbHelper.sync(client);
   await commandsLoader.loadCommands(client);
-  client.init();
 }
 
 const commandFiles = glob.sync('server/commands' + '/**/*.js');
@@ -174,8 +176,6 @@ const port = process.env.PORT || 3000;
 const isProd = process.env.NODE_ENV === 'production';
 
 const api = require('./api');
-
-api.init(client);
 
 // Import API Routes
 app.use('/api', api.router);
