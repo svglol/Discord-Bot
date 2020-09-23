@@ -41,7 +41,7 @@
 </ul>
 </aside>
 
-<div class="container column is-10" style="height:calc(100vh - 55px)">
+<div class="container column is-10" style="height:calc(100vh - 55px);margin:0;">
   <nuxt />
 </div>
 </section>

@@ -314,8 +314,12 @@ module.exports = {
     }
   },
   deleteSoundCommand: async function (command) {
-    var soundCommand = await SoundCommands.findOne({ where: { command: command} });
+    var soundCommand = await SoundCommands.findOne({ where: {command: command} });
     await soundCommand.destroy();
+  },
+  deleteGifCommand: async function (command) {
+    var gifCommand = await GifCommands.findOne({ where: {command: command} });
+    await gifCommand.destroy();
   }
 };
 
