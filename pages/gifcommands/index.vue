@@ -12,6 +12,10 @@
       {{ props.row.link }}
     </b-table-column>
 
+    <b-table-column field="date" label="Date Added" v-slot="props" sortable>
+      <datereadable :date="props.row.date"/>
+    </b-table-column>
+
     <b-table-column field="Actions" label="Actions" centered v-slot="props">
       <b-button  type="is-success" size="is-small" inverted
       icon-left="pencil"  @click='formProps.id = props.row.id;formProps.command = props.row.command; formProps.link = props.row.link;showForm = true'>Edit
@@ -39,9 +43,10 @@ aria-modal>
 <script>
 import axios from '~/plugins/axios'
 import gifcommandmodal from '~/components/GifCommandModal.vue'
+import datereadable from '~/components/DateReadable.Vue'
 
 export default {
-  components:{gifcommandmodal},
+  components:{gifcommandmodal,datereadable},
   data () {
     return {
       showForm:false,
@@ -95,7 +100,7 @@ export default {
         link: gifcommand.link
       })
       .then(function (response) {
-        ctx.gifcommands.push({id:response.data.id,command:response.data.command,link:response.data.link})
+        ctx.gifcommands.push({id:response.data.id,command:response.data.command,link:response.data.link,date:response.data.date})
         ctx.$buefy.toast.open({
           message: 'Command added!',
           type: 'is-success'
