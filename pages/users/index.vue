@@ -24,14 +24,14 @@
       <mstime :time="calculateConnectedTime(props.row.connections)"/>
     </b-table-column>
 
-    <b-table-column field="intro" label="Intro Gif" v-slot="props" sortable>
+    <b-table-column field="intro" label="Intro Message" v-slot="props" sortable>
       {{ props.row.intro }}
       <b-button  type="is-success" size="is-small" inverted
       icon-left="pencil" @click="editIntro(props.row)">
     </b-button>
   </b-table-column>
 
-  <b-table-column field="exit" label="Exit Gif" v-slot="props" sortable>
+  <b-table-column field="exit" label="Exit Message" v-slot="props" sortable>
     {{ props.row.exit }}
     <b-button  type="is-success" size="is-small" inverted
     icon-left="pencil" @click="editExit(props.row)">
@@ -97,7 +97,7 @@ export default {
     editIntro(user){
       var ctx = this;
       this.$buefy.dialog.prompt({
-        message: `Edit `+user.username+' Intro Gif',
+        message: `Edit `+user.username+' Intro Message',
         inputAttrs: {
           placeholder: '',
           value: user.intro,
@@ -113,7 +113,7 @@ export default {
             .then(function (response) {
               user.intro = value;
               ctx.$buefy.toast.open({
-                message: 'Intro updated',
+                message: 'Intro Message updated',
                 type: 'is-success'
               })
             })
@@ -127,7 +127,7 @@ export default {
     editExit(user){
       var ctx = this;
       this.$buefy.dialog.prompt({
-        message: `Edit `+user.username+' Exit Gif',
+        message: `Edit `+user.username+' Exit Message',
         inputAttrs: {
           placeholder: '',
           value: user.exit,
@@ -143,7 +143,7 @@ export default {
             .then(function (response) {
               user.exit = value;
               ctx.$buefy.toast.open({
-                message: 'Exit updated',
+                message: 'Exit Message updated',
                 type: 'is-success'
               })
             })
