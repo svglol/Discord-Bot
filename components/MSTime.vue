@@ -16,7 +16,7 @@ export default {
     this.fullTime = parseMillisecondsIntoReadableTime(this.time);
   },
   watch: {
-    time: function(newVal, oldVal) { 
+    time: function(newVal, oldVal) {
       this.fullTime = parseMillisecondsIntoReadableTime(newVal);
     }
   }

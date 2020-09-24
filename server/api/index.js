@@ -8,6 +8,7 @@ var _gifcommands = require('./gifcommands');
 var _discord = require('./discord');
 
 var router = _express.Router();
+router.use(_express.json());
 
 // Add USERS Routes
 router.use(_users.router);

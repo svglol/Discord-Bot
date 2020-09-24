@@ -92,6 +92,7 @@ export default {
       }
     },
     editIntro(user){
+      var ctx = this;
       this.$buefy.dialog.prompt({
         message: `Edit `+user.username+' Intro Gif',
         inputAttrs: {
@@ -102,11 +103,26 @@ export default {
         confirmText: 'Update',
         trapFocus: true,
         onConfirm: (value) => {
-
+          if(JSON.stringify(value) !== JSON.stringify(user.intro) || (value !== '' && user.intro === null)){
+            axios.post('/api/users/'+user.user_id, {
+              intro: value
+            })
+            .then(function (response) {
+              user.intro = value;
+              ctx.$buefy.toast.open({
+                message: 'Intro updated',
+                type: 'is-success'
+              })
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+          }
         }
       });
     },
     editExit(user){
+      var ctx = this;
       this.$buefy.dialog.prompt({
         message: `Edit `+user.username+' Exit Gif',
         inputAttrs: {
@@ -117,7 +133,21 @@ export default {
         confirmText: 'Update',
         trapFocus: true,
         onConfirm: (value) => {
-
+          if(JSON.stringify(value) !== JSON.stringify(user.exit) || (value !== '' && user.exit === null)){
+            axios.post('/api/users/'+user.user_id, {
+              exit: value
+            })
+            .then(function (response) {
+              user.exit = value;
+              ctx.$buefy.toast.open({
+                message: 'Exit updated',
+                type: 'is-success'
+              })
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+          }
         }
       });
     }

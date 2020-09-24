@@ -305,7 +305,7 @@ module.exports = {
       user.exit = link;
       await user.save();
     }
-    usersCollection.get(id).intro = link;
+    usersCollection.get(id).exit = link;
   },
   getSoundCommands: async function () {
     return await SoundCommands.findAll();
