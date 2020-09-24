@@ -8,6 +8,10 @@ var client;
 
 var fs = require('fs');
 
+const fileUpload = require('express-fileupload');
+
+router.use(fileUpload());
+
 /* GET soundcommands listing. */
 router.get('/soundcommands', function (req, res, next) {
   client.getDbHelper().getSoundCommands().then(value => {
@@ -37,6 +41,8 @@ router.get('/soundcommands/file/:id', function (req, res, next) {
 router.delete('/soundcommands/:commandName', function (req, res) {
   client.getLogger().log('info', 'DELETE - ' + req.originalUrl);
   let commandName = req.params.commandName;
+  var cmd = client.commands.get(commandName);
+  fs.unlinkSync(cmd.file);
   client.getDbHelper().deleteSoundCommand(commandName);
   client.commands.delete(commandName);
   res.send(200);
@@ -55,11 +61,24 @@ router.post('/soundcommands/:id', function (req, res) {
 // add sound command
 router.put('/soundcommands/', function (req, res) {
   client.getLogger().log('info', 'PUT - ' + req.originalUrl);
-  // var body = req.body;
-  // client.getDbHelper().addGifCommand(body.command, body.link, new Date().getTime()).then((result) => {
-  //   res.json({id: result.dataValues.id, command: result.dataValues.command, link: result.dataValues.link,date: result.dataValues.date});
-  // });
-  // client.getCommandsLoader().addGifCommand(client, body.command, body.link);
+
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.send(400);
+  }
+
+  let file = req.files.file;
+  let path = './resources/sound/' + req.body.command + '.wav';
+  if (!fs.existsSync(path)) {
+    file.mv(path, function (err) {
+      if (err) { return res.status(500).send(err); }
+      client.getDbHelper().addSoundCommand(req.body.command, path, req.body.volume, new Date().getTime()).then((result) => {
+        res.json({id: result.dataValues.id, command: result.dataValues.command, file: path, volume: result.dataValues.volume, date: result.dataValues.date});
+      });
+      client.getCommandsLoader().addSoundCommand(client, req.body.command, path, req.body.volume, new Date().getTime());
+    });
+  } else {
+    res.send(500);
+  }
 });
 
 module.exports = {

@@ -18,11 +18,13 @@
           <span class="file-name" v-if="vFile">
             {{ vFile.name }}
           </span>
-          <span class="file-name"  v-else-if="oldFile">
+          <span class="file-name" v-else-if="oldFile">
             {{ oldFile }}
           </span>
         </b-upload>
       </b-field>
+
+       <!-- <input type="file" id="file" ref="vFile"/> -->
 
       <b-field label="Volume">
         <b-numberinput step="0.1" min="0" max="1"  v-model="vVolume" required ref="volume" required>
@@ -45,7 +47,7 @@ export default {
   data() {
     return {
       vCommand:this.command,
-      vFile: {},
+      vFile: null,
       oldFile: this.file.replace("./resources/sound/",""),
       vVolume: this.volume,
     }
@@ -73,7 +75,7 @@ export default {
     },
     addCommand(){
       if(this.valid()){
-        this.$emit('add',{id:this.id,command:this.vCommand,volume:this.vLink,file:this.vFile});
+        this.$emit('add',{id:this.id,command:this.vCommand,volume:this.vVolume,file:this.vFile});
       }
     },
     valid(){

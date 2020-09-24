@@ -40,7 +40,7 @@ trap-focus
 :can-cancel="false"
 aria-role="dialog"
 aria-modal>
-<soundcommandmodal v-bind="formProps" @close="showForm = false" @update="updateSound" @add="addSound"/>
+<soundcommandmodal v-bind="formProps" @close='formProps.id = 0;formProps.command = ""; formProps.file = "";formProps.volume = 1;showForm = false' @update="updateSound" @add="addSound"/>
 </b-modal>
 </section>
 </template>
@@ -105,7 +105,29 @@ export default {
     addSound(soundCommand){
       this.showForm = false;
       const ctx = this;
-      console.log(soundCommand)
+      let formData = new FormData();
+      formData.append('file',soundCommand.file)
+      formData.append('command',soundCommand.command);
+      formData.append('volume',soundCommand.volume);
+
+      axios.put( '/api/soundcommands/',
+        formData,
+        {
+          headers: {
+              'Content-Type': 'multipart/form-data'
+          }
+        }
+      ).then(function(response){
+          ctx.soundcommands.push({id:response.data.id,command:response.data.command,volume:response.data.volume,date:response.data.date, file: response.data.file})
+          ctx.$buefy.toast.open({
+            message: 'Sound Command added!',
+            type: 'is-success'
+          })
+      })
+      .catch(function(error){
+         console.log(error);
+      });
+
       // axios.put('/api/soundcommands/', {
       //   command: soundcommand.command,
       //   volume: soundcommand.volume
