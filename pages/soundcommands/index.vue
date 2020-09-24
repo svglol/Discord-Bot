@@ -1,24 +1,23 @@
 <template>
   <section class="container">
     <h1>Sound Commands</h1>
-    <b-table :data="soundcommands" :bordered="true"
+    <b-table :data="soundcommands" :bordered="true" default-sort="command" default-sort-direction="desc"
     :striped='true' style="padding-top:1rem;padding-bottom:1rem">
 
-    <b-table-column field="command" label="Command" v-slot="props">
+    <b-table-column field="command" label="Command" v-slot="props" sortable>
       {{ props.row.command }}
     </b-table-column>
 
-    <b-table-column field="file" label="File" v-slot="props">
+    <b-table-column field="file" label="File" v-slot="props" >
       {{ props.row.file }}
     </b-table-column>
 
-    <b-table-column field="volume" label="Volume" v-slot="props">
+    <b-table-column field="volume" label="Volume" v-slot="props" sortable numeric>
       {{ props.row.volume }}
     </b-table-column>
 
-
-    <b-table-column field="date" label="Date Added" v-slot="props">
-      {{ props.row.date }}
+    <b-table-column field="date" label="Date Added" v-slot="props" sortable>
+       <datereadable :date="props.row.date"/>
     </b-table-column>
 
     <b-table-column field="Actions" label="Actions" centered v-slot="props">
@@ -37,8 +36,10 @@
 
 <script>
 import axios from '~/plugins/axios'
+import datereadable from '~/components/DateReadable.Vue'
 
 export default {
+  components: {datereadable},
   data () {
     return {
     }
