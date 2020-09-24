@@ -1,7 +1,7 @@
 <template>
   <section class="container">
     <h1>Users</h1>
-    <b-table :data="users" :bordered="true"  default-sort="userid" default-sort-direction="desc"
+    <b-table :data="users" :bordered="true"  default-sort="userid" default-sort-direction="desc" @dblclick="openUser"  :selected.sync="selected"
     :striped='true' style="padding-top:1rem;padding-bottom:1rem">
 
     <b-table-column field="userid" label="User ID" v-slot="props" sortable :custom-sort="sortByUserID">
@@ -50,6 +50,7 @@ export default {
   components: {mstime},
   data () {
     return {
+      selected: {}
     }
   },
   async asyncData () {
@@ -65,7 +66,9 @@ export default {
     calculateConnectedTime(connections){
       var totalMs = 0;
       connections.forEach((item, i) => {
-        totalMs += item.connectionLength;
+        if(!isNaN(item.connectionLength)){
+          totalMs += item.connectionLength;
+        }
       });
 
       return totalMs;
@@ -150,6 +153,9 @@ export default {
           }
         }
       });
+    },
+    openUser(){
+      this.$nuxt.$router.push({ path: '/users/'+this.selected.user_id })
     }
   }
 }
@@ -159,5 +165,7 @@ export default {
 .button.is-small {
   font-size: 1rem;
   background: rgba(0,0,0,0);
+  width: 1px;
+  height: 1px;
 }
 </style>

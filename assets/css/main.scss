@@ -77,3 +77,8 @@ h1{
     max-width: 600px!important;
     width: 100%!important;
 }
+
+.table tr.is-selected {
+    background-color: lighten($primary,50);
+    color:black;
+}
