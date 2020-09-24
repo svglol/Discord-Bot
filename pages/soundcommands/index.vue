@@ -17,12 +17,14 @@
     </b-table-column>
 
     <b-table-column field="date" label="Date Added" v-slot="props" sortable>
-       <datereadable :date="props.row.date"/>
+      <datereadable :date="props.row.date"/>
     </b-table-column>
 
     <b-table-column field="Actions" label="Actions" centered v-slot="props">
       <b-button  type="is-success" size="is-small" inverted
-      icon-left="pencil">Edit
+      icon-left="pencil"
+      @click='formProps.id = props.row.id;formProps.command = props.row.command; formProps.file = props.row.file; formProps.volume = props.row.volume;showForm = true'
+      >Edit
     </b-button>
     <b-button type="is-danger" size="is-small" inverted
     icon-left="delete" @click="deleteSound(props.row,soundcommands)">Delete
@@ -30,7 +32,16 @@
 </b-table-column>
 </b-table>
 
-<b-button type="is-primary" @click='addNew'>Add New</b-button>
+<b-button type="is-primary" @click='formProps.id = 0;formProps.command = ""; formProps.file = "";formProps.volume = 1;showForm = true'>Add New</b-button>
+<b-modal :active.sync="showForm"
+has-modal-card
+trap-focus
+:destroy-on-hide="false"
+:can-cancel="false"
+aria-role="dialog"
+aria-modal>
+<soundcommandmodal v-bind="formProps" @close="showForm = false" @update="updateSound" @add="addSound"/>
+</b-modal>
 </section>
 </template>
 
@@ -38,11 +49,19 @@
 import axios from '~/plugins/axios'
 import datereadable from '~/components/DateReadable.Vue'
 import soundfile from '~/components/SoundFile.Vue'
+import soundcommandmodal from '~/components/SoundCommandModal.vue'
 
 export default {
-  components: {datereadable,soundfile},
+  components: {datereadable,soundfile,soundcommandmodal},
   data () {
     return {
+      showForm:false,
+      formProps: {
+        id: 0,
+        command: '',
+        file:'',
+        volume: 1
+      }
     }
   },
   async asyncData () {
@@ -55,41 +74,52 @@ export default {
     }
   },
   methods: {
-    addNew(){
-      this.$buefy.dialog.prompt({
-        message: `Add new sound command`,
-        inputAttrs: {
-          placeholder: '',
-        },
-        confirmText: 'Add',
-        trapFocus: true,
-        onConfirm: (value) => this.$buefy.toast.open(`Your name is: ${value}`)
-      });
-    },
     deleteSound(sound,props){
-      // const ctx = this;
-      // this.$buefy.dialog.confirm({
-      //   message: 'Delete `'+gif.command+'` command?',
-      //   onConfirm: () => {
-      //     axios.delete('/api/gifcommands/'+gif.command, {
-      //       command: gif.command
-      //     })
-      //     .then(function (response) {
-      //       for(var i = props.length - 1; i >= 0; i--) {
-      //         if(props[i].command === gif.command) {
-      //           props.splice(i, 1);
-      //         }
-      //       }
-      //       ctx.$buefy.toast.open({
-      //         message: 'Command deleted!',
-      //         type: 'is-success'
-      //       })
-      //     })
-      //     .catch(function (error) {
-      //       console.log(error);
-      //     });
-      //   }
+      const ctx = this;
+      this.$buefy.dialog.confirm({
+        message: 'Delete `'+sound.command+'` Sound Command?',
+        onConfirm: () => {
+          axios.delete('/api/soundcommands/'+sound.command, {
+            command: sound.command
+          })
+          .then(function (response) {
+            for(var i = props.length - 1; i >= 0; i--) {
+              if(props[i].command === sound.command) {
+                props.splice(i, 1);
+              }
+            }
+            ctx.$buefy.toast.open({
+              message: 'Command deleted!',
+              type: 'is-success'
+            })
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+        }
+      })
+    },
+    updateSound(soundCommand){
+
+    },
+    addSound(soundCommand){
+      this.showForm = false;
+      const ctx = this;
+      console.log(soundCommand)
+      // axios.put('/api/soundcommands/', {
+      //   command: soundcommand.command,
+      //   volume: soundcommand.volume
       // })
+      // .then(function (response) {
+      //   ctx.gifcommands.push({id:response.data.id,command:response.data.command,link:response.data.link,date:response.data.date})
+      //   ctx.$buefy.toast.open({
+      //     message: 'Command added!',
+      //     type: 'is-success'
+      //   })
+      // })
+      // .catch(function (error) {
+      //   console.log(error);
+      // });
     }
   }
 }

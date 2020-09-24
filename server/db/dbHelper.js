@@ -1,4 +1,4 @@
-const { Users, UserSoundboard, UserMessage, UserConnection, GifCommands, SoundCommands} = require('./dbObjects.js');
+const {Users, UserSoundboard, UserMessage, UserConnection, GifCommands, SoundCommands} = require('./dbObjects.js');
 const Discord = require('discord.js');
 
 const dbInit = require('./dbInit.js');
@@ -17,16 +17,16 @@ module.exports = {
     client.getLogger().log('info', 'Synced Database to Cache');
   },
   addUser: async function (id) {
-    var user = await Users.findOne({ where: { user_id: id} });
+    var user = await Users.findOne({ where: {user_id: id} });
     if (!user) {
-      user = await Users.create({ user_id: id});
+      user = await Users.create({user_id: id});
       await syncUsersCollection();
     }
   },
   addUserMessage: async function (message) {
     var user = await Users.findOne({ where: { user_id: message.author.id } });
     if (!user) {
-      user = await Users.create({ user_id: message.author.id});
+      user = await Users.create({user_id: message.author.id});
       await syncUsersCollection();
     }
     var date = new Date();
@@ -34,7 +34,7 @@ module.exports = {
     usersCollection.get(message.author.id).messages.push(userMessage);
   },
   getUserMessages: async function (id) {
-    var messagesNorm = new Array();
+    var messagesNorm = [];
     var user = usersCollection.get(id);
     if (user != null) {
       messagesNorm.push(user.messages);
@@ -46,7 +46,7 @@ module.exports = {
     var messages = 0;
     await this.getMonthlyUserMessagesTotals().then(async function (result) {
       await result.forEach((item, i) => {
-        if (item.id == id) {
+        if (item.id === id) {
           rank = '#' + (i + 1);
           messages = item.messages;
         }
@@ -59,7 +59,7 @@ module.exports = {
     var messages = 0;
     await this.getAllTimeUserMessagesTotals().then(async function (result) {
       await result.forEach((item, i) => {
-        if (item.id == id) {
+        if (item.id === id) {
           rank = '#' + (i + 1);
           messages = item.messages;
         }
@@ -68,7 +68,7 @@ module.exports = {
     return {rank: rank, messages: messages};
   },
   getMonthlyUserMessagesTotals: async function () {
-    var leaderboard = new Array();
+    var leaderboard = [];
     var date = new Date();
     var currentMonth = date.getMonth();
     var currentYear = date.getYear();
@@ -76,22 +76,22 @@ module.exports = {
       var count = 0;
       user.messages.forEach((message, i) => {
         var messageDate = new Date(message.date);
-        if (currentMonth == messageDate.getMonth() && currentYear == messageDate.getYear()) {
+        if (currentMonth === messageDate.getMonth() && currentYear === messageDate.getYear()) {
           count++;
         }
       });
-      if (count != 0) {
+      if (count !== 0) {
         leaderboard.push({id: user.user_id, messages: count});
       }
     }
     return sortMessagesLeaderboard(leaderboard);
   },
   getAllTimeUserMessagesTotals: async function () {
-    var leaderboard = new Array();
+    var leaderboard = [];
     for (const [key, user] of usersCollection.entries()) {
       var count = 0;
       count = user.messages.length;
-      if (count != 0) {
+      if (count !== 0) {
         leaderboard.push({id: user.user_id, messages: count});
       }
     }
@@ -104,19 +104,19 @@ module.exports = {
       user.lastConnection = lastConnection;
       await user.save();
     } else {
-      await Users.create({ user_id: id, lastConnection: lastConnection});
+      await Users.create({user_id: id, lastConnection: lastConnection});
       syncUsersCollection();
     }
   },
   addUserConnection: async function (id) {
     var user = await Users.findOne({ where: { user_id: id } });
     if (!user) {
-      user = await Users.create({ user_id: id});
+      user = await Users.create({user_id: id});
     }
     var date = new Date();
     var lastConnection = usersCollection.get(id).lastConnection;
     this.updateUserLastConnection(id, 0);
-    if (lastConnection != 0) {
+    if (lastConnection !== 0) {
       var userConnection = await user.addConnection(id, lastConnection, date.getTime(), date.getTime() - lastConnection);
       usersCollection.get(id).connections.push(userConnection);
     }
@@ -124,7 +124,7 @@ module.exports = {
   addUserSoundboard: async function (id, command) {
     var user = await Users.findOne({ where: { user_id: id } });
     if (!user) {
-      user = await Users.create({ user_id: id});
+      user = await Users.create({user_id: id});
       syncUsersCollection();
     }
     var date = new Date();
@@ -133,7 +133,7 @@ module.exports = {
     syncUserSoundboard();
   },
   getUserSoundboard: async function (id) {
-    var messagesNorm = new Array();
+    var messagesNorm = [];
     var user = usersCollection.get(id);
     if (user != null) {
       messagesNorm.push(user.soundboard);
@@ -141,7 +141,7 @@ module.exports = {
     return messagesNorm;
   },
   getUserConnections: async function (id) {
-    var messagesNorm = new Array();
+    var messagesNorm = [];
     var user = usersCollection.get(id);
     if (user != null) {
       messagesNorm.push(user.connections);
@@ -153,7 +153,7 @@ module.exports = {
     var time = '-';
     await this.getMonthlyUserConnectionsTotals().then(async function (result) {
       await result.forEach((item, i) => {
-        if (item.id == id) {
+        if (item.id === id) {
           rank = '#' + (i + 1);
           time = item.totalTime;
         }
@@ -166,7 +166,7 @@ module.exports = {
     var time = '-';
     await this.getAllTimeUserConnectionsTotals().then(async function (result) {
       await result.forEach((item, i) => {
-        if (item.id == id) {
+        if (item.id === id) {
           rank = '#' + (i + 1);
           time = item.totalTime;
         }
@@ -182,15 +182,14 @@ module.exports = {
     var total = 0;
     var user = usersCollection.get(id);
     if (user != null) {
-      if (user.lastConnection == 0) return 0;
+      if (user.lastConnection === 0) return 0;
       var date = new Date();
       total = date.getTime() - user.lastConnection;
     }
     return total;
   },
   getMonthlyUserConnectionsTotals: async function () {
-    var users = await Users.findAll();
-    var leaderboard = new Array();
+    var leaderboard = [];
 
     var date = new Date();
     var currentMonth = date.getMonth();
@@ -202,19 +201,19 @@ module.exports = {
         totalMs += result;
       });
       user.connections.forEach((item, i) => {
-        disconnectDate = new Date(item.disconnectTime);
-        if (currentMonth == disconnectDate.getMonth() && currentYear == disconnectDate.getYear()) {
+        var disconnectDate = new Date(item.disconnectTime);
+        if (currentMonth === disconnectDate.getMonth() && currentYear === disconnectDate.getYear()) {
           totalMs += item.connectionLength;
         }
       });
-      if (totalMs != 0) {
+      if (totalMs !== 0) {
         await leaderboard.push({id: user.user_id, totalTime: totalMs});
       }
     }
     return sortConnectionsLeaderboard(leaderboard);
   },
   getAllTimeUserConnectionsTotals: async function () {
-    var leaderboard = new Array();
+    var leaderboard = [];
 
     for (const [key, user] of usersCollection.entries()) {
       var totalMs = 0;
@@ -224,7 +223,7 @@ module.exports = {
       user.connections.forEach((item, i) => {
         totalMs += item.connectionLength;
       });
-      if (totalMs != 0) {
+      if (totalMs !== 0) {
         await leaderboard.push({id: user.user_id, totalTime: totalMs});
       }
     }
@@ -232,9 +231,9 @@ module.exports = {
   },
   getAllTimeSoundboardTotals: async function () {
     var soundboardUsage = userSoundboardCache;
-    var leaderboard = new Array();
+    var leaderboard = [];
     for (const userSoundboard of soundboardUsage) {
-      var update = leaderboard.find(data => data.command == userSoundboard.command);
+      var update = leaderboard.find(data => data.command === userSoundboard.command);
       if (update != null) {
         update.uses += 1;
       } else {
@@ -245,16 +244,16 @@ module.exports = {
   },
   getMonthlySoundboardTotals: async function () {
     var soundboardUsage = userSoundboardCache;
-    var leaderboard = new Array();
+    var leaderboard = [];
 
     var date = new Date();
     var currentMonth = date.getMonth();
     var currentYear = date.getYear();
 
     for (const userSoundboard of soundboardUsage) {
-      useDate = new Date(userSoundboard.date);
-      if (currentMonth == useDate.getMonth() && currentYear == useDate.getYear()) {
-        var update = leaderboard.find(data => data.command == userSoundboard.command);
+      var useDate = new Date(userSoundboard.date);
+      if (currentMonth === useDate.getMonth() && currentYear === useDate.getYear()) {
+        var update = leaderboard.find(data => data.command === userSoundboard.command);
         if (update != null) {
           update.uses += 1;
         } else {
@@ -273,21 +272,21 @@ module.exports = {
     await syncUsersCollection();
   },
   setSoundCommandVolume: async function (command, volume) {
-    var soundCommand = await SoundCommands.findOne({ where: { command: command} });
+    var soundCommand = await SoundCommands.findOne({ where: {command: command} });
     if (soundCommand) {
       soundCommand.volume = volume;
       soundCommand.save();
     }
   },
   addGifCommand: async function (command, link, date) {
-    var gifCommand = await GifCommands.findOne({ where: { command: command} });
+    var gifCommand = await GifCommands.findOne({ where: {command: command} });
     if (!gifCommand) {
-      gifCommand = await GifCommands.create({ command: command, link: link, date: date});
+      gifCommand = await GifCommands.create({command: command, link: link, date: date});
     }
     return gifCommand;
   },
   getGifCommands: async function () {
-    return await GifCommands.findAll();
+    return GifCommands.findAll();
   },
   getUsers: function () {
     return usersCollection;
@@ -309,12 +308,12 @@ module.exports = {
     usersCollection.get(id).exit = link;
   },
   getSoundCommands: async function () {
-    return await SoundCommands.findAll();
+    return SoundCommands.findAll();
   },
   addSoundCommand: async function (command, file, volume, date) {
-    var soundCommand = await SoundCommands.findOne({ where: { command: command} });
+    var soundCommand = await SoundCommands.findOne({ where: {command: command} });
     if (!soundCommand) {
-      soundCommand = await SoundCommands.create({ command: command, file: file, volume: volume, date: date});
+      soundCommand = await SoundCommands.create({command: command, file: file, volume: volume, date: date});
     }
   },
   deleteSoundCommand: async function (command) {
@@ -374,7 +373,7 @@ function sortSoundboardUsageLeaderboard (leaderboard) {
 
 async function syncUserSoundboard () {
   var userSoundboard = await UserSoundboard.findAll();
-  userSoundboardCache = new Array();
+  userSoundboardCache = [];
   userSoundboard.forEach(i => userSoundboardCache.push(i));
 }
 

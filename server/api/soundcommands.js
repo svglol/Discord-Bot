@@ -33,15 +33,34 @@ router.get('/soundcommands/file/:id', function (req, res, next) {
   });
 });
 
-/* GET user by ID. */
-// router.get('/soundcommands/:id', function (req, res, next) {
-//   const id = parseInt(req.params.id);
-//   if (id >= 0 && id < users.length) {
-//     res.json(users[id]);
-//   } else {
-//     res.sendStatus(404);
-//   }
-// });
+// Remove sound command
+router.delete('/soundcommands/:commandName', function (req, res) {
+  client.getLogger().log('info', 'DELETE - ' + req.originalUrl);
+  let commandName = req.params.commandName;
+  client.getDbHelper().deleteSoundCommand(commandName);
+  client.commands.delete(commandName);
+  res.send(200);
+});
+
+// update sound command
+router.post('/soundcommands/:id', function (req, res) {
+  client.getLogger().log('info', 'POST - ' + req.originalUrl);
+  // var body = req.body;
+  // client.getDbHelper().editGifCommand(body.id, body.command, body.link);
+  // client.commands.delete(body.command);
+  // client.getCommandsLoader().addGifCommand(client, body.command, body.link);
+  // res.sendStatus(200);
+});
+
+// add sound command
+router.put('/soundcommands/', function (req, res) {
+  client.getLogger().log('info', 'PUT - ' + req.originalUrl);
+  // var body = req.body;
+  // client.getDbHelper().addGifCommand(body.command, body.link, new Date().getTime()).then((result) => {
+  //   res.json({id: result.dataValues.id, command: result.dataValues.command, link: result.dataValues.link,date: result.dataValues.date});
+  // });
+  // client.getCommandsLoader().addGifCommand(client, body.command, body.link);
+});
 
 module.exports = {
   router,

@@ -38,7 +38,7 @@ router.put('/gifcommands/', function (req, res) {
   client.getLogger().log('info', 'PUT - ' + req.originalUrl);
   var body = req.body;
   client.getDbHelper().addGifCommand(body.command, body.link, new Date().getTime()).then((result) => {
-    res.json({id: result.dataValues.id, command: result.dataValues.command, link: result.dataValues.link,date: result.dataValues.date});
+    res.json({id: result.dataValues.id, command: result.dataValues.command, link: result.dataValues.link, date: result.dataValues.date});
   });
   client.getCommandsLoader().addGifCommand(client, body.command, body.link);
 });
