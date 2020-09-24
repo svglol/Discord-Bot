@@ -25,10 +25,24 @@ router.delete('/gifcommands/:commandName', function (req, res) {
 
 // update gif command
 router.post('/gifcommands/:id', function (req, res) {
-  console.log(req.params);
   client.getLogger().log('info', 'POST - ' + req.originalUrl);
-  // console.log(req)
-  res.send('POST request to the homepage');
+  var body = req.body;
+  console.log(body);
+  client.getDbHelper().editGifCommand(body.id, body.command, body.link);
+  client.commands.delete(body.command);
+  client.getCommandsLoader().addGifCommand(client, body.command, body.link);
+  res.sendStatus(200);
+});
+
+// add gif command
+router.put('/gifcommands/', function (req, res) {
+  console.log(req.params);
+  client.getLogger().log('info', 'PUT - ' + req.originalUrl);
+  var body = req.body;
+  client.getDbHelper().addGifCommand(body.command, body.link, new Date().getTime()).then((result) => {
+    res.json({id: result.dataValues.id, command: result.dataValues.command, link: result.dataValues.link});
+  });
+  client.getCommandsLoader().addGifCommand(client, body.command, body.link);
 });
 
 module.exports = {

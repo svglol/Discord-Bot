@@ -14,7 +14,7 @@
 
     <b-table-column field="Actions" label="Actions" centered v-slot="props">
       <b-button  type="is-success" size="is-small" inverted
-      icon-left="pencil">Edit
+      icon-left="pencil"  @click='formProps.id = props.row.id;formProps.command = props.row.command; formProps.link = props.row.link;showForm = true'>Edit
     </b-button>
     <b-button type="is-danger" size="is-small" inverted
     icon-left="delete" @click="deleteGif(props.row,gifcommands)">Delete
@@ -22,16 +22,34 @@
 </b-table-column>
 </b-table>
 
-<b-button type="is-primary" @click='addNew'>Add New</b-button>
+<b-button type="is-primary" @click='formProps.id = 0;formProps.command = ""; formProps.link = "";showForm = true'>Add New</b-button>
+
+<b-modal :active.sync="showForm"
+has-modal-card
+trap-focus
+:destroy-on-hide="false"
+:can-cancel="false"
+aria-role="dialog"
+aria-modal>
+<gifcommandmodal v-bind="formProps" @close="showForm = false" @update="updateGif" @add="addGif"/>
+</b-modal>
 </section>
 </template>
 
 <script>
 import axios from '~/plugins/axios'
+import gifcommandmodal from '~/components/GifCommandModal.vue'
 
 export default {
+  components:{gifcommandmodal},
   data () {
     return {
+      showForm:false,
+      formProps: {
+        id: 0,
+        command: '',
+        link: ''
+      }
     }
   },
   async asyncData () {
@@ -44,17 +62,6 @@ export default {
     }
   },
   methods: {
-    addNew(){
-      this.$buefy.dialog.prompt({
-        message: `Add new gif command`,
-        inputAttrs: {
-          placeholder: '',
-        },
-        confirmText: 'Add',
-        trapFocus: true,
-        onConfirm: (value) => this.$buefy.toast.open(`Your name is: ${value}`)
-      });
-    },
     deleteGif(gif,props){
       const ctx = this;
       this.$buefy.dialog.confirm({
@@ -79,6 +86,48 @@ export default {
           });
         }
       })
+    },
+    addGif(gifcommand){
+      this.showForm = false;
+      const ctx = this;
+      axios.put('/api/gifcommands/', {
+        command: gifcommand.command,
+        link: gifcommand.link
+      })
+      .then(function (response) {
+        ctx.gifcommands.push({id:response.data.id,command:response.data.command,link:response.data.link})
+        ctx.$buefy.toast.open({
+          message: 'Command added!',
+          type: 'is-success'
+        })
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    },
+    updateGif(gifcommand){
+      this.showForm = false;
+      const ctx = this;
+      axios.post('/api/gifcommands/'+gifcommand.id, {
+        id: gifcommand.id,
+        command: gifcommand.command,
+        link: gifcommand.link
+      })
+      .then(function (response) {
+        ctx.gifcommands.forEach((item, i) => {
+          if(item.id === gifcommand.id){
+            item.command = gifcommand.command;
+            item.link = gifcommand.link;
+          }
+        });
+        ctx.$buefy.toast.open({
+          message: 'Command updated!',
+          type: 'is-success'
+        })
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
     }
   }
 }

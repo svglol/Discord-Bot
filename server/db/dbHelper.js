@@ -284,6 +284,7 @@ module.exports = {
     if (!gifCommand) {
       gifCommand = await GifCommands.create({ command: command, link: link, date: date});
     }
+    return gifCommand;
   },
   getGifCommands: async function () {
     return await GifCommands.findAll();
@@ -323,6 +324,12 @@ module.exports = {
   deleteGifCommand: async function (command) {
     var gifCommand = await GifCommands.findOne({ where: {command: command} });
     await gifCommand.destroy();
+  },
+  editGifCommand: async function (id, command, link) {
+    var gifCommand = await GifCommands.findOne({ where: {id: id} });
+    gifCommand.command = command;
+    gifCommand.link = link;
+    gifCommand.save();
   }
 };
 
