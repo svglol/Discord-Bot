@@ -1,6 +1,6 @@
 <template>
   <section class="container">
-    <h1>Gif Commands</h1>
+    <h1>Text Commands</h1>
     <b-table :data="gifcommands" :bordered="true"  default-sort="command" default-sort-direction="asc"
     :striped='true' style="padding-top:1rem;padding-bottom:1rem">
 
@@ -8,7 +8,7 @@
       {{ props.row.command }}
     </b-table-column>
 
-    <b-table-column field="link" label="Link" v-slot="props" sortable>
+    <b-table-column field="link" label="Text" v-slot="props" sortable>
       {{ props.row.link }}
     </b-table-column>
 

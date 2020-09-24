@@ -69,9 +69,9 @@ export default {
           to: { name: 'soundcommands' }
         },
         {
-          title: 'Gif Commands',
-          icon: 'gif',
-          to: { name: 'gifcommands' }
+          title: 'Text Commands',
+          icon: 'message-outline',
+          to: { name: 'textcommands' }
         },
         {
           title: 'Log',

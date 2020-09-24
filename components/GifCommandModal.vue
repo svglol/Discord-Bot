@@ -1,14 +1,14 @@
 <template>
   <div class="modal-card">
     <header class="modal-card-head" >
-      <p class="modal-card-title" v-if="id == 0">Add new gif command</p>
-      <p class="modal-card-title" v-if="id !== 0">Update gif command</p>
+      <p class="modal-card-title" v-if="id == 0">Add New Text Command</p>
+      <p class="modal-card-title" v-if="id !== 0">Update Text Command</p>
     </header>
     <section class="modal-card-body">
       <b-field label="Command">
         <b-input v-model="vCommand" required validation-message="Command required"  ref="command"></b-input>
       </b-field>
-      <b-field label="Link">
+      <b-field label="Text">
         <b-input v-model="vLink" required validation-message="Link required" ref="link"></b-input>
       </b-field>
     </section>
