@@ -45,17 +45,36 @@ router.delete('/soundcommands/:commandName', function (req, res) {
   fs.unlinkSync(cmd.file);
   client.getDbHelper().deleteSoundCommand(commandName);
   client.commands.delete(commandName);
-  res.send(200);
+  res.sendStatus(200);
 });
 
 // update sound command
 router.post('/soundcommands/:id', function (req, res) {
   client.getLogger().log('info', 'POST - ' + req.originalUrl);
-  // var body = req.body;
-  // client.getDbHelper().editGifCommand(body.id, body.command, body.link);
-  // client.commands.delete(body.command);
-  // client.getCommandsLoader().addGifCommand(client, body.command, body.link);
-  // res.sendStatus(200);
+  let path = './resources/sound/' + req.body.command + '.wav';
+  if (req.files) {
+    let file = req.files.file;
+    file.mv(path, function (err) {
+      if (err) { return res.status(500).send(err); }
+    });
+  }
+
+  client.getDbHelper().getSoundCommands().then(result => {
+    result.forEach((item, i) => {
+      if (item.dataValues.id === parseInt(req.body.id)) {
+        if (item.dataValues.commandName !== req.body.command) {
+          // move file
+          fs.rename(item.dataValues.file, path, function (err) {
+            if (err) throw err;
+          });
+        }
+        client.getDbHelper().editSoundCommand(req.body.id, req.body.command, path, req.body.volume);
+        client.commands.delete(item.dataValues.command);
+        client.getCommandsLoader().addSoundCommand(client, req.body.command, path, req.body.volume, new Date().getTime());
+        res.sendStatus(200);
+      }
+    });
+  });
 });
 
 // add sound command
@@ -63,7 +82,7 @@ router.put('/soundcommands/', function (req, res) {
   client.getLogger().log('info', 'PUT - ' + req.originalUrl);
 
   if (!req.files || Object.keys(req.files).length === 0) {
-    return res.send(400);
+    return res.sendStatus(400);
   }
 
   let file = req.files.file;
@@ -77,7 +96,7 @@ router.put('/soundcommands/', function (req, res) {
       client.getCommandsLoader().addSoundCommand(client, req.body.command, path, req.body.volume, new Date().getTime());
     });
   } else {
-    res.send(500);
+    res.sendStatus(500);
   }
 });
 

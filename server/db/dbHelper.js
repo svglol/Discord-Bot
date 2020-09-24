@@ -330,6 +330,13 @@ module.exports = {
     gifCommand.command = command;
     gifCommand.link = link;
     gifCommand.save();
+  },
+  editSoundCommand: async function (id, command, file, volume) {
+    var soundCommand = await SoundCommands.findOne({ where: {id: id} });
+    soundCommand.command = command;
+    soundCommand.volume = volume;
+    soundCommand.file = file;
+    soundCommand.save();
   }
 };
 

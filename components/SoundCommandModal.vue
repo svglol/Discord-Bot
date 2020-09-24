@@ -24,7 +24,7 @@
         </b-upload>
       </b-field>
 
-       <!-- <input type="file" id="file" ref="vFile"/> -->
+      <!-- <input type="file" id="file" ref="vFile"/> -->
 
       <b-field label="Volume">
         <b-numberinput step="0.1" min="0" max="1"  v-model="vVolume" required ref="volume" required>
@@ -60,7 +60,9 @@ export default {
       this.vVolume = newVal;
     },
     file: function(newVal, oldVal) {
-      this.oldFile = newVal.replace("./resources/sound/","");
+      if(newVal !== null){
+        this.oldFile = newVal.replace("./resources/sound/","");
+      }
       this.vFile = null;
     }
   },
@@ -69,9 +71,14 @@ export default {
   },
   methods:{
     updateCommand(){
-      // if(this.valid()){
-      //   this.$emit('update',{id:this.id,command:this.vCommand,link:this.vLink});
-      // }
+      if(this.valid()){
+        if(this.vFile !== null){
+          this.$emit('update',{id:this.id,command:this.vCommand,volume:this.vVolume,file:this.vFile});
+        }
+        else{
+          this.$emit('update',{id:this.id,command:this.vCommand,volume:this.vVolume});
+        }
+      }
     },
     addCommand(){
       if(this.valid()){

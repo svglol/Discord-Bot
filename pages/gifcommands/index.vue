@@ -1,7 +1,7 @@
 <template>
   <section class="container">
     <h1>Gif Commands</h1>
-    <b-table :data="gifcommands" :bordered="true"  default-sort="command" default-sort-direction="desc"
+    <b-table :data="gifcommands" :bordered="true"  default-sort="command" default-sort-direction="asc"
     :striped='true' style="padding-top:1rem;padding-bottom:1rem">
 
     <b-table-column field="command" label="Command" v-slot="props" sortable>

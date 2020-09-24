@@ -1,7 +1,7 @@
 <template>
   <section class="container">
     <h1>Sound Commands</h1>
-    <b-table :data="soundcommands" :bordered="true" default-sort="command" default-sort-direction="desc"
+    <b-table :data="soundcommands" :bordered="true" default-sort="command" default-sort-direction="asc"
     :striped='true' style="padding-top:1rem;padding-bottom:1rem">
 
     <b-table-column field="command" label="Command" v-slot="props" sortable>
@@ -100,50 +100,69 @@ export default {
       })
     },
     updateSound(soundCommand){
-
-    },
-    addSound(soundCommand){
       this.showForm = false;
       const ctx = this;
       let formData = new FormData();
-      formData.append('file',soundCommand.file)
+      formData.append('file',soundCommand.file);
+      formData.append('id',soundCommand.id);
       formData.append('command',soundCommand.command);
       formData.append('volume',soundCommand.volume);
 
-      axios.put( '/api/soundcommands/',
-        formData,
-        {
-          headers: {
-              'Content-Type': 'multipart/form-data'
-          }
+      axios.post( '/api/soundcommands/'+soundCommand.id,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data'
         }
-      ).then(function(response){
-          ctx.soundcommands.push({id:response.data.id,command:response.data.command,volume:response.data.volume,date:response.data.date, file: response.data.file})
-          ctx.$buefy.toast.open({
-            message: 'Sound Command added!',
-            type: 'is-success'
-          })
-      })
-      .catch(function(error){
-         console.log(error);
+      }
+    ).then(function(response){
+      ctx.soundcommands.forEach((item, i) => {
+        if(item.id === soundCommand.id){
+          if(item.command !== soundCommand.command){
+            console.log(soundCommand.command)
+            item.file = './resources/sound/'+soundCommand.command+'.wav';
+            console.log(item.file);
+          }
+          item.command = soundCommand.command;
+          item.volume = soundCommand.volume;
+        }
       });
+      ctx.$buefy.toast.open({
+        message: 'Sound Command added!',
+        type: 'is-success'
+      })
+    })
+    .catch(function(error){
+      console.log(error);
+    });
+  },
+  addSound(soundCommand){
+    this.showForm = false;
+    const ctx = this;
+    let formData = new FormData();
+    formData.append('file',soundCommand.file)
+    formData.append('command',soundCommand.command);
+    formData.append('volume',soundCommand.volume);
 
-      // axios.put('/api/soundcommands/', {
-      //   command: soundcommand.command,
-      //   volume: soundcommand.volume
-      // })
-      // .then(function (response) {
-      //   ctx.gifcommands.push({id:response.data.id,command:response.data.command,link:response.data.link,date:response.data.date})
-      //   ctx.$buefy.toast.open({
-      //     message: 'Command added!',
-      //     type: 'is-success'
-      //   })
-      // })
-      // .catch(function (error) {
-      //   console.log(error);
-      // });
+    axios.put( '/api/soundcommands/',
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
     }
-  }
+  ).then(function(response){
+    ctx.soundcommands.push({id:response.data.id,command:response.data.command,volume:response.data.volume,date:response.data.date, file: response.data.file})
+    ctx.$buefy.toast.open({
+      message: 'Sound Command added!',
+      type: 'is-success'
+    })
+  })
+  .catch(function(error){
+    console.log(error);
+  });
+}
+}
 }
 </script>
 
