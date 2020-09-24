@@ -54,14 +54,9 @@ export default {
     return {
       items: [
         {
-          title: 'Home',
+          title: 'Dashboard',
           icon: 'home',
           to: { name: 'index' }
-        },
-        {
-          title: 'Bot Control',
-          icon: 'laptop',
-          to: { name: 'botcontrol' }
         },
         {
           title: 'Users',
