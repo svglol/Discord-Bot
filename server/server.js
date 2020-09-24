@@ -20,10 +20,10 @@ class Client extends Discord.Client {
 
     this.once('ready', () => {
       client.user
-      .setActivity(prefix + 'help for commands', {
-        type: 'PLAYING'
-      })
-      .catch(console.error);
+        .setActivity(prefix + 'help for commands', {
+          type: 'PLAYING'
+        })
+        .catch(console.error);
 
       sound.listen(this);
       intro.listen(this);
@@ -128,25 +128,6 @@ class Client extends Discord.Client {
 }
 
 const client = new Client();
-
-
-// var logger = winston.createLogger({
-//   format: format.combine(
-//     format.timestamp({
-//       format: 'YYYY-MM-DD HH:mm:ss'
-//     }),
-//     format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
-//   ),
-//   transports: [
-//     new (winston.transports.Console)({ level: loggerLevel }),
-//     new winston.transports.File({
-//       filename: '.log',
-//     }),
-//    new winston.transports.File({
-//      filename: '.log',
-//      timestamp: new Date()
-//    })]
-// });
 
 const logger = winston.createLogger({
   transports: [
