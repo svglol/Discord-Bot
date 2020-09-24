@@ -27,7 +27,6 @@ router.delete('/gifcommands/:commandName', function (req, res) {
 router.post('/gifcommands/:id', function (req, res) {
   client.getLogger().log('info', 'POST - ' + req.originalUrl);
   var body = req.body;
-  console.log(body);
   client.getDbHelper().editGifCommand(body.id, body.command, body.link);
   client.commands.delete(body.command);
   client.getCommandsLoader().addGifCommand(client, body.command, body.link);
@@ -36,7 +35,6 @@ router.post('/gifcommands/:id', function (req, res) {
 
 // add gif command
 router.put('/gifcommands/', function (req, res) {
-  console.log(req.params);
   client.getLogger().log('info', 'PUT - ' + req.originalUrl);
   var body = req.body;
   client.getDbHelper().addGifCommand(body.command, body.link, new Date().getTime()).then((result) => {
