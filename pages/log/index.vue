@@ -14,7 +14,7 @@ export default {
   },
   head () {
     return {
-      title: 'Discord Bot - Dashboard'
+      title: 'Discord Bot - Log'
     }
   }
 }
