@@ -25,8 +25,6 @@ router.get('/soundcommands/file/:id', function (req, res, next) {
     value.forEach((item, i) => {
       if (item.dataValues.id === parseInt(id)) {
         soundCommand = item.dataValues;
-        // res.download(soundCommand.file);
-
         var file = soundCommand.file;
         var data = fs.readFileSync(file);
         res.json({sound: data.toString('base64')});
