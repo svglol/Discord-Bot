@@ -9,7 +9,7 @@
     </b-table-column>
 
     <b-table-column field="file" label="File" v-slot="props" >
-      {{ props.row.file }}
+      <soundfile :soundCommand="props.row"/>
     </b-table-column>
 
     <b-table-column field="volume" label="Volume" v-slot="props" sortable numeric>
@@ -37,9 +37,10 @@
 <script>
 import axios from '~/plugins/axios'
 import datereadable from '~/components/DateReadable.Vue'
+import soundfile from '~/components/SoundFile.Vue'
 
 export default {
-  components: {datereadable},
+  components: {datereadable,soundfile},
   data () {
     return {
     }
