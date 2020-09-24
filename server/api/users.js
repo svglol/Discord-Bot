@@ -9,15 +9,17 @@ var client;
 /* GET users listing. */
 router.get('/users', function (req, res, next) {
   var users = client.getDbHelper().getUsers();
+  client.getLogger().log('info', 'GET - ' + req.originalUrl);
   res.json(users);
 });
 
 /* GET user by ID. */
 router.get('/users/:id', function (req, res, next) {
-  res.send('POST123 request to the homepage');
+  client.getLogger().log('info', 'GET - ' + req.originalUrl);
 });
 
 router.post('/users/:id', function (req, res) {
+  client.getLogger().log('info', 'POST - ' + req.originalUrl);
   var id = req.params.id;
   var body = req.body;
   if (body.intro !== undefined) {

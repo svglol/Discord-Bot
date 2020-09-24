@@ -89,7 +89,7 @@ sw.*
 # Vim swap files
 *.swp
 
-log
+.log
 ecosystem.config.js
 /resources
 database.sqlite

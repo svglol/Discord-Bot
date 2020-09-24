@@ -9,6 +9,7 @@ var client;
 /* GET soundcommands listing. */
 router.get('/soundcommands', function (req, res, next) {
   client.getDbHelper().getSoundCommands().then(value => {
+    client.getLogger().log('info', 'GET - ' + req.originalUrl);
     res.json(value);
   });
 });
