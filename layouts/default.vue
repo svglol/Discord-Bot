@@ -1,47 +1,32 @@
 <template>
   <div>
-    <nav
-      class="navbar header has-shadow is-primary"
-      role="navigation"
-      aria-label="main navigation"
+    <b-sidebar
+      :expand-on-hover="false"
+      :reduce="false"
+      type="is-dark"
+      open
+      fullheight
     >
-      <div class="navbar-brand">
-        <a
-          class="navbar-item"
-          href="/"
+      <h2 class="app-title">Discord Bot Dashboard</h2>
+      <ul class="menu-list">
+        <li
+          v-for="(item, key) of items"
+          :key="key"
         >
-          Discord Bot Dashboard
-        </a>
-
-        <div class="navbar-burger">
-          <span />
-          <span />
-          <span />
-        </div>
-      </div>
-    </nav>
-
-    <section class="main-content columns">
-      <aside class="column is-2 section">
-        <ul class="menu-list">
-          <li
-            v-for="(item, key) of items"
-            :key="key"
+          <nuxt-link
+            :to="item.to"
+            exact-active-class="is-active"
           >
-            <nuxt-link
-              :to="item.to"
-              exact-active-class="is-active"
-            >
-              <b-icon :icon="item.icon" /> {{ item.title }}
-            </nuxt-link>
-          </li>
-        </ul>
-      </aside>
+            <b-icon :icon="item.icon" /> {{ item.title }}
+          </nuxt-link>
+        </li>
+      </ul>
+    </b-sidebar>
+    <section
+      class="main-content columns">
 
       <div
-        class="container column"
-        style="height:calc(100vh - 55px);margin:0;max-width: 20000px;
-    width: 80vw;">
+        class="container column">
         <nuxt />
       </div>
     </section>
