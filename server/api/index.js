@@ -6,7 +6,7 @@ var _users = require('./users');
 var _soundcommands = require('./soundcommands');
 var _gifcommands = require('./gifcommands');
 var _discord = require('./discord');
-var _bot = require('./bot')
+var _bot = require('./bot');
 
 var router = _express.Router();
 router.use(_express.json());

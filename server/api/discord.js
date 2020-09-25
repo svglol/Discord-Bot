@@ -32,7 +32,7 @@ router.get('/discord/servers', function (req, res, next) {
 router.get('/discord/servers/:id/voicechannels', function (req, res, next) {
   client.getLogger().log('info', 'GET - ' + req.originalUrl);
   var guild = client.guilds.cache.get(req.params.id);
-  res.json(guild.channels.cache.filter(c => c.type === 'voice'))
+  res.json(guild.channels.cache.filter(c => c.type === 'voice'));
 });
 
 module.exports = {
