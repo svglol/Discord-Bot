@@ -2,7 +2,7 @@
   <div class="card" style="width:100%">
     <header class="card-header" style="background-color:rgba(0,114,201,1)">
       <p class="card-header-title" style="color:white">
-        Sound Command Controller
+        Text Message Controller
       </p>
     </header>
     <div class="card-content">
@@ -18,7 +18,7 @@
         </b-select>
       </b-field>
 
-      <b-field label="Voice Channel">
+      <b-field label="Text Channel">
         <b-select placeholder="Select a voice channel" v-model="channel">
           <option
           v-for="option in channels"
@@ -29,32 +29,21 @@
       </b-select>
     </b-field>
 
-    <b-field label="Sound Command">
-      <b-select placeholder="Select a sound command" v-model="sound">
-        <option
-        v-for="option in soundcommands"
-        :value="option.command"
-        :key="option.command">
-        {{ option.command }}
-      </option>
-    </b-select>
-  </b-field>
+    <b-field label="Message">
+      <b-input v-model="message" type="textarea"></b-input>
+    </b-field>
 
-  <b-button icon-left="play" @click="play" type="is-success">
-    Queue
-  </b-button>
+    <b-button icon-left="message" @click="sendMessage" type="is-success">
+      Send Message
+    </b-button>
 
-</div>
-<b-loading :active.sync="soundcommands.length < 1 || servers.length < 1" :is-full-page="false"></b-loading>
+  </div>
+  <b-loading :active.sync="servers.length < 1" :is-full-page="false"></b-loading>
 </div>
 <footer class="card-footer">
-
-  <b-button icon-left="stop" @click="stop" style="margin:1rem" type="is-danger">
-    Stop
-  </b-button>
-  <b-button icon-left="skip-next" @click="skip" style="margin-top:1rem" type="is-warning">
-    Skip
-  </b-button>
+  <b-button icon-left="cached" @click="clear" style="margin:1rem" type="is-danger">
+    Clear Chat
+</b-button>
 </footer>
 </div>
 </template>
@@ -65,12 +54,11 @@ import axios from '~/plugins/axios'
 export default {
   data () {
     return {
-      soundcommands: [],
       servers:[],
       channels:[],
       server: '',
       channel: '',
-      sound: '',
+      message: '',
     }
   },
   mounted(){
@@ -80,66 +68,48 @@ export default {
       ctx.server = ctx.servers[0].id;
     });
 
-    axios.get('/api/soundcommands').then(result => {
-      ctx.soundcommands = result.data;
-      ctx.soundcommands.sort(function(a, b){
-        if(a.command < b.command) { return -1; }
-        if(a.command > b.command) { return 1; }
-        return 0;
-      })
-      ctx.sound = {};
-    })
-
   },
   watch :{
     server: function(newVal){
       var ctx = this;
       //get voice channels
-      axios.get('/api/discord/servers/'+newVal+'/voicechannels').then(result => {
+      axios.get('/api/discord/servers/'+newVal+'/textchannels').then(result => {
         ctx.channels = result.data;
         ctx.channel = ctx.channels[0].id;
       });
     }
   },
   methods:{
-    play(){
-      if(this.sound){
+    sendMessage(){
+      if(this.message && this.message !== ''){
         var ctx = this;
         axios.post('/api/bot',{
-          play: true,
+          message: ctx.message,
           server: ctx.server,
           channel: ctx.channel,
-          sound: ctx.sound
         }).then(result => {
+          ctx.message = '';
           ctx.$buefy.toast.open({
-            message: 'Added to Queue',
+            message: 'Message Sent',
             type: 'is-success'
           })
         });
       }
     },
-    skip(){
+    clear(){
       var ctx = this;
       axios.post('/api/bot',{
-        skip: true
+        clear: true,
+        server: ctx.server,
+        channel: ctx.channel,
       }).then(result => {
+        ctx.message = '';
         ctx.$buefy.toast.open({
-          message: 'Skipped',
+          message: 'Chat Cleared',
           type: 'is-success'
         })
       });
-    },
-    stop(){
-      var ctx = this;
-      axios.post('/api/bot',{
-        stop: true
-      }).then(result => {
-        ctx.$buefy.toast.open({
-          message: 'Stopped',
-          type: 'is-success'
-        })
-      });
-    },
+    }
   }
 };
 

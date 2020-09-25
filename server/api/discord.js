@@ -35,6 +35,13 @@ router.get('/discord/servers/:id/voicechannels', function (req, res, next) {
   res.json(guild.channels.cache.filter(c => c.type === 'voice'));
 });
 
+// get server text channels
+router.get('/discord/servers/:id/textchannels', function (req, res, next) {
+  client.getLogger().log('info', 'GET - ' + req.originalUrl);
+  var guild = client.guilds.cache.get(req.params.id);
+  res.json(guild.channels.cache.filter(c => c.type === 'text'));
+});
+
 module.exports = {
   router,
   init: async function (discordClient) {
