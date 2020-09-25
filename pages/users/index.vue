@@ -53,9 +53,10 @@ export default {
       selected: {}
     }
   },
-  async asyncData () {
-    let { data } = await axios.get('/api/users');
-    return { users: data }
+  asyncData () {
+    return axios.get('/api/users').then(res => {
+      return { users: res.data }
+    });
   },
   head () {
     return {

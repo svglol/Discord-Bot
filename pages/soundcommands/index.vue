@@ -64,9 +64,10 @@ export default {
       }
     }
   },
-  async asyncData () {
-    let { data } = await axios.get('/api/soundcommands');
-    return { soundcommands: data }
+  asyncData () {
+    return axios.get('/api/soundcommands').then(res => {
+      return {soundcommands: res.data }
+    });
   },
   head () {
     return {

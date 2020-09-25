@@ -57,9 +57,10 @@ export default {
       }
     }
   },
-  async asyncData () {
-    let { data } = await axios.get('/api/gifcommands');
-    return { gifcommands: data }
+  asyncData () {
+    return axios.get('/api/gifcommands').then(res => {
+      return {gifcommands: res.data }
+    });
   },
   head () {
     return {
