@@ -1,4 +1,3 @@
-const prefix = require('../config.json').prefix;
 var client;
 
 module.exports = {
@@ -30,7 +29,7 @@ module.exports = {
 
     // Listen for chat messages to be recorded as stats
     client.on('message', message => {
-      if (!message.author.bot && message.content.charAt(0) !== prefix) {
+      if (!message.author.bot && message.content.charAt(0) !== client.getPrefix()) {
         client.getDbHelper().addUserMessage(message);
       }
     });

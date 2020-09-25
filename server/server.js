@@ -12,7 +12,7 @@ const commandsLoader = require('./lib/commandsLoader.js');
 
 const dbHelper = require('./db/dbHelper.js');
 
-const prefix = require('./config.json').prefix;
+const prefix = process.env.PREFIX;
 
 const { Nuxt, Builder } = require('nuxt');
 const app = require('express')();

@@ -1,7 +1,7 @@
 var lastUsedIntroArray = [];
 var lastUsedExitArray = [];
 
-const cooldown = require('../config.json').cooldown;
+const cooldown = process.env.COOLDOWN;
 
 module.exports = {
   listen: function (client) {
