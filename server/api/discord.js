@@ -22,6 +22,19 @@ router.get('/discord/command/:command', function (req, res, next) {
   }
 });
 
+// get connected discord servers
+router.get('/discord/servers', function (req, res, next) {
+  client.getLogger().log('info', 'GET - ' + req.originalUrl);
+  res.json(client.guilds.cache);
+});
+
+// get server voice channels
+router.get('/discord/servers/:id/voicechannels', function (req, res, next) {
+  client.getLogger().log('info', 'GET - ' + req.originalUrl);
+  var guild = client.guilds.cache.get(req.params.id);
+  res.json(guild.channels.cache.filter(c => c.type === 'voice'))
+});
+
 module.exports = {
   router,
   init: async function (discordClient) {

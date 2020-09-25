@@ -1,21 +1,19 @@
 <template>
   <section class="container">
-    <div>
+    <div class="columns">
+      <div class="column is-3">
+        <soundcommandcontroller />
+      </div>
     </div>
   </section>
 </template>
 
 <script>
-import axios from '~/plugins/axios'
-import Logo from '~/components/Logo.vue'
+import soundcommandcontroller from '~/components/SoundCommandContoller.vue'
 
 export default {
   components: {
-    Logo
-  },
-  async asyncData () {
-    // let { data } = await axios.get('/api/users')
-    return ;
+    soundcommandcontroller
   },
   head () {
     return {

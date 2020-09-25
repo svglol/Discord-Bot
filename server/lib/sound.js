@@ -17,19 +17,33 @@ module.exports = {
       dispatcher = null;
       soundQueue = [];
     }
-    message.delete().catch(err => console.log(err));
+    if (message != null) {
+      message.delete().catch(err => console.log(err));
+    }
   },
   skip: function (message) {
     if (dispatcher != null) {
       dispatcher.end();
     }
-    message.delete().catch(err => console.log(err));
+    if (message != null) {
+      message.delete().catch(err => console.log(err));
+    }
   },
   queue: function (message, obj, end) {
     var userVoiceChannel = message.member.voice.channel;
     if (userVoiceChannel !== undefined) {
       stats.addSoundBoardUse(message.author.id, obj.command);
-      let soundQueueItem = [message, obj, end];
+      let soundQueueItem = [message.member.voice.channel, obj, end, message];
+      soundQueue.push(soundQueueItem);
+      if (dispatcher == null && voiceChannel == null) {
+        playNextInQueue();
+      }
+    }
+  },
+  queueToChannel: function (channel, obj, end) {
+    var userVoiceChannel = channel;
+    if (userVoiceChannel !== undefined) {
+      let soundQueueItem = [channel, obj, end];
       soundQueue.push(soundQueueItem);
       if (dispatcher == null && voiceChannel == null) {
         playNextInQueue();
@@ -41,10 +55,10 @@ module.exports = {
 var lastDisconTime = 0;
 
 async function playNextInQueue () {
-  var message = soundQueue[0][0];
+  var message = soundQueue[0][3];
   var file = soundQueue[0][1].file;
   var end = soundQueue[0][2];
-  voiceChannel = message.member.voice.channel;
+  var voiceChannel = soundQueue[0][0];
 
   var date = new Date();
   var currentTime = date.getTime();
@@ -60,7 +74,9 @@ async function playNextInQueue () {
     dispatcher.setVolume(volume);
     dispatcher.on('finish', () => {
       if (end) {
-        message.delete().catch(err => console.log(err));
+        if(message) {
+          message.delete().catch(err => console.log(err));
+        }
       }
       soundQueue.shift();
       if (soundQueue.length !== 0) {
