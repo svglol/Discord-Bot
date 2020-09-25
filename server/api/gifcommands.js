@@ -27,10 +27,17 @@ router.delete('/gifcommands/:commandName', function (req, res) {
 router.post('/gifcommands/:id', function (req, res) {
   client.getLogger().log('info', 'POST - ' + req.originalUrl);
   var body = req.body;
-  client.getDbHelper().editGifCommand(body.id, body.command, body.link);
-  client.commands.delete(body.command);
-  client.getCommandsLoader().addGifCommand(client, body.command, body.link);
-  res.sendStatus(200);
+
+  client.getDbHelper().getGifCommands().then(result => {
+    result.forEach((item, i) => {
+      if (item.dataValues.id === parseInt(req.body.id)) {
+        client.getDbHelper().editGifCommand(body.id, body.command, body.link);
+        client.commands.delete(item.dataValues.command);
+        client.getCommandsLoader().addGifCommand(client, body.command, body.link);
+        res.sendStatus(200);
+      }
+    });
+  });
 });
 
 // add gif command
