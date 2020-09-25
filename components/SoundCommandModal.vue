@@ -7,6 +7,7 @@
     <section class="modal-card-body">
       <b-field label="Command">
         <b-input v-model="vCommand" required validation-message="Command required"  ref="command"></b-input>
+        <p class="help is-danger" v-if="!validCommand">Command name is already taken</p>
       </b-field>
 
       <b-field label="Sound File">
@@ -24,8 +25,6 @@
         </b-upload>
       </b-field>
 
-      <!-- <input type="file" id="file" ref="vFile"/> -->
-
       <b-field label="Volume">
         <b-numberinput step="0.1" min="0" max="1"  v-model="vVolume" required ref="volume" required>
         </b-numberinput>
@@ -41,6 +40,7 @@
 </template>
 
 <script>
+import axios from '~/plugins/axios'
 
 export default {
   props: ['id', 'command', 'file','volume'],
@@ -50,6 +50,7 @@ export default {
       vFile: null,
       oldFile: this.file.replace("./resources/sound/",""),
       vVolume: this.volume,
+      validCommand: true
     }
   },
   watch: {
@@ -64,6 +65,29 @@ export default {
         this.oldFile = newVal.replace("./resources/sound/","");
       }
       this.vFile = null;
+    },
+    vCommand: function(newVal){
+      let ctx = this;
+      if(newVal !== ''){
+        axios.get('/api/discord/command/'+newVal, {
+          command: newVal,
+        })
+        .then(function (response) {
+          if(response.data === "OK"){
+            ctx.validCommand = true;
+            $refs.command.setValidity(true);
+          }else{
+            ctx.validCommand = false;
+            $refs.command.setValidity(false);
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      }else{
+        ctx.validCommand = true;
+        ctx.$refs.command.setValidity(true);
+      }
     }
   },
   mounted(){
@@ -90,6 +114,7 @@ export default {
       this.$refs.volume.checkHtml5Validity();
       if(this.vCommand === '')return false;
       if(this.vLink === '')return false;
+      if(this.validCommand === false) return false;
       return true;
     }
   }

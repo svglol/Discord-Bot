@@ -6,10 +6,11 @@
     </header>
     <section class="modal-card-body">
       <b-field label="Command">
-        <b-input v-model="vCommand" required validation-message="Command required"  ref="command"></b-input>
+        <b-input v-model="vCommand" required validation-message="Command required" ref="command"></b-input>
+        <p class="help is-danger" v-if="!validCommand">Command name is already taken</p>
       </b-field>
       <b-field label="Text">
-        <b-input v-model="vLink" required validation-message="Link required" ref="link"></b-input>
+        <b-input v-model="vLink" required validation-message="Text required" ref="link"></b-input>
       </b-field>
     </section>
 
@@ -22,22 +23,47 @@
 </template>
 
 <script>
+import axios from '~/plugins/axios'
 
 export default {
   props: ['id', 'command', 'link'],
   data() {
     return {
       vCommand:this.command,
-      vLink:this.link
+      vLink:this.link,
+      validCommand: true
     }
   },
   watch: {
     command: function(newVal, oldVal) { // watch it
-     this.vCommand = newVal;
-   },
-   link: function(newVal, oldVal) {
-     this.vLink = newVal;
-   }
+      this.vCommand = newVal;
+    },
+    link: function(newVal, oldVal) {
+      this.vLink = newVal;
+    },
+    vCommand: function(newVal){
+      let ctx = this;
+      if(newVal !== ''){
+        axios.get('/api/discord/command/'+newVal, {
+          command: newVal,
+        })
+        .then(function (response) {
+          if(response.data === "OK"){
+            ctx.validCommand = true;
+            $refs.command.setValidity(true);
+          }else{
+            ctx.validCommand = false;
+            $refs.command.setValidity(false);
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      }else{
+        ctx.validCommand = true;
+        ctx.$refs.command.setValidity(true);
+      }
+    }
   },
   mounted(){
 
@@ -58,6 +84,7 @@ export default {
       this.$refs.link.checkHtml5Validity();
       if(this.vCommand === '')return false;
       if(this.vLink === '')return false;
+      if(this.validCommand === false) return false;
       return true;
     }
   }

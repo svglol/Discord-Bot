@@ -6,9 +6,20 @@ var router = _express.Router();
 
 var client;
 
-// get gif commands
 router.get('/discord/getUsername/:id', function (req, res, next) {
+  client.getLogger().log('info', 'GET - ' + req.originalUrl);
   res.json(client.users.cache.get(req.params.id));
+});
+
+// get if command is available
+router.get('/discord/command/:command', function (req, res, next) {
+  client.getLogger().log('info', 'GET - ' + req.originalUrl);
+  let command = req.params.command;
+  if (client.commands.get(command)) {
+    res.status(200).send('Command Taken'); // taken
+  } else {
+    res.sendStatus(200);// ok
+  }
 });
 
 module.exports = {
