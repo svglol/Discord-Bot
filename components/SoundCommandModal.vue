@@ -68,17 +68,17 @@ export default {
     },
     vCommand: function(newVal){
       let ctx = this;
-      if(newVal !== ''){
+      if(newVal !== '' && newVal !== this.command){
         axios.get('/api/discord/command/'+newVal, {
           command: newVal,
         })
         .then(function (response) {
           if(response.data === "OK"){
             ctx.validCommand = true;
-            $refs.command.setValidity(true);
+            ctx.$refs.command.setValidity(true);
           }else{
             ctx.validCommand = false;
-            $refs.command.setValidity(false);
+            ctx.$refs.command.setValidity(false);
           }
         })
         .catch(function (error) {
