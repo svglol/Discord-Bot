@@ -1,29 +1,31 @@
 <template>
   <div>
-    {{dateFormatted}}
+    {{ dateFormatted }}
   </div>
 </template>
 
 <script>
 export default {
-  props: ['date'],
+  props: {
+    date: {type: Number, default: 0, required: true}
+  },
   data () {
     return {
-      dateFormatted:''
-    }
-  },
-  mounted(){
-    this.dateFormatted = parseReadable(this.date);
+      dateFormatted: ''
+    };
   },
   watch: {
-    date: function(newVal, oldVal) {
+    date: function (newVal, oldVal) {
       this.dateFormatted = parseReadable(newVal);
     }
+  },
+  mounted () {
+    this.dateFormatted = parseReadable(this.date);
   }
 };
 
-function parseReadable(millisec) {
-  if(millisec === 0){
+function parseReadable (millisec) {
+  if (millisec === 0) {
     return '';
   }
   var date = new Date(millisec);

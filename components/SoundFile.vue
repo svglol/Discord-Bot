@@ -1,34 +1,38 @@
 <template>
   <div>
-    {{filename}}
-    <b-button size="is-small" rounded
-    icon-left="play" @click="playSound">
-  </b-button>
-</div>
+    {{ filename }}
+    <b-button
+      size="is-small"
+      rounded
+      icon-left="play"
+      @click="playSound"/>
+  </div>
 </template>
 
 <script>
-import axios from '~/plugins/axios'
+import axios from '~/plugins/axios';
 
 export default {
-  props: ['soundCommand'],
+  props: {
+    soundCommand: {type: Object, required: true}
+  },
   data () {
     return {
-      filename:''
-    }
-  },
-  mounted(){
-    this.filename = this.soundCommand.file.replace("./resources/sound/","");
+      filename: ''
+    };
   },
   watch: {
-    soundCommand: function(newVal, oldVal) {
-      this.filename = this.soundCommand.file.replace("./resources/sound/","");
+    soundCommand: function (newVal, oldVal) {
+      this.filename = this.soundCommand.file.replace('./resources/sound/', '');
     }
   },
-  methods:{
-    async playSound(){
-      let { data } = await axios.get('/api/soundcommands/file/'+this.soundCommand.id);
-      var snd = new Audio("data:audio/wav;base64," + data.sound);
+  mounted () {
+    this.filename = this.soundCommand.file.replace('./resources/sound/', '');
+  },
+  methods: {
+    async playSound () {
+      let { data } = await axios.get('/api/soundcommands/file/' + this.soundCommand.id);
+      var snd = new Audio('data:audio/wav;base64,' + data.sound);
       snd.play();
     }
   }

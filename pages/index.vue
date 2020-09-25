@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import soundcommandcontroller from '~/components/SoundCommandContoller.vue'
-import textmessagecontroller from '~/components/TextMessageController.vue'
+import soundcommandcontroller from '~/components/SoundCommandContoller.vue';
+import textmessagecontroller from '~/components/TextMessageController.vue';
 
 export default {
   components: {
@@ -23,13 +23,11 @@ export default {
   head () {
     return {
       title: 'Discord Bot - Dashboard'
-    }
+    };
   }
-}
+};
 </script>
 
 <style scoped>
-
-
 
 </style>

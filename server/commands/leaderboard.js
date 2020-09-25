@@ -1,15 +1,14 @@
 const Discord = require('discord.js');
 
-var totalConnectionTime = new Array();
-var userChatMessages = new Array();
-var soundboardUsage = new Array();
+var totalConnectionTime = [];
+var userChatMessages = [];
+var soundboardUsage = [];
 
-var monthlyConnectionTime = new Array();
-var monthlyUserChatMessages = new Array();
-var monthlySoundboardUsage = new Array();
+var monthlyConnectionTime = [];
+var monthlyUserChatMessages = [];
+var monthlySoundboardUsage = [];
 
 var guild;
-var internalMax = 0;
 const leaderboardSize = 10;
 
 var tools;
@@ -61,7 +60,7 @@ module.exports = {
             msg.edit(leaderboardEmbeds.get(page)[internalPage]);
           } else if (reaction.emoji.name === '⬆') {
             // scroll up current page
-            if (internalPage != 0) {
+            if (internalPage !== 0) {
               internalPage--;
             }
             msg.edit(leaderboardEmbeds.get(page)[internalPage]);
@@ -102,13 +101,12 @@ function getVoiceEmbedFooter (internalPage, lifetime) {
   if (lifetime) {
     totalSize = totalConnectionTime.length;
   }
-  internalMax = totalSize;
   var current = (internalPage + 1);
   return current + '/' + Math.ceil(totalSize / leaderboardSize);
 }
 
 function setVoiceEmbedField (internalPage, embed, lifetime) {
-  var leaderboardArray = new Array();
+  var leaderboardArray = [];
 
   if (lifetime) {
     totalConnectionTime.forEach((item, i) => {
@@ -125,7 +123,7 @@ function setVoiceEmbedField (internalPage, embed, lifetime) {
   var start = leaderboardSize * internalPage;
   var end = start + leaderboardSize;
 
-  var rows = new Array();
+  var rows = [];
   rows.push(['#', 'Name', 'Time']);
 
   for (let i = 0; i < leaderboardArray.length; i++) {
@@ -151,7 +149,6 @@ function getMessagesEmbedFooter (internalPage, lifetime) {
   if (lifetime) {
     totalSize = userChatMessages.length;
   }
-  internalMax = totalSize;
   var current = (internalPage + 1);
   return current + '/' + Math.ceil(totalSize / leaderboardSize);
 }
@@ -167,7 +164,7 @@ function setMessagesEmbedField (internalPage, embed, lifetime) {
   var start = leaderboardSize * internalPage;
   var end = start + leaderboardSize;
 
-  var rows = new Array();
+  var rows = [];
   rows.push(['#', 'Name', 'Messages']);
 
   for (let i = 0; i < leaderboardArray.length; i++) {
@@ -191,7 +188,6 @@ function getSoundboardEmbedFooter (internalPage, lifetime) {
   if (lifetime) {
     totalSize = soundboardUsage.length;
   }
-  internalMax = totalSize;
   var current = (internalPage + 1);
   return current + '/' + Math.ceil(totalSize / leaderboardSize);
 }
@@ -205,7 +201,7 @@ function setSoundboardEmbedField (internalPage, embed, lifetime) {
   var start = leaderboardSize * internalPage;
   var end = start + leaderboardSize;
 
-  var rows = new Array();
+  var rows = [];
   rows.push(['#', 'Name', 'Plays']);
 
   for (let i = 0; i < leaderboardArray.length; i++) {
@@ -229,11 +225,11 @@ function generateLeaderboardEmbeds (lifetime) {
     var title = pages[i];
     if (title === '🗣️ Voice') {
       // loop through each internal page
-      var voiceLeaderboardEmbeds = new Array();
+      var voiceLeaderboardEmbeds = [];
       var length = 0;
       if (lifetime)length = totalConnectionTime.length / leaderboardSize;
       else length = monthlyConnectionTime.length / leaderboardSize;
-      if (length == 0) length = 1;
+      if (length === 0) length = 1;
       for (var o = 0; o < Math.ceil(length); o++) {
         var embed = new Discord.MessageEmbed()
           .setTitle(title + ' ' + 'Leaderboard')
@@ -245,11 +241,11 @@ function generateLeaderboardEmbeds (lifetime) {
       leaderboardEmbeds.set(i, voiceLeaderboardEmbeds);
     } else if (title === '⌨️ Messages') {
       // loop through each internal page
-      var messagesLeaderboardEmbeds = new Array();
+      var messagesLeaderboardEmbeds = [];
       var length = 0;
       if (lifetime)length = userChatMessages.length / leaderboardSize;
       else length = monthlyUserChatMessages.length / leaderboardSize;
-      if (length == 0) length = 1;
+      if (length === 0) length = 1;
       for (var o = 0; o < Math.ceil(length); o++) {
         var embed = new Discord.MessageEmbed()
           .setTitle(title + ' ' + 'Leaderboard')

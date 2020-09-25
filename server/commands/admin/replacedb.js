@@ -12,7 +12,7 @@ module.exports = {
         if (x.test(attachment.name)) {
           // fs.renameSync("database.sqlite", "database-"+new Date().toTimeString()+".sqlite");
           const file = fs.createWriteStream('database.sqlite');
-          const request = https.get(attachment.url, async function (response) {
+          https.get(attachment.url, async function (response) {
             await response.pipe(file);
             client.getLogger().log('info', 'Database Replaced');
           });

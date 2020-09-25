@@ -1,20 +1,20 @@
 <template>
   <section class="container">
-    User 
+    User
   </section>
 </template>
 
 <script>
-import axios from '~/plugins/axios'
+import axios from '~/plugins/axios';
 
 export default{
-  name: 'id',
+  name: 'Id',
   components: {
   },
   async asyncData ({ params, error }) {
 
-  },
-}
+  }
+};
 </script>
 
 <style scoped>

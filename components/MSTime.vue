@@ -1,28 +1,32 @@
 <template>
   <div>
-    {{fullTime}}
+    {{ fullTime }}
   </div>
 </template>
 
 <script>
 export default {
-  props: ['time'],
+  props: { time: {
+    type: Number,
+    default: 0,
+    required: true
+  }},
   data () {
     return {
-      fullTime:''
-    }
-  },
-  mounted(){
-    this.fullTime = parseMillisecondsIntoReadableTime(this.time);
+      fullTime: ''
+    };
   },
   watch: {
-    time: function(newVal, oldVal) {
+    time: function (newVal, oldVal) {
       this.fullTime = parseMillisecondsIntoReadableTime(newVal);
     }
+  },
+  mounted () {
+    this.fullTime = parseMillisecondsIntoReadableTime(this.time);
   }
 };
 
-function parseMillisecondsIntoReadableTime(millisec) {
+function parseMillisecondsIntoReadableTime (millisec) {
   var seconds = (millisec / 1000).toFixed(0);
   var minutes = Math.floor(seconds / 60);
   var hours = '';

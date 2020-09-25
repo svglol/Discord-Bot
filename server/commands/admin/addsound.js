@@ -11,7 +11,7 @@ module.exports = {
   execute (message, args, client) {
     var commandName = args[0];
     if (client.commands.get(commandName)) return message.reply('That command name is already taken');
-    if (message.attachments.size == 0) return message.reply('No attachment found');
+    if (message.attachments.size === 0) return message.reply('No attachment found');
 
     for (const [key, attachment] of message.attachments.entries()) {
       var wav = /^[^.]+.wav$/;
@@ -26,7 +26,7 @@ module.exports = {
         var extension = attachment.name.substring(attachment.name.lastIndexOf('.') + 1);
         var path = './resources/sound/' + commandName + '.' + extension;
         const file = fs.createWriteStream(path);
-        const request = https.get(attachment.url, async function (response) {
+        https.get(attachment.url, async function (response) {
           await response.pipe(file);
           client.getDbHelper().addSoundCommand(commandName, path, 1, new Date().getTime());
           client.getCommandsLoader().addSoundCommand(client, commandName, path, 1, new Date().getTime());

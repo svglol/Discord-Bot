@@ -57,7 +57,7 @@ function helpMessage (message, client, soundCommands, gifCommands, newSoundComma
     collector.on('collect', (reaction, user) => {
       reaction.users.remove(user);
       if (reaction.emoji.name === '⬆') {
-        if (page != 0) {
+        if (page !== 0) {
           page--;
         }
         var embed;
@@ -69,7 +69,6 @@ function helpMessage (message, client, soundCommands, gifCommands, newSoundComma
 
         msg.edit(embed);
       } else if (reaction.emoji.name === '⬇') {
-        var embed;
         if (currentPage === 'Sound') {
           if (page < soundboardEmbeds.length - 1) {
             page++;
@@ -114,7 +113,7 @@ function helpMessage (message, client, soundCommands, gifCommands, newSoundComma
 }
 
 function generateNewSoundboardEmbed (newSoundCommands) {
-  soundboardEmbeds = new Array();
+  var soundboardEmbeds = [];
 
   var cmdLength = 0;
   newSoundCommands.forEach((item, i) => {
@@ -136,7 +135,7 @@ function generateNewSoundboardEmbed (newSoundCommands) {
     var soundsMessage = '';
 
     for (var j = start; j < newSoundCommands.length; j++) {
-      addMessage = '`' + newSoundCommands[j][1].name + '` ';
+      var addMessage = '`' + newSoundCommands[j][1].name + '` ';
       if (addMessage.length + soundsMessage.length < 2048) {
         soundsMessage += addMessage;
       } else {
@@ -152,7 +151,7 @@ function generateNewSoundboardEmbed (newSoundCommands) {
 }
 
 function generateSoundboardEmbeds (soundCommands) {
-  soundboardEmbeds = new Array();
+  var soundboardEmbeds = [];
 
   var cmdLength = 0;
   soundCommands.forEach((item, i) => {
@@ -174,7 +173,7 @@ function generateSoundboardEmbeds (soundCommands) {
     var soundsMessage = '';
 
     for (var j = start; j < soundCommands.length; j++) {
-      addMessage = '`' + soundCommands[j][1].name + '` ';
+      var addMessage = '`' + soundCommands[j][1].name + '` ';
       if (addMessage.length + soundsMessage.length < 2048) {
         soundsMessage += addMessage;
       } else {
@@ -190,7 +189,7 @@ function generateSoundboardEmbeds (soundCommands) {
 }
 
 function generateGifEmbeds (gifCommands) {
-  gifEmbeds = new Array();
+  var gifEmbeds = [];
 
   var cmdLength = 0;
   gifCommands.forEach((item, i) => {
@@ -211,7 +210,7 @@ function generateGifEmbeds (gifCommands) {
 
     var soundsMessage = '';
     for (var j = start; j < gifCommands.length; j++) {
-      addMessage = '`' + gifCommands[j][1].name + '` ';
+      var addMessage = '`' + gifCommands[j][1].name + '` ';
       if (addMessage.length + soundsMessage.length < 2048) {
         soundsMessage += addMessage;
       } else {

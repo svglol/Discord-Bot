@@ -1,64 +1,26 @@
 // Set your colors
 $primary: #0072c9;
-$primary-invert: findColorInvert($primary);
+$primary-invert: findcolorinvert($primary);
 $twitter: #4099ff;
-$twitter-invert: findColorInvert($twitter);
-
-@import '~bulma/sass/utilities/_all';
-
-// Setup $colors to use as bulma classes (e.g. 'is-twitter')
+$twitter-invert: findcolorinvert($twitter);
+@import '~bulma/sass/utilities/all'; // Setup $colors to use as bulma classes (e.g. 'is-twitter')
 $colors: (
-'white': (
-$white,
-$black,
-),
-'black': (
-$black,
-$white,
-),
-'light': (
-$light,
-$light-invert,
-),
-'dark': (
-$dark,
-$dark-invert,
-),
-'primary': (
-$primary,
-$primary-invert,
-),
-'info': (
-$info,
-$info-invert,
-),
-'success': (
-$success,
-$success-invert,
-),
-'warning': (
-$warning,
-$warning-invert,
-),
-'danger': (
-$danger,
-$danger-invert,
-),
-'twitter': (
-$twitter,
-$twitter-invert,
-),
-);
-
-// Links
+  'white': ($white, $black,),
+  'black': ($black, $white,),
+  'light': ($light, $light-invert,),
+  'dark': ($dark, $dark-invert,),
+  'primary': ($primary, $primary-invert,),
+  'info': ($info, $info-invert,),
+  'success': ($success, $success-invert,),
+  'warning': ($warning, $warning-invert,),
+  'danger': ($danger, $danger-invert,),
+  'twitter': ($twitter, $twitter-invert,),
+); // Links
 $link: $primary;
 $link-invert: $primary-invert;
-$link-focus-border: $primary;
-
-// Import Bulma and Buefy styles
+$link-focus-border: $primary; // Import Bulma and Buefy styles
 @import '~bulma';
 @import '~buefy/src/scss/buefy';
-
 $white: #fff;
 $grey: darken($white, 15%);
 $black: #333;
@@ -68,17 +30,17 @@ $black: #333;
   padding: 1em;
 }
 
-h1{
+h1 {
   font-size: 150%;
   font-weight: 700;
 }
 
 .dialog .modal-card {
-    max-width: 600px!important;
-    width: 100%!important;
+  max-width: 600px;
+  width: 100%;
 }
 
 .table tr.is-selected {
-    background-color: lighten($primary,50);
-    color:black;
+  background-color: lighten($primary, 50);
+  color: $black;
 }

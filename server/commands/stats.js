@@ -1,10 +1,5 @@
 const Discord = require('discord.js');
 
-var currectConnectionTime = new Array();
-var totalConnectionTime = new Array();
-var userChatMessages = new Array();
-var monthlyConnectionTime = new Array();
-
 module.exports = {
   name: 'stats',
   description: 'stats',
@@ -54,10 +49,10 @@ module.exports = {
       .setAuthor(message.member.displayName, message.author.displayAvatarURL())
       .setColor('#0099ff');
 
-    var date = new Date();
+    date = new Date();
     var month = client.getTools().getMonthName(date.getMonth());
 
-    var rows = new Array();
+    var rows = [];
     rows.push(['All-time Voice', '']);
     rows.push(['Pos', 'Time']);
     rows.push([totalVoiceRank.toString(), totalVoice.toString()]);
