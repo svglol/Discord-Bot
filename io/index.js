@@ -9,9 +9,6 @@ module.exports = function () {
     server.close();
   });
 
-  // Add `socket.io-client` in vendor
-  this.addVendor('socket.io-client');
-
   // Add socket.io events
   let messages = [];
   io.on('connection', (socket) => {

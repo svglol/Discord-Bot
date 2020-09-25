@@ -14,6 +14,15 @@ const dbHelper = require('./db/dbHelper.js');
 
 const prefix = require('./config.json').prefix;
 
+const { Nuxt, Builder } = require('nuxt');
+const app = require('express')();
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
+const port = process.env.PORT || 3000;
+const isProd = process.env.NODE_ENV === 'production';
+
+const api = require('./api');
+
 class Client extends Discord.Client {
   constructor (...args) {
     super(...args);
@@ -28,8 +37,27 @@ class Client extends Discord.Client {
       sound.listen(this);
       intro.listen(this);
       stats.listen(this);
-
       api.init(client);
+
+      // Import API Routes
+      app.use('/api', api.router);
+
+      // We instantiate Nuxt.js with the options
+      var config = require('../nuxt.config.js');
+      config.dev = !isProd;
+
+      const nuxt = new Nuxt(config);
+      // Start build process in dev mode
+      if (config.dev) {
+        const builder = new Builder(nuxt);
+        builder.build();
+      }
+      app.use(nuxt.render);
+
+      // Listen the server
+
+      server.listen(port, '0.0.0.0');
+      logger.log('info', 'Server listening on localhost:' + port);
     });
   }
 
@@ -166,36 +194,6 @@ client.on('error', m => logger.log('error', m));
 process.on('uncaughtException', error => logger.log('error', error));
 
 start();
-
-// api / sockets
-
-const { Nuxt, Builder } = require('nuxt');
-const app = require('express')();
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
-const port = process.env.PORT || 3000;
-const isProd = process.env.NODE_ENV === 'production';
-
-const api = require('./api');
-
-// Import API Routes
-app.use('/api', api.router);
-
-// We instantiate Nuxt.js with the options
-var config = require('../nuxt.config.js');
-config.dev = !isProd;
-
-const nuxt = new Nuxt(config);
-// Start build process in dev mode
-if (config.dev) {
-  const builder = new Builder(nuxt);
-  builder.build();
-}
-app.use(nuxt.render);
-
-// Listen the server
-server.listen(port, '0.0.0.0');
-console.log('Server listening on localhost:' + port); // eslint-disable-line no-console
 
 // Socket.io
 var messages = [];

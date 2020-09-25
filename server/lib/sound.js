@@ -74,7 +74,7 @@ async function playNextInQueue () {
     dispatcher.setVolume(volume);
     dispatcher.on('finish', () => {
       if (end) {
-        if(message) {
+        if (message) {
           message.delete().catch(err => console.log(err));
         }
       }
