@@ -16,7 +16,7 @@ router.post('/bot/', function (req, res) {
     client.getSound().stop();
     res.sendStatus(200);
   } else if (body.play) {
-    let command = body.sound;
+    let command = body.sound.replace(/['"]+/g, '');
     let cmd = client.commands.get(command);
     let sound = {file: cmd.file, command: cmd.name, volume: cmd.volume};
     let chan = client.channels.cache.get(body.channel);
