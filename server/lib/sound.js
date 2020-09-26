@@ -12,7 +12,9 @@ module.exports = {
       voiceChannel.leave();
       voiceChannel = null;
       soundQueue.forEach(obj => {
-        obj[0].delete().catch(err => console.log(err));
+        if (obj[3]) {
+          obj[3].delete().catch(err => console.log(err));
+        }
       });
       dispatcher = null;
       soundQueue = [];
@@ -58,7 +60,7 @@ async function playNextInQueue () {
   var message = soundQueue[0][3];
   var file = soundQueue[0][1].file;
   var end = soundQueue[0][2];
-  var voiceChannel = soundQueue[0][0];
+  voiceChannel = soundQueue[0][0];
 
   var date = new Date();
   var currentTime = date.getTime();

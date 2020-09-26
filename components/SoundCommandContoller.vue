@@ -1,13 +1,16 @@
 <template>
   <div
     class="card"
-    style="width:100%">
+    style="width:100%"
+  >
     <header
       class="card-header"
-      style="background-color:rgba(0,114,201,1)">
+      style="background-color:rgba(0,114,201,1)"
+    >
       <p
         class="card-header-title"
-        style="color:white">
+        style="color:white"
+      >
         Sound Command Controller
       </p>
     </header>
@@ -16,11 +19,13 @@
         <b-field label="Server">
           <b-select
             v-model="server"
-            placeholder="Select a server">
+            placeholder="Select a server"
+          >
             <option
               v-for="option in servers"
+              :key="option.id"
               :value="option.id"
-              :key="option.id">
+            >
               {{ option.name }}
             </option>
           </b-select>
@@ -29,11 +34,13 @@
         <b-field label="Voice Channel">
           <b-select
             v-model="channel"
-            placeholder="Select a voice channel">
+            placeholder="Select a voice channel"
+          >
             <option
               v-for="option in channels"
+              :key="option.id"
               :value="option.id"
-              :key="option.id">
+            >
               {{ option.name }}
             </option>
           </b-select>
@@ -42,11 +49,13 @@
         <b-field label="Sound Command">
           <b-select
             v-model="sound"
-            placeholder="Select a sound command">
+            placeholder="Select a sound command"
+          >
             <option
               v-for="option in soundcommands"
+              :key="option.command"
               :value="option.command"
-              :key="option.command">
+            >
               {{ option.command }}
             </option>
           </b-select>
@@ -55,29 +64,31 @@
         <b-button
           icon-left="play"
           type="is-success"
-          @click="play">
+          @click="play"
+        >
           Queue
         </b-button>
-
       </div>
       <b-loading
         :active.sync="soundcommands.length < 1 || servers.length < 1"
-        :is-full-page="false"/>
+        :is-full-page="false"
+      />
     </div>
     <footer class="card-footer">
-
       <b-button
         icon-left="stop"
         style="margin:1rem"
         type="is-danger"
-        @click="stop">
+        @click="stop"
+      >
         Stop
       </b-button>
       <b-button
         icon-left="skip-next"
         style="margin-top:1rem"
         type="is-warning"
-        @click="skip">
+        @click="skip"
+      >
         Skip
       </b-button>
     </footer>
@@ -129,11 +140,12 @@ export default {
     play () {
       if (this.sound) {
         var ctx = this;
+
         axios.post('/api/bot', {
           play: true,
           server: ctx.server,
           channel: ctx.channel,
-          sound: ctx.sound
+          sound: JSON.stringify(ctx.sound)
         }).then(result => {
           ctx.$buefy.toast.open({
             message: 'Added to Queue',
