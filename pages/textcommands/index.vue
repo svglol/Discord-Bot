@@ -77,9 +77,9 @@
 </template>
 
 <script>
-import axios from '~/plugins/axios';
-import gifcommandmodal from '~/components/GifCommandModal.vue';
-import datereadable from '~/components/DateReadable.Vue';
+import axios from '../../plugins/axios';
+import gifcommandmodal from '../../components/GifCommandModal.vue';
+import datereadable from '../../components/DateReadable.Vue';
 
 export default {
   components: {gifcommandmodal, datereadable},
