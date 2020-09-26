@@ -40,7 +40,28 @@ router.post('/bot/', function (req, res) {
       });
       chan.bulkDelete(messagesToDelete);
     });
+  } else if (body.reset) {
+    client.getLogger().log('info', 'Reset Initiated');
+    client.getSound().stop();
+    res.sendStatus(200);
+    process.exit(1);
   }
+});
+
+// send bot status
+router.get('/bot/', function (req, res) {
+  client.getLogger().log('info', 'PUT - ' + req.originalUrl);
+  let totalUsers = 0;
+  let onlineUsers = 0;
+  let connectedUsers = 0;
+  client.guilds.cache.forEach((guild, i) => {
+    totalUsers += guild.memberCount;
+    onlineUsers += guild.members.cache.filter(m => m.presence.status === 'online').size;
+    connectedUsers += guild.members.cache.filter(m => m.voice.channel !== null).size;
+  });
+
+  let bot = {uptime: client.getStartTime(), totalUsers: totalUsers, onlineUsers: onlineUsers, connectedUsers: connectedUsers};
+  res.json(bot);
 });
 
 module.exports = {

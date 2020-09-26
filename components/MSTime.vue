@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <p>
     {{ fullTime }}
-  </div>
+  </p>
 </template>
 
 <script>

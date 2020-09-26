@@ -54,7 +54,7 @@ h1 {
 }
 
 .main-content{
-  margin-left:17rem;
+  margin-left:16.3rem;
 }
 
 .menu-list a {
@@ -65,5 +65,10 @@ h1 {
 }
 
 .menu-list a:hover{
-  background-color:lighten($primary, 50);
+  background-color:darken($primary, 10);
+  color: darken($white, 15);
+}
+
+.nuxt-progress{
+  background-color: $primary;
 }

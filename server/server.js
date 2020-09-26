@@ -9,6 +9,7 @@ const sound = require('./lib/sound.js');
 const intro = require('./lib/intro.js');
 const stats = require('./lib/stats.js');
 const commandsLoader = require('./lib/commandsLoader.js');
+const startTime = new Date().getTime();
 
 const dbHelper = require('./db/dbHelper.js');
 
@@ -152,6 +153,9 @@ class Client extends Discord.Client {
   }
   getCommandsLoader () {
     return commandsLoader;
+  }
+  getStartTime () {
+    return startTime;
   }
 }
 
