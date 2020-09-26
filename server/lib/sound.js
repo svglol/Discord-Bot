@@ -8,44 +8,44 @@ module.exports = {
     stats = client.getStats();
   },
   stop: function (message) {
-    if (dispatcher != null) {
+    if (dispatcher !== null) {
       voiceChannel.leave();
       voiceChannel = null;
       soundQueue.forEach(obj => {
-        if (obj[3]) {
-          obj[3].delete().catch(err => console.log(err));
+        if (obj.message) {
+          obj.message.delete().catch(err => console.log(err));
         }
       });
       dispatcher = null;
       soundQueue = [];
     }
-    if (message != null) {
+    if (message !== null) {
       message.delete().catch(err => console.log(err));
     }
   },
   skip: function (message) {
-    if (dispatcher != null) {
+    if (dispatcher !== null) {
       dispatcher.end();
     }
-    if (message != null) {
+    if (message !== null) {
       message.delete().catch(err => console.log(err));
     }
   },
-  queue: function (message, obj, end) {
-    var userVoiceChannel = message.member.voice.channel;
+  queue: function (message, soundCommand, end) {
+    let userVoiceChannel = message.member.voice.channel;
     if (userVoiceChannel !== undefined) {
-      stats.addSoundBoardUse(message.author.id, obj.command);
-      let soundQueueItem = [message.member.voice.channel, obj, end, message];
+      stats.addSoundBoardUse(message.author.id, soundCommand.command);
+      let soundQueueItem = { voiceChannel: message.member.voice.channel, soundCommand: soundCommand, end: end, message: message };
       soundQueue.push(soundQueueItem);
       if (dispatcher == null && voiceChannel == null) {
         playNextInQueue();
       }
     }
   },
-  queueToChannel: function (channel, obj, end) {
-    var userVoiceChannel = channel;
+  queueToChannel: function (channel, soundCommand, end) {
+    let userVoiceChannel = channel;
     if (userVoiceChannel !== undefined) {
-      let soundQueueItem = [channel, obj, end];
+      let soundQueueItem = { voiceChannel: channel, soundCommand: soundCommand, end: end };
       soundQueue.push(soundQueueItem);
       if (dispatcher == null && voiceChannel == null) {
         playNextInQueue();
@@ -57,22 +57,23 @@ module.exports = {
 var lastDisconTime = 0;
 
 async function playNextInQueue () {
-  var message = soundQueue[0][3];
-  var file = soundQueue[0][1].file;
-  var end = soundQueue[0][2];
-  voiceChannel = soundQueue[0][0];
+  let nextInQueue = soundQueue[0];
+  let message = nextInQueue.message;
+  let file = nextInQueue.soundCommand.file;
+  let end = nextInQueue.end;
+  voiceChannel = nextInQueue.voiceChannel;
 
-  var date = new Date();
-  var currentTime = date.getTime();
+  let date = new Date();
+  let currentTime = date.getTime();
 
-  var reconWait = 500;
+  let reconWait = 500;
   if (lastDisconTime > currentTime - reconWait) {
     await PromiseTimeout(lastDisconTime - (currentTime - reconWait));
   }
 
   await voiceChannel.join().then(async connection => {
     dispatcher = await connection.play(file);
-    var volume = soundQueue[0][1].volume;
+    let volume = nextInQueue.soundCommand.volume;
     dispatcher.setVolume(volume);
     dispatcher.on('finish', () => {
       if (end) {
@@ -86,8 +87,8 @@ async function playNextInQueue () {
       } else {
         connection.disconnect();
         voiceChannel = null;
-        var date = new Date();
-        var currentTime = date.getTime();
+        let date = new Date();
+        let currentTime = date.getTime();
         lastDisconTime = currentTime;
       }
       dispatcher = null;
