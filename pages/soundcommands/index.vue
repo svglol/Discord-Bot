@@ -85,10 +85,10 @@
 </template>
 
 <script>
-import axios from '~/plugins/axios';
-import datereadable from '~/components/DateReadable.Vue';
-import soundfile from '~/components/SoundFile.Vue';
-import soundcommandmodal from '~/components/SoundCommandModal.vue';
+import axios from '../../plugins/axios';
+import datereadable from '../../components/DateReadable.Vue';
+import soundfile from '../../components/SoundFile.Vue';
+import soundcommandmodal from '../../components/SoundCommandModal.vue';
 
 export default {
   components: {datereadable, soundfile, soundcommandmodal},
