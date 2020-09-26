@@ -18,7 +18,7 @@ module.exports = {
 
         var dbUser = client.getDbHelper().getUsers().get(user.id);
         if (dbUser != null) {
-          if (dbUser.intro != null) {
+          if (dbUser.intro != null && dbUser.intro !== '') {
             var date = new Date();
             var currentTime = date.getTime();
             var lastUsedUser = {userid: user.id, usedTime: currentTime};
@@ -53,7 +53,7 @@ module.exports = {
         var user = newMember;
         var dbUser = client.getDbHelper().getUsers().get(user.id);
         if (dbUser != null) {
-          if (dbUser.exit != null) {
+          if (dbUser.exit != null && dbUser.exit !== '') {
             var date = new Date();
             var currentTime = date.getTime();
             var lastUsedUser = {userid: user.id, usedTime: currentTime};
