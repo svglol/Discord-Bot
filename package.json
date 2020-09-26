@@ -28,8 +28,8 @@
     "winston-array-transport": "^1.0.1"
   },
   "devDependencies": {
-    "babel-core": "^6.22.1",
-    "babel-eslint": "^8.2.1",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-eslint": "^10.0.1",
     "babel-helper-vue-jsx-merge-props": "^2.0.3",
     "babel-loader": "^7.1.1",
     "babel-plugin-syntax-jsx": "^6.18.0",
@@ -37,7 +37,7 @@
     "babel-plugin-transform-vue-jsx": "^3.5.0",
     "babel-preset-env": "^1.3.2",
     "babel-preset-stage-2": "^6.22.0",
-    "eslint": "^4.15.0",
+    "eslint": "^5.8.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-friendly-formatter": "^3.0.0",
     "eslint-loader": "^1.7.1",
@@ -46,7 +46,18 @@
     "eslint-plugin-node": "^5.2.0",
     "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-standard": "^3.0.1",
-    "eslint-plugin-vue": "^4.0.0",
-    "nodemon": "^1.11.0"
+    "eslint-plugin-vue": "^5.0.0",
+    "nodemon": "^1.11.0",
+    "@vue/cli-plugin-babel": "^3.0.0",
+    "@vue/cli-plugin-eslint": "^3.0.0",
+    "@vue/cli-plugin-unit-jest": "^3.0.0",
+    "@vue/cli-service": "^3.0.0",
+    "@vue/eslint-config-airbnb": "^4.0.0",
+    "@vue/test-utils": "1.0.0-beta.29",
+    "babel-jest": "^23.6.0",
+    "lint-staged": "^8.1.4",
+    "node-sass": "^4.9.0",
+    "sass-loader": "^7.1.0",
+    "vue-template-compiler": "^2.5.21"
   }
 }
