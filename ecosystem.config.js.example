@@ -1,0 +1,16 @@
+module.exports = {
+  apps : [{
+    name: 'Discord-Bot',
+    script: 'server/server.js',
+    watch_delay: 1000,
+    watch: ['server/server.js','server/commands','server/db','server/lib','server/api'],
+    ignore_watch:['database.sqlite','*.sqlite-journal','*.log','.git'],
+    env: {
+      NODE_ENV: "dev",
+      TOKEN: "",
+      PORT: 3000,
+      PREFIX: ".",
+      COOLDOWN: 300000
+    }
+  }]
+}
