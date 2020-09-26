@@ -28,7 +28,7 @@ module.exports = {
   },
 
   css: ['./assets/css/main.scss'],
-  modules: ['/io', 'nuxt-buefy'],
+  modules: ['nuxt-buefy'],
   env: {
     WS_URL: process.env.WS_URL || 'http://localhost:3000'
   },
