@@ -115,6 +115,7 @@ export default {
       // get voice channels
       axios.get('/api/discord/servers/' + newVal + '/voicechannels').then(result => {
         ctx.channels = result.data;
+        ctx.channels = ctx.channels.reverse();
         ctx.channel = ctx.channels[0].id;
       });
     }
