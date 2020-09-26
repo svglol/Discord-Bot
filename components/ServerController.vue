@@ -45,7 +45,7 @@
 
 <script>
 import axios from '../plugins/axios';
-import mstime from '../components/MSTime.Vue';
+import mstime from './../components/MSTime.Vue';
 
 export default {
   components: {mstime},
