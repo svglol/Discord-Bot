@@ -64,6 +64,11 @@ router.get('/bot/', function (req, res) {
   res.json(bot);
 });
 
+router.get('/bot/log', function (req, res) {
+  client.getLogger().log('info', 'GET - ' + req.originalUrl);
+  res.json(client.getLogs());
+});
+
 module.exports = {
   router,
   init: async function (discordClient) {

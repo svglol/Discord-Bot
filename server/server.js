@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const winston = require('winston');
+const ArrayTransport = require('winston-array-transport');
 var glob = require('glob');
 require('dotenv').config();
 
@@ -23,6 +24,8 @@ const port = process.env.PORT || 3000;
 const isProd = process.env.NODE_ENV === 'production';
 
 const api = require('./api');
+
+var logs = [];
 
 class Client extends Discord.Client {
   constructor (...args) {
@@ -157,6 +160,9 @@ class Client extends Discord.Client {
   getStartTime () {
     return startTime;
   }
+  getLogs () {
+    return logs;
+  }
 }
 
 const client = new Client();
@@ -167,7 +173,8 @@ const logger = winston.createLogger({
     new winston.transports.File({
       filename: '.log',
       timestamp: true
-    })
+    }),
+    new ArrayTransport({ array: logs })
   ],
   format: winston.format.printf(
     log => `${log.level.toUpperCase()} - ${log.message}`
