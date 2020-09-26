@@ -386,7 +386,7 @@ async function syncUserSoundboard () {
 }
 
 async function syncUsersCollection () {
-  var users = await Users.findAll();
+  let users = await Users.findAll();
   usersCollection.clear();
 
   for (const user of users) {
@@ -395,14 +395,13 @@ async function syncUsersCollection () {
     var soundboard = await user.getSoundboards();
     var newMessages = [];
     messages.forEach((item, i) => {
-      var newMessage = {id: item.dataValues.id, user_id: item.dataValues.user_id, date: item.dataValues.date};
+      var newMessage = {date: item.dataValues.date};
       newMessages.push(newMessage);
     });
 
     var newConnections = [];
     connections.forEach((item, i) => {
-      var newConnection = {id: item.dataValues.id,
-        user_id: item.dataValues.user_id,
+      var newConnection = {
         connectTime: item.dataValues.connectTime,
         disconnectTime: item.dataValues.disconnectTime,
         connectionLength: item.dataValues.connectionLength};
@@ -411,8 +410,7 @@ async function syncUsersCollection () {
 
     var newSoundboards = [];
     soundboard.forEach((item, i) => {
-      var newSoundboard = { id: item.dataValues.id,
-        user_id: item.dataValues.userid,
+      var newSoundboard = {
         date: item.dataValues.date,
         command: item.dataValues.command};
       newSoundboards.push(newSoundboard);
