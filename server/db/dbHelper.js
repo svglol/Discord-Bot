@@ -118,7 +118,11 @@ module.exports = {
     this.updateUserLastConnection(id, 0);
     if (lastConnection !== 0) {
       var userConnection = await user.addConnection(id, lastConnection, date.getTime(), date.getTime() - lastConnection);
-      usersCollection.get(id).connections.push(userConnection);
+      var newConnection = {
+        connectTime: userConnection.dataValues.connectTime,
+        disconnectTime: userConnection.dataValues.disconnectTime,
+        connectionLength: userConnection.dataValues.connectionLength};
+      usersCollection.get(id).connections.push(newConnection);
     }
   },
   addUserSoundboard: async function (id, command) {
