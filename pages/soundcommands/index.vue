@@ -7,21 +7,23 @@
       :striped="true"
       default-sort="command"
       default-sort-direction="asc"
-      style="padding-top:1rem;padding-bottom:1rem">
-
+      style="padding-top:1rem;padding-bottom:1rem"
+    >
       <b-table-column
         v-slot="props"
         field="command"
         label="Command"
-        sortable>
+        sortable
+      >
         {{ props.row.command }}
       </b-table-column>
 
       <b-table-column
         v-slot="props"
         field="file"
-        label="File" >
-        <soundfile :sound-command="props.row"/>
+        label="File"
+      >
+        <soundfile :sound-command="props.row" />
       </b-table-column>
 
       <b-table-column
@@ -29,7 +31,8 @@
         field="volume"
         label="Volume"
         sortable
-        numeric>
+        numeric
+      >
         {{ props.row.volume }}
       </b-table-column>
 
@@ -37,36 +40,44 @@
         v-slot="props"
         field="date"
         label="Date Added"
-        sortable>
-        <datereadable :date="props.row.date"/>
+        sortable
+      >
+        <datereadable :date="props.row.date" />
       </b-table-column>
 
       <b-table-column
         v-slot="props"
         field="Actions"
         label="Actions"
-        centered>
+        centered
+      >
         <b-button
           type="is-success"
           size="is-small"
           inverted
           icon-left="pencil"
-          @click="formProps.id = props.row.id;formProps.command = props.row.command; formProps.file = props.row.file; formProps.volume = props.row.volume;showForm = true"
-        >Edit
+          @click="update(props.row.id,props.row.command,props.row.file,props.row.volume)"
+        >
+          Edit
         </b-button>
         <b-button
           type="is-danger"
           size="is-small"
           inverted
           icon-left="delete"
-          @click="deleteSound(props.row,soundcommands)">Delete
+          @click="deleteSound(props.row,soundcommands)"
+        >
+          Delete
         </b-button>
       </b-table-column>
     </b-table>
 
     <b-button
       type="is-primary"
-      @click="formProps.id = 0;formProps.command = &quot;&quot;; formProps.file = &quot;&quot;;formProps.volume = 1;showForm = true">Add New</b-button>
+      @click="addnew"
+    >
+      Add New
+    </b-button>
     <b-modal
       :active.sync="showForm"
       :destroy-on-hide="false"
@@ -74,12 +85,14 @@
       has-modal-card
       trap-focus
       aria-role="dialog"
-      aria-modal>
+      aria-modal
+    >
       <soundcommandmodal
         v-bind="formProps"
-        @close="formProps.id = 0;formProps.command = &quot;&quot;; formProps.file = &quot;&quot;;formProps.volume = 1;showForm = false"
+        @close="close"
         @update="updateSound"
-        @add="addSound"/>
+        @add="addSound"
+      />
     </b-modal>
   </section>
 </template>
@@ -114,6 +127,27 @@ export default {
     };
   },
   methods: {
+    addnew () {
+      this.formProps.id = 0;
+      this.formProps.command = '';
+      this.formProps.file = '';
+      this.formProps.volume = 1;
+      this.showForm = true;
+    },
+    close () {
+      this.formProps.id = 0;
+      this.formProps.command = '';
+      this.formProps.file = '';
+      this.formProps.volume = 1;
+      this.showForm = false;
+    },
+    update (id, command, file, volume) {
+      this.formProps.id = id;
+      this.formProps.command = command;
+      this.formProps.file = file;
+      this.formProps.volume = volume;
+      this.showForm = true;
+    },
     deleteSound (sound, props) {
       const ctx = this;
       this.$buefy.dialog.confirm({

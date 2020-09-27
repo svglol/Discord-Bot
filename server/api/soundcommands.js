@@ -16,6 +16,17 @@ router.use(fileUpload());
 router.get('/soundcommands', function (req, res, next) {
   client.getDbHelper().getSoundCommands().then(value => {
     client.getLogger().log('info', 'GET - ' + req.originalUrl);
+    value.forEach((item, i) => {
+      let fileExists = false;
+      try {
+        if (fs.existsSync(item.file)) {
+          fileExists = true;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+      item.dataValues.fileExists = fileExists;
+    });
     res.json(value);
   });
 });

@@ -1,11 +1,20 @@
 <template>
   <div>
-    {{ filename }}
-    <b-button
-      size="is-small"
-      rounded
-      icon-left="play"
-      @click="playSound"/>
+    <div v-if="soundCommand.fileExists">
+      {{ filename }}
+      <b-button
+        size="is-small"
+        rounded
+        icon-left="play"
+        @click="playSound"
+      />
+    </div>
+    <b-tag
+      v-else
+      type="is-danger"
+    >
+      File not found
+    </b-tag>
   </div>
 </template>
 
