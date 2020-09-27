@@ -3,11 +3,14 @@
     <b-sidebar
       :expand-on-hover="false"
       :reduce="false"
+      :mobile="'reduce'"
       type="is-dark"
       open
       fullheight
     >
-      <h2 class="app-title">Discord Bot Dashboard</h2>
+      <h2 class="app-title">
+        Discord Bot Dashboard
+      </h2>
       <ul class="menu-list">
         <li
           v-for="(item, key) of items"
@@ -23,10 +26,11 @@
       </ul>
     </b-sidebar>
     <section
-      class="main-content columns">
-
+      class="main-content columns"
+    >
       <div
-        class="container column">
+        class="container column"
+      >
         <nuxt />
       </div>
     </section>
