@@ -177,7 +177,7 @@ export default {
     },
     lastUsed () {
       if (this.user.soundboards.length > 0) {
-        return this.soundboards.messages[this.user.soundboards.length - 1].date;
+        return this.user.soundboards[this.user.soundboards.length - 1].date;
       } else {
         return 0;
       }
