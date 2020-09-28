@@ -42,7 +42,7 @@
           :line-options="{regionFill: 1}"
           :tooltip-options="{
             formatTooltipX: d => (d + '').toUpperCase(),
-            formatTooltipY: d => d + ' messages',
+            formatTooltipY: d => d + ' commands',
           }"
         />
 
