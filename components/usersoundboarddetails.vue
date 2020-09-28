@@ -25,7 +25,7 @@
         <p class="label">
           Last Soundboard Used
         </p>
-        <DateReadable :date="user.soundboards[user.soundboards.length-1].date" />
+        <datereadable :date="user.soundboards[user.soundboards.length-1].date" />
 
         <vue-frappe
           v-if="renderChart"

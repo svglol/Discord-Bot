@@ -99,12 +99,7 @@
 
 <script>
 import axios from '~/plugins/axios';
-import datereadable from '~/components/DateReadable.vue';
-import soundfile from '~/components/SoundFile.vue';
-import soundcommandmodal from '~/components/SoundCommandModal.vue';
-
 export default {
-  components: {datereadable, soundfile, soundcommandmodal},
   data () {
     return {
       showForm: false,

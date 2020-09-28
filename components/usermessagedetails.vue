@@ -25,7 +25,7 @@
         <p class="label">
           Last Message Sent
         </p>
-        <DateReadable :date="user.messages[user.messages.length-1].date" />
+        <datereadable :date="user.messages[user.messages.length-1].date" />
 
         <vue-frappe
           v-if="renderChart"

@@ -1,42 +1,62 @@
 <template>
   <div
     class="card"
-    style="width:100%">
+    style="width:100%"
+  >
     <header
       class="card-header"
-      style="background-color:rgba(0,114,201,1)">
+      style="background-color:rgba(0,114,201,1)"
+    >
       <p
         class="card-header-title"
-        style="color:white">
+        style="color:white"
+      >
         Server Status
       </p>
     </header>
     <div class="card-content">
       <div class="content">
-        <p class="label">Uptime</p>
+        <p class="label">
+          Uptime
+        </p>
         <mstime
           :time="uptimeMS"
-          class="data"/>
+          class="data"
+        />
 
-        <p class="label">Total Users</p>
-        <p class="data">{{ totalUsers }}</p>
+        <p class="label">
+          Total Users
+        </p>
+        <p class="data">
+          {{ totalUsers }}
+        </p>
 
-        <p class="label">Online Users</p>
-        <p class="data">{{ onlineUsers }}</p>
+        <p class="label">
+          Online Users
+        </p>
+        <p class="data">
+          {{ onlineUsers }}
+        </p>
 
-        <p class="label">Connected Users</p>
-        <p class="data">{{ connectedUsers }}</p>
+        <p class="label">
+          Connected Users
+        </p>
+        <p class="data">
+          {{ connectedUsers }}
+        </p>
       </div>
       <b-loading
         :active.sync="loading"
-        :is-full-page="false"/>
+        :is-full-page="false"
+      />
     </div>
     <footer class="card-footer">
       <b-button
         icon-left="cached"
         style="margin:1rem"
         type="is-danger"
-        @click="reset">
+        @click="reset"
+      >
         Reset
       </b-button>
     </footer>
@@ -45,10 +65,8 @@
 
 <script>
 import axios from '~/plugins/axios';
-import mstime from '~/components/mstime.vue';
 
 export default {
-  components: {mstime},
   data () {
     return {
       uptime: 0,

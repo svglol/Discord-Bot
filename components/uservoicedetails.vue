@@ -29,7 +29,7 @@
         <p class="label">
           Last Connection
         </p>
-        <DateReadable :date="lastConnection()" />
+        <datereadable :date="lastConnection()" />
 
         <vue-frappe
           v-if="renderChart"
@@ -72,12 +72,9 @@
 </template>
 
 <script>
-
-import mstime from '~/components/mstime.vue';
 const currentYear = new Date().getFullYear();
 
 export default {
-  components: {mstime},
   props: { user: {
     type: Object,
     required: true

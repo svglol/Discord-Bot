@@ -7,13 +7,14 @@
       :striped="true"
       default-sort="command"
       default-sort-direction="asc"
-      style="padding-top:1rem;padding-bottom:1rem">
-
+      style="padding-top:1rem;padding-bottom:1rem"
+    >
       <b-table-column
         v-slot="props"
         field="command"
         label="Command"
-        sortable>
+        sortable
+      >
         {{ props.row.command }}
       </b-table-column>
 
@@ -21,7 +22,8 @@
         v-slot="props"
         field="link"
         label="Text"
-        sortable>
+        sortable
+      >
         {{ props.row.link }}
       </b-table-column>
 
@@ -29,35 +31,44 @@
         v-slot="props"
         field="date"
         label="Date Added"
-        sortable>
-        <datereadable :date="props.row.date"/>
+        sortable
+      >
+        <datereadable :date="props.row.date" />
       </b-table-column>
 
       <b-table-column
         v-slot="props"
         field="Actions"
         label="Actions"
-        centered>
+        centered
+      >
         <b-button
           type="is-success"
           size="is-small"
           inverted
           icon-left="pencil"
-          @click="formProps.id = props.row.id;formProps.command = props.row.command; formProps.link = props.row.link;showForm = true">Edit
+          @click="formProps.id = props.row.id;formProps.command = props.row.command; formProps.link = props.row.link;showForm = true"
+        >
+          Edit
         </b-button>
         <b-button
           type="is-danger"
           size="is-small"
           inverted
           icon-left="delete"
-          @click="deleteGif(props.row,gifcommands)">Delete
+          @click="deleteGif(props.row,gifcommands)"
+        >
+          Delete
         </b-button>
       </b-table-column>
     </b-table>
 
     <b-button
       type="is-primary"
-      @click="formProps.id = 0;formProps.command = &quot;&quot;; formProps.link = &quot;&quot;;showForm = true">Add New</b-button>
+      @click="addNew"
+    >
+      Add New
+    </b-button>
 
     <b-modal
       :active.sync="showForm"
@@ -66,23 +77,22 @@
       has-modal-card
       trap-focus
       aria-role="dialog"
-      aria-modal>
+      aria-modal
+    >
       <gifcommandmodal
         v-bind="formProps"
         @close="showForm = false"
         @update="updateGif"
-        @add="addGif"/>
+        @add="addGif"
+      />
     </b-modal>
   </section>
 </template>
 
 <script>
 import axios from '~/plugins/axios';
-import gifcommandmodal from '~/components/GifCommandModal.vue';
-import datereadable from '~/components/DateReadable.vue';
 
 export default {
-  components: {gifcommandmodal, datereadable},
   data () {
     return {
       showForm: false,
@@ -104,6 +114,12 @@ export default {
     };
   },
   methods: {
+    addNew () {
+      this.formProps.id = 0;
+      this.formProps.command = '';
+      this.formProps.link = '';
+      this.showForm = true;
+    },
     deleteGif (gif, props) {
       const ctx = this;
       this.$buefy.dialog.confirm({

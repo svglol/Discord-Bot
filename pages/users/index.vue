@@ -9,14 +9,15 @@
       default-sort="userid"
       default-sort-direction="desc"
       style="padding-top:1rem;padding-bottom:1rem"
-      @dblclick="openUser">
-
+      @dblclick="openUser"
+    >
       <b-table-column
         v-slot="props"
         :custom-sort="sortByUserID"
         field="userid"
         label="User ID"
-        sortable>
+        sortable
+      >
         {{ props.row.user_id }}
       </b-table-column>
 
@@ -24,7 +25,8 @@
         v-slot="props"
         field="username"
         label="Username"
-        sortable>
+        sortable
+      >
         {{ props.row.username }}
       </b-table-column>
 
@@ -33,7 +35,8 @@
         field="messages"
         label="Messages"
         sortable
-        numeric>
+        numeric
+      >
         {{ props.row.messages.length }}
       </b-table-column>
 
@@ -43,7 +46,8 @@
         field="soundboard"
         label="Soundboard Uses"
         sortable
-        numeric>
+        numeric
+      >
         {{ props.row.soundboards.length }}
       </b-table-column>
 
@@ -52,48 +56,50 @@
         :custom-sort="sortByTime"
         field="connections"
         label="Total Connection Time"
-        sortable>
-        <mstime :time="calculateConnectedTime(props.row.connections)"/>
+        sortable
+      >
+        <mstime :time="calculateConnectedTime(props.row.connections)" />
       </b-table-column>
 
       <b-table-column
         v-slot="props"
         field="intro"
         label="Intro Message"
-        sortable>
+        sortable
+      >
         {{ props.row.intro }}
         <b-button
           type="is-success"
           size="is-small"
           inverted
           icon-left="pencil"
-          @click="editIntro(props.row)"/>
+          @click="editIntro(props.row)"
+        />
       </b-table-column>
 
       <b-table-column
         v-slot="props"
         field="exit"
         label="Exit Message"
-        sortable>
+        sortable
+      >
         {{ props.row.exit }}
         <b-button
           type="is-success"
           size="is-small"
           inverted
           icon-left="pencil"
-          @click="editExit(props.row)"/>
+          @click="editExit(props.row)"
+        />
       </b-table-column>
-
     </b-table>
   </section>
 </template>
 
 <script>
 import axios from '~/plugins/axios';
-import mstime from '~/components/mstime.vue';
 
 export default {
-  components: {mstime},
   data () {
     return {
       selected: {}

@@ -15,16 +15,8 @@
 </template>
 
 <script>
-import soundcommandcontroller from '~/components/SoundCommandContoller.vue';
-import textmessagecontroller from '~/components/TextMessageController.vue';
-import servercontroller from '~/components/ServerController.vue';
 
 export default {
-  components: {
-    soundcommandcontroller,
-    textmessagecontroller,
-    servercontroller
-  },
   head () {
     return {
       title: 'Discord Bot - Dashboard'
