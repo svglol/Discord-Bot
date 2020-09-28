@@ -15,7 +15,11 @@ router.get('/users', function (req, res, next) {
 
 /* GET user by ID. */
 router.get('/users/:id', function (req, res, next) {
+  let id = req.params.id;
   client.getLogger().log('info', 'GET - ' + req.originalUrl);
+  let users = client.getDbHelper().getUsers();
+  let user = users.get(id);
+  res.json(user);
 });
 
 router.post('/users/:id', function (req, res) {

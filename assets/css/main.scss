@@ -97,3 +97,25 @@ h1 {
   text-align:center;
 }
 }
+
+.graph-svg-tip.comparison .title{
+  color: $white;
+}
+
+.card-header{
+  background-color: $primary;
+}
+
+.card-header-title{
+  color:$white;
+}
+
+.chart-container {
+  margin-top: 1rem;
+}
+
+.chart-container .title{
+  fill:#363636;
+  font-size: 100%;
+  font-weight: 700;
+}

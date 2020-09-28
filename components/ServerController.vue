@@ -45,7 +45,7 @@
 
 <script>
 import axios from '~/plugins/axios';
-import mstime from '~/components/MSTime.vue';
+import mstime from '~/components/mstime.vue';
 
 export default {
   components: {mstime},
