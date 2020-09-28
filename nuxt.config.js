@@ -1,7 +1,7 @@
 module.exports = {
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
-    title: 'nuxt-project',
+    title: 'Discord Bot Dashboard',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -37,6 +37,7 @@ module.exports = {
     // extra config e.g
     BaseURL: `http://${process.env.HOST || 'localhost'}:${process.env.PORT || 3000}`,
     proxyHeaders: false,
-    credentials: false
+    credentials: false,
+    crossdomain: true
   }
 };
