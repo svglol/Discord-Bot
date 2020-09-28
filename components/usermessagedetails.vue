@@ -25,7 +25,7 @@
         <p class="label">
           Last Message Sent
         </p>
-        <datereadable :date="user.messages[user.messages.length-1].date" />
+        <datereadable :date="lastMessageSent()" />
 
         <vue-frappe
           v-if="renderChart"
@@ -103,28 +103,36 @@ export default {
   },
   methods: {
     filter () {
-      this.renderChart = false;
-      let monthlyMessages = new Map();
-      for (var i = 0; i < 12; i++) {
-        monthlyMessages.set(i, 0);
+      // this.renderChart = false;
+      // let monthlyMessages = new Map();
+      // for (var i = 0; i < 12; i++) {
+      //   monthlyMessages.set(i, 0);
+      // }
+      // this.user.messages.forEach((item, i) => {
+      //   let messageDate = new Date(item.date);
+      //   let messageMonth = messageDate.getMonth();
+      //   if (messageDate.getFullYear() === this.yearFilter) {
+      //     let month = monthlyMessages.get(messageMonth);
+      //     let num = month + 1;
+      //     monthlyMessages.set(messageMonth, num);
+      //   }
+      // });
+      // let values = [];
+      // this.chartData = [];
+      // monthlyMessages.forEach((item, i) => {
+      //   values.push(item);
+      // });
+      //
+      // this.chartData.push({values: values});
+      // this.renderChart = true;
+    },
+    lastMessageSent () {
+      if (this.user.messages.length > 0) {
+        return 1;
+        // return this.user.messages[this.user.messages.length - 1].date;
+      } else {
+        return 0;
       }
-      this.user.messages.forEach((item, i) => {
-        let messageDate = new Date(item.date);
-        let messageMonth = messageDate.getMonth();
-        if (messageDate.getFullYear() === this.yearFilter) {
-          let month = monthlyMessages.get(messageMonth);
-          let num = month + 1;
-          monthlyMessages.set(messageMonth, num);
-        }
-      });
-      let values = [];
-      this.chartData = [];
-      monthlyMessages.forEach((item, i) => {
-        values.push(item);
-      });
-
-      this.chartData.push({values: values});
-      this.renderChart = true;
     }
   }
 };

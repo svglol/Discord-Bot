@@ -25,7 +25,7 @@
         <p class="label">
           Last Soundboard Used
         </p>
-        <datereadable :date="user.soundboards[user.soundboards.length-1].date" />
+        <datereadable :date="lastUsed()" />
 
         <vue-frappe
           v-if="renderChart"
@@ -174,6 +174,13 @@ export default {
 
       this.chartData.push({values: values});
       this.renderChart = true;
+    },
+    lastUsed () {
+      if (this.user.soundboards.length > 0) {
+        return this.soundboards.messages[this.user.soundboards.length - 1].date;
+      } else {
+        return 0;
+      }
     }
   }
 };

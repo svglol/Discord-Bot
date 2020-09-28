@@ -142,7 +142,11 @@ export default {
       return totalMs;
     },
     lastConnection () {
-      return Math.max(this.user.connections[this.user.connections.length - 1].connectTime, this.user.lastConnection);
+      if (this.user.connections.length > 0) {
+        return Math.max(this.user.connections[this.user.connections.length - 1].connectTime, this.user.lastConnection);
+      } else {
+        return 0;
+      }
     }
   }
 };
