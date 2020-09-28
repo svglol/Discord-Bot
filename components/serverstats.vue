@@ -18,8 +18,8 @@
           v-if="renderChart"
           id="statsChart"
           :labels="[
-            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
           ]"
           type="axis-mixed"
           :height="600"
