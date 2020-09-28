@@ -28,9 +28,13 @@ module.exports = {
   },
 
   css: ['~/assets/css/main.scss'],
-  modules: ['nuxt-buefy'],
+  modules: ['nuxt-buefy', '@nuxtjs/axios'],
   env: {
     WS_URL: process.env.WS_URL || 'http://localhost:3000'
   },
-  telemetry: false
+  telemetry: false,
+  axios: {
+    // extra config e.g
+    BaseURL: `http://${process.env.HOST || 'localhost'}:${process.env.PORT || 3000}`
+  }
 };

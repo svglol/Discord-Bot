@@ -3,11 +3,13 @@
     <div class="chatArea">
       <ul
         ref="messages"
-        class="messages">
+        class="messages"
+      >
         <li
           v-for="(line, index) in log"
           :key="index"
-          class="message">
+          class="message"
+        >
           {{ line }}
         </li>
       </ul>
@@ -16,8 +18,6 @@
 </template>
 
 <script>
-import axios from '~/plugins/axios';
-
 export default {
   data () {
     return {
@@ -28,8 +28,8 @@ export default {
       title: 'Discord Bot - Log'
     };
   },
-  asyncData () {
-    return axios.get('/api/bot/log').then(res => {
+  asyncData ({$axios}) {
+    return $axios.get('/api/bot/log').then(res => {
       return { log: res.data };
     });
   }
