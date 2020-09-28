@@ -149,8 +149,6 @@ export default {
       values.push(item.count);
     });
     this.commandsData.push({values: values});
-
-    console.log(topTen);
   },
   methods: {
     filter () {
