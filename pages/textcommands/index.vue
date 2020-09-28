@@ -90,7 +90,6 @@
 </template>
 
 <script>
-import axios from '~/plugins/axios';
 
 export default {
   data () {
@@ -103,8 +102,8 @@ export default {
       }
     };
   },
-  asyncData () {
-    return axios.get('/api/gifcommands').then(res => {
+  asyncData ({$axios}) {
+    return $axios.get('/api/gifcommands').then(res => {
       return {gifcommands: res.data};
     });
   },
