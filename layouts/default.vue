@@ -48,6 +48,11 @@ export default {
           to: { name: 'index' }
         },
         {
+          title: 'Stats',
+          icon: 'chart-line-variant',
+          to: { name: 'stats' }
+        },
+        {
           title: 'Users',
           icon: 'account-multiple',
           to: { name: 'users' }
