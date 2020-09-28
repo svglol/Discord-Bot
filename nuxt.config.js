@@ -35,9 +35,7 @@ module.exports = {
   telemetry: false,
   axios: {
     // extra config e.g
-    BaseURL: `http://${process.env.HOST || 'localhost'}:${process.env.PORT || 3000}`,
     proxyHeaders: false,
-    credentials: false,
-    crossdomain: true
+    credentials: false
   }
 };
