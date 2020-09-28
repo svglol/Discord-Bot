@@ -18,6 +18,8 @@
 </template>
 
 <script>
+import axios from '~/plugins/axios';
+
 export default {
   data () {
     return {
@@ -28,8 +30,8 @@ export default {
       title: 'Discord Bot - Log'
     };
   },
-  asyncData ({$axios}) {
-    return $axios.get('/api/bot/log').then(res => {
+  asyncData () {
+    return axios.get('/api/bot/log').then(res => {
       return { log: res.data };
     });
   }

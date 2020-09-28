@@ -28,14 +28,9 @@ module.exports = {
   },
 
   css: ['~/assets/css/main.scss'],
-  modules: ['nuxt-buefy', '@nuxtjs/axios'],
+  modules: ['nuxt-buefy'],
   env: {
     WS_URL: process.env.WS_URL || 'http://localhost:3000'
   },
-  telemetry: false,
-  axios: {
-    // extra config e.g
-    proxyHeaders: false,
-    credentials: false
-  }
+  telemetry: false
 };
