@@ -55,12 +55,8 @@ export default {
     }
   },
   mounted () {
-    const currentMonth = new Date().getMonth();
-    const diff = 12 - currentMonth;
-
-    for (let i = 1; i < diff; i++) {
-      this.labels.unshift(this.labels.pop());
-    }
+    const diff = 12 - new Date().getMonth();
+    rearrangeArray(this.labels, diff);
 
     let monthlyMessages = new Map();
     let monthlyConnectionTime = new Map();
@@ -88,9 +84,7 @@ export default {
     monthlyMessages.forEach((item, i) => {
       values.push(item);
     });
-    for (let i = 1; i < diff; i++) {
-      values.unshift(values.pop());
-    }
+    rearrangeArray(values, diff);
     this.chartData.push({name: 'Messages', chartType: 'line', values: values});
 
     // get user hours
@@ -111,9 +105,7 @@ export default {
     monthlyConnectionTime.forEach((item, i) => {
       values.push(msToHours(item));
     });
-    for (let i = 1; i < diff; i++) {
-      values.unshift(values.pop());
-    }
+    rearrangeArray(values, diff);
     this.chartData.push({name: 'Hours', chartType: 'line', values: values});
 
     // get soundboard usage
@@ -132,9 +124,7 @@ export default {
     monthlySoundboards.forEach((item, i) => {
       values.push(item);
     });
-    for (let i = 1; i < diff; i++) {
-      values.unshift(values.pop());
-    }
+    rearrangeArray(values, diff);
     this.chartData.push({name: 'Sound Cmds', chartType: 'line', values: values});
     this.renderChart = true;
   },
@@ -147,7 +137,7 @@ function msToHours (duration) {
   return hours;
 }
 
-var rollingYear = function (d1) {
+function rollingYear (d1) {
   var diff = Math.abs(d1.getTime() - new Date().getTime());
   diff = diff / (1000 * 60 * 60 * 24);
   if (diff < 365) {
@@ -155,6 +145,13 @@ var rollingYear = function (d1) {
   }
   return false;
 };
+
+function rearrangeArray (arr, amount) {
+  for (let i = 1; i < amount; i++) {
+    arr.unshift(arr.pop());
+  }
+}
+
 </script>
 
 <style>
