@@ -17,10 +17,7 @@
         <vue-frappe
           v-if="renderChart"
           id="statsChart"
-          :labels="[
-            'January', 'February', 'March', 'April', 'May', 'June',
-            'July', 'August', 'September', 'October', 'November', 'December'
-          ]"
+          :labels="labels"
           type="axis-mixed"
           :height="500"
           :colors="['#0072c9', '#FF3860', '#FFDD57']"
@@ -37,9 +34,6 @@
 </template>
 
 <script>
-
-const currentYear = new Date().getFullYear();
-
 export default {
   props: { users: {
     type: Array,
@@ -48,7 +42,11 @@ export default {
   data () {
     return {
       renderChart: false,
-      chartData: []
+      chartData: [],
+      labels: [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ]
     };
   },
   watch: {
@@ -57,10 +55,17 @@ export default {
     }
   },
   mounted () {
+    const currentMonth = new Date().getMonth();
+    const diff = 12 - currentMonth;
+
+    for (let i = 1; i < diff; i++) {
+      this.labels.unshift(this.labels.pop());
+    }
+
     let monthlyMessages = new Map();
     let monthlyConnectionTime = new Map();
     let monthlySoundboards = new Map();
-    for (var i = 0; i < 12; i++) {
+    for (let i = 0; i < 12; i++) {
       monthlyMessages.set(i, 0);
       monthlyConnectionTime.set(i, 0);
       monthlySoundboards.set(i, 0);
@@ -71,7 +76,7 @@ export default {
       user.messages.forEach((item, i) => {
         let messageDate = new Date(item.date);
         let messageMonth = messageDate.getMonth();
-        if (messageDate.getFullYear() === currentYear) {
+        if (rollingYear(messageDate)) {
           let month = monthlyMessages.get(messageMonth);
           let num = month + 1;
           monthlyMessages.set(messageMonth, num);
@@ -83,7 +88,9 @@ export default {
     monthlyMessages.forEach((item, i) => {
       values.push(item);
     });
-
+    for (let i = 1; i < diff; i++) {
+      values.unshift(values.pop());
+    }
     this.chartData.push({name: 'Messages', chartType: 'line', values: values});
 
     // get user hours
@@ -91,7 +98,7 @@ export default {
       user.connections.forEach((item, i) => {
         let connectionDate = new Date(item.connectTime);
         let connectionMonth = connectionDate.getMonth();
-        if (connectionDate.getFullYear() === currentYear) {
+        if (rollingYear(connectionDate)) {
           let month = monthlyConnectionTime.get(connectionMonth);
           if (!isNaN(item.connectionLength)) {
             let num = month + item.connectionLength;
@@ -104,6 +111,9 @@ export default {
     monthlyConnectionTime.forEach((item, i) => {
       values.push(msToHours(item));
     });
+    for (let i = 1; i < diff; i++) {
+      values.unshift(values.pop());
+    }
     this.chartData.push({name: 'Hours', chartType: 'line', values: values});
 
     // get soundboard usage
@@ -111,7 +121,7 @@ export default {
       user.soundboards.forEach((item, i) => {
         let soundboardDate = new Date(item.date);
         let soundboardMonth = soundboardDate.getMonth();
-        if (soundboardDate.getFullYear() === currentYear) {
+        if (rollingYear(soundboardDate)) {
           let month = monthlySoundboards.get(soundboardMonth);
           let num = month + 1;
           monthlySoundboards.set(soundboardMonth, num);
@@ -122,6 +132,9 @@ export default {
     monthlySoundboards.forEach((item, i) => {
       values.push(item);
     });
+    for (let i = 1; i < diff; i++) {
+      values.unshift(values.pop());
+    }
     this.chartData.push({name: 'Sound Cmds', chartType: 'line', values: values});
     this.renderChart = true;
   },
@@ -133,6 +146,15 @@ function msToHours (duration) {
   var hours = Math.floor((duration / (1000 * 60 * 60)));
   return hours;
 }
+
+var rollingYear = function (d1) {
+  var diff = Math.abs(d1.getTime() - new Date().getTime());
+  diff = diff / (1000 * 60 * 60 * 24);
+  if (diff < 365) {
+    return true;
+  }
+  return false;
+};
 </script>
 
 <style>
