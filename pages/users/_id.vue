@@ -1,17 +1,18 @@
 <template>
   <section class="container">
     <div class="columns">
-      <div class="column is-3">
+      <div class="column">
         <userdetails :user="user" />
       </div>
-      <div class="column is-3">
-        <usermessagedetails :user="user" />
+    </div>
+    <div class="columns">
+      <div class="column">
+        <serverstats :users="[user]" />
       </div>
-      <div class="column is-3">
-        <uservoicedetails :user="user" />
-      </div>
-      <div class="column is-3">
-        <usersoundboarddetails :user="user" />
+    </div>
+    <div class="columns">
+      <div class="column">
+        <serverstatscommands :users="[user]" />
       </div>
     </div>
   </section>
