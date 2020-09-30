@@ -1,8 +1,7 @@
 var lastUsedIntroArray = [];
 var lastUsedExitArray = [];
 
-const cooldown = process.env.COOLDOWN;
-
+const cooldown = 300000;
 module.exports = {
   listen: function (client) {
     client.on('voiceStateUpdate', (oldMember, newMember) => {
