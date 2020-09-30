@@ -9,6 +9,7 @@ var dclient;
 class DbHelper {
   constructor (client) {
     dclient = client;
+    this.syncGuildUsers();
     syncUsersCollection();
     syncUserSoundboard();
     client.logger.log('info', 'Synced Database to Cache');
@@ -40,6 +41,14 @@ class DbHelper {
       messagesNorm.push(user.messages);
     }
     return messagesNorm;
+  }
+
+  async syncGuildUsers () {
+    for (const [key, guild] of dclient.guilds.cache.entries()) {
+      for (const [id, member] of guild.members.cache.entries()) {
+        await this.addUser(member.user.id);
+      }
+    }
   }
 
   async getUserMessageMonthlyRank (id) {
@@ -283,15 +292,6 @@ class DbHelper {
       }
     }
     return sortSoundboardUsageLeaderboard(leaderboard);
-  }
-
-  async syncGuildUsers (client) {
-    for (const [key, guild] of client.guilds.cache.entries()) {
-      for (const [id, member] of guild.members.cache.entries()) {
-        await this.addUser(member.user.id);
-      }
-    }
-    await syncUsersCollection();
   }
 
   async setSoundCommandVolume (command, volume) {

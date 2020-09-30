@@ -49,7 +49,6 @@ class Client extends Discord.Client {
       this.dbHelper = new DbHelper(this);
       this.expressApi = new Api(this);
 
-      this.dbHelper.syncGuildUsers(this);
       this.commandsLoader.loadCommands(client);
 
       // generate commands from file
