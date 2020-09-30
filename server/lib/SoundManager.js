@@ -30,10 +30,10 @@ class SoundManager {
   }
 
   skip (message) {
-    if (dispatcher !== null) {
+    if (dispatcher) {
       dispatcher.end();
     }
-    if (message !== null) {
+    if (message) {
       message.delete().catch(err => console.log(err));
     }
   }
