@@ -1,7 +1,6 @@
 const Discord = require('discord.js');
 const winston = require('winston');
 const ArrayTransport = require('winston-array-transport');
-const glob = require('glob');
 require('dotenv').config();
 
 // Modules
@@ -41,22 +40,13 @@ class Client extends Discord.Client {
 
     this.once('ready', () => {
       this.commands = new Discord.Collection();
+      this.dbHelper = new DbHelper(this);
       this.stats = new StatsManager(this);
       this.soundManager = new SoundManager(this);
       this.intro = new IntroExitManager(this);
       this.tools = new Tools();
-      this.commandsLoader = new CommandsLoader();
-      this.dbHelper = new DbHelper(this);
+      this.commandsLoader = new CommandsLoader(this);
       this.expressApi = new Api(this);
-
-      this.commandsLoader.loadCommands(client);
-
-      // generate commands from file
-      const commandFiles = glob.sync('server/commands' + '/**/*.js');
-      for (let file of commandFiles) {
-        const command = require(`${file.replace('server/', './')}`);
-        client.commands.set(command.name, command);
-      }
 
       // Import API Routes
       app.use('/api', this.expressApi.router);

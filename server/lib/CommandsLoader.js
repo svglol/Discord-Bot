@@ -1,13 +1,25 @@
+const glob = require('glob');
+
 class CommandsLoader {
-  async loadCommands (client) {
-    var gifCommands = await client.dbHelper.getGifCommands();
-    gifCommands.forEach((item, i) => {
-      this.addGifCommand(client, item.dataValues.command, item.dataValues.link);
+  constructor (client) {
+    // load commands from database
+    client.dbHelper.getGifCommands().then(gifCommands => {
+      gifCommands.forEach((item, i) => {
+        this.addGifCommand(client, item.dataValues.command, item.dataValues.link);
+      });
     });
-    var soundCommands = await client.dbHelper.getSoundCommands();
-    soundCommands.forEach((item, i) => {
-      this.addSoundCommand(client, item.dataValues.command, item.dataValues.file, item.dataValues.volume, item.dataValues.date);
+    client.dbHelper.getSoundCommands().then(soundCommands => {
+      soundCommands.forEach((item, i) => {
+        this.addSoundCommand(client, item.dataValues.command, item.dataValues.file, item.dataValues.volume, item.dataValues.date);
+      });
     });
+
+    // Load commands from files
+    const commandFiles = glob.sync('server/commands' + '/**/*.js');
+    for (let file of commandFiles) {
+      const command = require(`${file.replace('server/', '../')}`);
+      client.commands.set(command.name, command);
+    }
   }
 
   addGifCommand (client, commandname, link) {
