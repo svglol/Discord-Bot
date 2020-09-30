@@ -26,7 +26,7 @@ class GifCommands {
 
     // update gif command
     router.post('/gifcommands/:id', function (req, res) {
-      client.logger.log('info', 'POST - ' + req.originalUrl);
+      client.logger.log('info', 'POST - ' + req.originalUrl + ' - ' + JSON.stringify(req.body));
       var body = req.body;
 
       client.dbHelper.getGifCommands().then(result => {
@@ -43,7 +43,7 @@ class GifCommands {
 
     // add gif command
     router.put('/gifcommands/', function (req, res) {
-      client.logger.log('info', 'PUT - ' + req.originalUrl);
+      client.logger.log('info', 'PUT - ' + req.originalUrl + ' - ' + JSON.stringify(req.body));
       var body = req.body;
       client.dbHelper.addGifCommand(body.command, body.link, new Date().getTime()).then((result) => {
         res.json({id: result.dataValues.id, command: result.dataValues.command, link: result.dataValues.link, date: result.dataValues.date});

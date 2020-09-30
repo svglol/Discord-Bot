@@ -9,8 +9,8 @@ class Bot {
     this.router = router;
 
     router.post('/bot/', function (req, res) {
-      client.logger.log('info', 'PUT - ' + req.originalUrl);
       var body = req.body;
+      client.logger.log('info', 'PUT - ' + req.originalUrl + ' - ' + JSON.stringify(body));
       if (body.skip) {
         client.soundManager.skip();
         res.sendStatus(200);
@@ -50,9 +50,9 @@ class Bot {
       }
     });
 
-    // send bot status
+    // get bot status
     router.get('/bot/', function (req, res) {
-      client.logger.log('info', 'PUT - ' + req.originalUrl);
+      client.logger.log('info', 'GET - ' + req.originalUrl);
       let totalUsers = 0;
       let onlineUsers = 0;
       let connectedUsers = 0;

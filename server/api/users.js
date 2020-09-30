@@ -25,7 +25,7 @@ class Users {
     });
 
     router.post('/users/:id', function (req, res) {
-      client.logger.log('info', 'POST - ' + req.originalUrl);
+      client.logger.log('info', 'POST - ' + req.originalUrl + ' - ' + JSON.stringify(req.body));
       var id = req.params.id;
       var body = req.body;
       if (body.intro !== undefined) {

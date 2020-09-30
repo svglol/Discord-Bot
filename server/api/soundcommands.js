@@ -63,7 +63,7 @@ class SoundCommands {
 
     // update sound command
     router.post('/soundcommands/:id', function (req, res) {
-      client.logger.log('info', 'POST - ' + req.originalUrl);
+      client.logger.log('info', 'POST - ' + req.originalUrl + ' - ' + JSON.stringify(req.body));
       let path = './resources/sound/' + req.body.command + '.wav';
       if (req.files) {
         let file = req.files.file;
@@ -92,7 +92,7 @@ class SoundCommands {
 
     // add sound command
     router.put('/soundcommands/', function (req, res) {
-      client.logger.log('info', 'PUT - ' + req.originalUrl);
+      client.logger.log('info', 'PUT - ' + req.originalUrl + ' - ' + JSON.stringify(req.body));
 
       if (!req.files || Object.keys(req.files).length === 0) {
         return res.sendStatus(400);
