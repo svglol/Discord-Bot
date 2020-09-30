@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const winston = require('winston');
-const { format, createLogger, transports } = require('winston');
+const { format, createLogger } = require('winston');
 const ArrayTransport = require('winston-array-transport');
 require('dotenv').config();
 
@@ -147,20 +147,6 @@ class Client extends Discord.Client {
 }
 
 // Winston logging
-// const logger = winston.createLogger({
-//   transports: [
-//     new winston.transports.Console({'timestamp': true}),
-//     new winston.transports.File({
-//       filename: '.log',
-//       timestamp: true
-//     }),
-//     new ArrayTransport({ array: log })
-//   ],
-//   format: winston.format.printf(
-//     log => `${log.timestamp} - ${log.level.toUpperCase()} - ${log.message}`
-//   )
-// });
-
 const logger = createLogger({
   format: format.combine(
     format.label({ label: '[my-label]' }),
