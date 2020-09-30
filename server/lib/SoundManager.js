@@ -2,12 +2,15 @@ var soundQueue = [];
 var dispatcher;
 var voiceChannel;
 var stats;
+var lastDisconTime = 0;
+var client;
 
-module.exports = {
-  listen: function (client) {
-    stats = client.getStats();
-  },
-  stop: function (message) {
+class SoundManager {
+  constructor (discordClient) {
+    client = discordClient;
+    stats = client.stats;
+  }
+  stop (message) {
     if (dispatcher !== null) {
       if (voiceChannel) {
         voiceChannel.leave();
@@ -24,16 +27,17 @@ module.exports = {
     if (message !== undefined) {
       message.delete().catch(err => console.log(err));
     }
-  },
-  skip: function (message) {
+  }
+
+  skip (message) {
     if (dispatcher !== null) {
       dispatcher.end();
     }
     if (message !== null) {
       message.delete().catch(err => console.log(err));
     }
-  },
-  queue: function (message, soundCommand, end) {
+  }
+  queue (message, soundCommand, end) {
     let userVoiceChannel = message.member.voice.channel;
     if (userVoiceChannel !== undefined) {
       stats.addSoundBoardUse(message.author.id, soundCommand.command);
@@ -43,8 +47,8 @@ module.exports = {
         playNextInQueue();
       }
     }
-  },
-  queueToChannel: function (channel, soundCommand, end) {
+  }
+  queueToChannel (channel, soundCommand, end) {
     let userVoiceChannel = channel;
     if (userVoiceChannel !== undefined) {
       let soundQueueItem = { voiceChannel: channel, soundCommand: soundCommand, end: end };
@@ -54,9 +58,9 @@ module.exports = {
       }
     }
   }
-};
+}
 
-var lastDisconTime = 0;
+module.exports = SoundManager;
 
 async function playNextInQueue () {
   let nextInQueue = soundQueue[0];

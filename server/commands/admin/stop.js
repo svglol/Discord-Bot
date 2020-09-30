@@ -4,6 +4,6 @@ module.exports = {
   adminOnly: true,
   guildOnly: true,
   execute (message, args, client) {
-    client.getSound().stop(message);
+    client.soundManager.stop(message);
   }
 };

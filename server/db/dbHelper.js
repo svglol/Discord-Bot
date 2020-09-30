@@ -14,7 +14,7 @@ module.exports = {
     dclient = client;
     await syncUsersCollection();
     await syncUserSoundboard();
-    client.getLogger().log('info', 'Synced Database to Cache');
+    client.logger.log('info', 'Synced Database to Cache');
   },
   addUser: async function (id) {
     var user = await Users.findOne({ where: {user_id: id} });

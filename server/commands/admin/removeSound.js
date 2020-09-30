@@ -11,7 +11,7 @@ module.exports = {
     var commandName = args[0];
     if (!client.commands.get(commandName)) return message.reply('No command with that name found');
 
-    client.getDbHelper().deleteSoundCommand(commandName);
+    client.dbHelper.deleteSoundCommand(commandName);
     var cmd = client.commands.get(commandName);
     fs.unlinkSync(cmd.file);
     client.commands.delete(commandName);

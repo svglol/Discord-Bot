@@ -1,8 +1,8 @@
 var client;
 
-module.exports = {
-  listen: function (cClient) {
-    client = cClient;
+class StatsManager {
+  constructor (discordClient) {
+    client = discordClient;
 
     // listen for client join/disconnect
     client.on('voiceStateUpdate', (oldMember, newMember) => {
@@ -18,27 +18,29 @@ module.exports = {
         if (newUserChannel !== afkChannel) {
           var date = new Date();
           var currentTime = date.getTime();
-          client.getDbHelper().updateUserLastConnection(newMember.id, currentTime);
+          client.dbHelper.updateUserLastConnection(newMember.id, currentTime);
         }
-      }
-      // User leaves server
-      else if (newUserChannel === null || newUserChannel === afkChannel) {
-        client.getDbHelper().addUserConnection(newMember.id);
+      } else if (newUserChannel === null || newUserChannel === afkChannel) {
+        // User leaves server
+        client.dbHelper.addUserConnection(newMember.id);
       }
     });
 
     // Listen for chat messages to be recorded as stats
     client.on('message', message => {
-      if (!message.author.bot && message.content.charAt(0) !== client.getPrefix()) {
-        client.getDbHelper().addUserMessage(message);
+      if (!message.author.bot && message.content.charAt(0) !== client.prefix) {
+        client.dbHelper.addUserMessage(message);
       }
     });
 
     client.on('guildMemberAdd', member => {
-      client.getDbHelper().addUser(member.id);
+      client.dbHelper.addUser(member.id);
     });
-  },
-  addSoundBoardUse: function (id, command) {
-    client.getDbHelper().addUserSoundboard(id, command);
   }
-};
+
+  addSoundBoardUse (id, command) {
+    client.dbHelper.addUserSoundboard(id, command);
+  }
+}
+
+module.exports = StatsManager;

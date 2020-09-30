@@ -14,8 +14,8 @@ router.use(fileUpload());
 
 /* GET soundcommands listing. */
 router.get('/soundcommands', function (req, res, next) {
-  client.getDbHelper().getSoundCommands().then(value => {
-    client.getLogger().log('info', 'GET - ' + req.originalUrl);
+  client.dbHelper.getSoundCommands().then(value => {
+    client.logger.log('info', 'GET - ' + req.originalUrl);
     value.forEach((item, i) => {
       let fileExists = false;
       try {
@@ -33,9 +33,9 @@ router.get('/soundcommands', function (req, res, next) {
 
 // Get sound file by ID
 router.get('/soundcommands/file/:id', function (req, res, next) {
-  client.getLogger().log('info', 'GET - ' + req.originalUrl);
+  client.logger.log('info', 'GET - ' + req.originalUrl);
   var id = req.params.id;
-  client.getDbHelper().getSoundCommands().then(value => {
+  client.dbHelper.getSoundCommands().then(value => {
     var soundCommand;
     value.forEach((item, i) => {
       if (item.dataValues.id === parseInt(id)) {
@@ -50,18 +50,18 @@ router.get('/soundcommands/file/:id', function (req, res, next) {
 
 // Remove sound command
 router.delete('/soundcommands/:commandName', function (req, res) {
-  client.getLogger().log('info', 'DELETE - ' + req.originalUrl);
+  client.logger.log('info', 'DELETE - ' + req.originalUrl);
   let commandName = req.params.commandName;
   var cmd = client.commands.get(commandName);
   fs.unlinkSync(cmd.file);
-  client.getDbHelper().deleteSoundCommand(commandName);
+  client.dbHelper.deleteSoundCommand(commandName);
   client.commands.delete(commandName);
   res.sendStatus(200);
 });
 
 // update sound command
 router.post('/soundcommands/:id', function (req, res) {
-  client.getLogger().log('info', 'POST - ' + req.originalUrl);
+  client.logger.log('info', 'POST - ' + req.originalUrl);
   let path = './resources/sound/' + req.body.command + '.wav';
   if (req.files) {
     let file = req.files.file;
@@ -70,7 +70,7 @@ router.post('/soundcommands/:id', function (req, res) {
     });
   }
 
-  client.getDbHelper().getSoundCommands().then(result => {
+  client.dbHelper.getSoundCommands().then(result => {
     result.forEach((item, i) => {
       if (item.dataValues.id === parseInt(req.body.id)) {
         if (item.dataValues.commandName !== req.body.command) {
@@ -79,9 +79,9 @@ router.post('/soundcommands/:id', function (req, res) {
             if (err) throw err;
           });
         }
-        client.getDbHelper().editSoundCommand(req.body.id, req.body.command, path, req.body.volume);
+        client.dbHelper.editSoundCommand(req.body.id, req.body.command, path, req.body.volume);
         client.commands.delete(item.dataValues.command);
-        client.getCommandsLoader().addSoundCommand(client, req.body.command, path, req.body.volume, new Date().getTime());
+        client.commandsLoader.addSoundCommand(client, req.body.command, path, req.body.volume, new Date().getTime());
         res.sendStatus(200);
       }
     });
@@ -90,7 +90,7 @@ router.post('/soundcommands/:id', function (req, res) {
 
 // add sound command
 router.put('/soundcommands/', function (req, res) {
-  client.getLogger().log('info', 'PUT - ' + req.originalUrl);
+  client.logger.log('info', 'PUT - ' + req.originalUrl);
 
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.sendStatus(400);
@@ -101,10 +101,10 @@ router.put('/soundcommands/', function (req, res) {
   if (!fs.existsSync(path)) {
     file.mv(path, function (err) {
       if (err) { return res.status(500).send(err); }
-      client.getDbHelper().addSoundCommand(req.body.command, path, req.body.volume, new Date().getTime()).then((result) => {
+      client.dbHelper.addSoundCommand(req.body.command, path, req.body.volume, new Date().getTime()).then((result) => {
         res.json({id: result.dataValues.id, command: result.dataValues.command, file: path, volume: result.dataValues.volume, date: result.dataValues.date});
       });
-      client.getCommandsLoader().addSoundCommand(client, req.body.command, path, req.body.volume, new Date().getTime());
+      client.commandsLoader.addSoundCommand(client, req.body.command, path, req.body.volume, new Date().getTime());
     });
   } else {
     res.sendStatus(500);

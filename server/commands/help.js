@@ -6,7 +6,7 @@ module.exports = {
   aliases: ['commands'],
   description: 'help',
   execute (message, args, client) {
-    prefix = client.getPrefix();
+    prefix = client.prefix;
     helpMessage(message, client, client.getSoundCommands(), client.getGifCommands(), client.getNewSoundCommands());
   }
 };

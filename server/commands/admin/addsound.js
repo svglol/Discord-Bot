@@ -28,8 +28,8 @@ module.exports = {
         const file = fs.createWriteStream(path);
         https.get(attachment.url, async function (response) {
           await response.pipe(file);
-          client.getDbHelper().addSoundCommand(commandName, path, 1, new Date().getTime());
-          client.getCommandsLoader().addSoundCommand(client, commandName, path, 1, new Date().getTime());
+          client.dbHelper.addSoundCommand(commandName, path, 1, new Date().getTime());
+          client.commandsLoader.addSoundCommand(client, commandName, path, 1, new Date().getTime());
           message.delete().catch(err => console.log(err));
         });
       } else {

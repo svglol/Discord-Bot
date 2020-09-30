@@ -10,10 +10,10 @@ module.exports = {
 
     var monthlyVoiceRank = '#0';
     var monthlyVoice = 0;
-    await client.getDbHelper().getUserConnectionMonthlyRank(message.author.id).then(function (result) {
+    await client.dbHelper.getUserConnectionMonthlyRank(message.author.id).then(function (result) {
       monthlyVoiceRank = result.rank;
       if (Number.isInteger(result.time)) {
-        monthlyVoice = client.getTools().parseMillisecondsIntoReadableTime(result.time);
+        monthlyVoice = client.tools.parseMillisecondsIntoReadableTime(result.time);
       } else {
         monthlyVoice = result.time;
       }
@@ -21,10 +21,10 @@ module.exports = {
 
     var totalVoiceRank = '#0';
     var totalVoice = 0;
-    await client.getDbHelper().getUserConnectionAllTimeRank(message.author.id).then(function (result) {
+    await client.dbHelper.getUserConnectionAllTimeRank(message.author.id).then(function (result) {
       totalVoiceRank = result.rank;
       if (Number.isInteger(result.time)) {
-        totalVoice = client.getTools().parseMillisecondsIntoReadableTime(result.time);
+        totalVoice = client.tools.parseMillisecondsIntoReadableTime(result.time);
       } else {
         totalVoice = result.time;
       }
@@ -32,14 +32,14 @@ module.exports = {
 
     var totalMessages = 0;
     var totalMessagesRank = '#0';
-    await client.getDbHelper().getUserMessageAllTimeRank(message.author.id).then(function (result) {
+    await client.dbHelper.getUserMessageAllTimeRank(message.author.id).then(function (result) {
       totalMessagesRank = result.rank;
       totalMessages = result.messages;
     });
 
     var monthlyMessages = 0;
     var monthlyMessagesRank = '#0';
-    await client.getDbHelper().getUserMessageMonthlyRank(message.author.id).then(function (result) {
+    await client.dbHelper.getUserMessageMonthlyRank(message.author.id).then(function (result) {
       monthlyMessagesRank = result.rank;
       monthlyMessages = result.messages;
     });
@@ -50,7 +50,7 @@ module.exports = {
       .setColor('#0099ff');
 
     date = new Date();
-    var month = client.getTools().getMonthName(date.getMonth());
+    var month = client.tools.getMonthName(date.getMonth());
 
     var rows = [];
     rows.push(['All-time Voice', '']);
@@ -69,9 +69,9 @@ module.exports = {
     rows.push(['Pos', 'Messages']);
     rows.push([monthlyMessagesRank.toString(), monthlyMessages.toString()]);
 
-    embed.setDescription(client.getTools().generateTable(rows));
+    embed.setDescription(client.tools.generateTable(rows));
     message.reply(embed);
 
-    client.getLogger().log('info', 'Stats Command executed in ' + client.getTools().calculateExecutionTime(startTime) + 'ms');
+    client.logger.log('info', 'Stats Command executed in ' + client.tools.calculateExecutionTime(startTime) + 'ms');
   }
 };
