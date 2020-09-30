@@ -9,10 +9,9 @@ const SoundManager = require('./lib/SoundManager');
 const StatsManager = require('./lib/StatsManager');
 const IntroExitManager = require('./lib/IntroExitManager');
 const Tools = require('./lib/Tools.js');
-const CommandsLoader = require('./lib/commandsLoader.js');
-
-const dbHelper = require('./db/dbHelper.js');
-const api = require('./api');
+const CommandsLoader = require('./lib/CommandsLoader.js');
+const DbHelper = require('./db/dbHelper.js');
+const Api = require('./api');
 
 // Nuxt / Api
 const { Nuxt, Builder } = require('nuxt');
@@ -47,13 +46,11 @@ class Client extends Discord.Client {
       this.intro = new IntroExitManager(this);
       this.tools = new Tools();
       this.commandsLoader = new CommandsLoader();
-      this.dbHelper = dbHelper;
+      this.dbHelper = new DbHelper(this);
+      this.expressApi = new Api(this);
 
-      dbHelper.sync(client);
-      dbHelper.syncGuildUsers(this);
+      this.dbHelper.syncGuildUsers(this);
       this.commandsLoader.loadCommands(client);
-
-      api.init(client);
 
       // generate commands from file
       const commandFiles = glob.sync('server/commands' + '/**/*.js');
@@ -63,7 +60,7 @@ class Client extends Discord.Client {
       }
 
       // Import API Routes
-      app.use('/api', api.router);
+      app.use('/api', this.expressApi.router);
 
       // We instantiate Nuxt.js with the options
       var config = require('../nuxt.config.js');
