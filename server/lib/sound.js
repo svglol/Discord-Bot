@@ -9,8 +9,10 @@ module.exports = {
   },
   stop: function (message) {
     if (dispatcher !== null) {
-      voiceChannel.leave();
-      voiceChannel = null;
+      if (voiceChannel) {
+        voiceChannel.leave();
+        voiceChannel = null;
+      }
       soundQueue.forEach(obj => {
         if (obj.message) {
           obj.message.delete().catch(err => console.log(err));
@@ -19,7 +21,7 @@ module.exports = {
       dispatcher = null;
       soundQueue = [];
     }
-    if (message !== null) {
+    if (message !== undefined) {
       message.delete().catch(err => console.log(err));
     }
   },
