@@ -6,9 +6,12 @@ var userSoundboardCache = [];
 
 var dclient;
 
+var dbInit = require('./dbInit.js');
+
 class DbHelper {
   constructor (client) {
     dclient = client;
+    dbInit.init(client);
     this.syncGuildUsers();
     syncUsersCollection();
     syncUserSoundboard();
