@@ -34,7 +34,8 @@ class DbHelper {
     }
     var date = new Date();
     var userMessage = await user.addMessage(message.author.id, date.getTime());
-    usersCollection.get(message.author.id).messages.push(userMessage);
+    var newMessage = {date: userMessage.dataValues.date};
+    usersCollection.get(message.author.id).messages.push(newMessage);
   }
 
   async getUserMessages (id) {
@@ -152,7 +153,10 @@ class DbHelper {
     }
     var date = new Date();
     var userSoundboard = await user.addSoundboard(id, date.getTime(), command);
-    usersCollection.get(id).soundboards.push(userSoundboard);
+    var newSoundboard = {
+      date: userSoundboard.dataValues.date,
+      command: userSoundboard.dataValues.command};
+    usersCollection.get(id).soundboards.push(newSoundboard);
     syncUserSoundboard();
   }
 
