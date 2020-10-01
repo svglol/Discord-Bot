@@ -39,7 +39,7 @@ class SoundManager {
   }
   queue (message, soundCommand, end) {
     let userVoiceChannel = message.member.voice.channel;
-    if (userVoiceChannel !== undefined) {
+    if (userVoiceChannel) {
       stats.addSoundBoardUse(message.author.id, soundCommand.command);
       let soundQueueItem = { voiceChannel: message.member.voice.channel, soundCommand: soundCommand, end: end, message: message };
       soundQueue.push(soundQueueItem);
