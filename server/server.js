@@ -1,50 +1,56 @@
 const Discord = require('discord.js');
 const winston = require('winston');
+const { format, createLogger } = require('winston');
 const ArrayTransport = require('winston-array-transport');
-var glob = require('glob');
 require('dotenv').config();
 
 // Modules
-const tools = require('./lib/tools.js');
-const sound = require('./lib/sound.js');
-const intro = require('./lib/intro.js');
-const stats = require('./lib/stats.js');
-const commandsLoader = require('./lib/commandsLoader.js');
-const startTime = new Date().getTime();
+const SoundManager = require('./lib/SoundManager');
+const StatsManager = require('./lib/StatsManager');
+const IntroExitManager = require('./lib/IntroExitManager');
+const Tools = require('./lib/Tools.js');
+const CommandsLoader = require('./lib/CommandsLoader.js');
+const DbHelper = require('./db/dbHelper.js');
+const Api = require('./api');
 
-const dbHelper = require('./db/dbHelper.js');
-
-const prefix = process.env.PREFIX;
-
+// Nuxt / Api
 const { Nuxt, Builder } = require('nuxt');
 const app = require('express')();
 const server = require('http').createServer(app);
-const io = require('socket.io')(server);
 const port = process.env.PORT || 3000;
 const isProd = process.env.NODE_ENV === 'production';
 
-const api = require('./api');
-
-var logs = [];
+var log = [];
+const prefix = process.env.PREFIX;
 
 class Client extends Discord.Client {
   constructor (...args) {
     super(...args);
 
-    this.once('ready', () => {
-      client.user
-        .setActivity(prefix + 'help for commands', {
-          type: 'PLAYING'
-        })
-        .catch(console.error);
+    this.logger = logger;
+    this.startTime = new Date().getTime();
+    this.prefix = prefix;
+    this.login(process.env.TOKEN);
 
-      sound.listen(this);
-      intro.listen(this);
-      stats.listen(this);
-      api.init(client);
+    this.on('ready', () => logger.log('info', 'Discord-Bot Connected'));
+    this.on('debug', m => logger.log('debug', m));
+    this.on('warn', m => logger.log('warn', m));
+    this.on('error', m => logger.log('error', m));
+
+    process.on('uncaughtException', error => this.logger.log('error', error));
+
+    this.once('ready', () => {
+      this.commands = new Discord.Collection();
+      this.dbHelper = new DbHelper(this);
+      this.stats = new StatsManager(this);
+      this.soundManager = new SoundManager(this);
+      this.intro = new IntroExitManager(this);
+      this.tools = new Tools();
+      this.commandsLoader = new CommandsLoader(this);
+      this.expressApi = new Api(this);
 
       // Import API Routes
-      app.use('/api', api.router);
+      app.use('/api', this.expressApi.router);
 
       // We instantiate Nuxt.js with the options
       var config = require('../nuxt.config.js');
@@ -59,53 +65,52 @@ class Client extends Discord.Client {
       app.use(nuxt.render);
 
       // Listen the server
-
       server.listen(port, '0.0.0.0');
       logger.log('info', 'Server listening on localhost:' + port);
-    });
-  }
 
-  async init () {
-    this.login(process.env.TOKEN);
+      // Set Activitiy
+      client.user
+        .setActivity(prefix + 'help for commands', {
+          type: 'PLAYING'
+        })
+        .catch(console.error);
 
-    client.on('ready', () => {
-      dbHelper.syncGuildUsers(this);
-    });
+      // Listen for commands
+      client.on('message', message => {
+        if (!message.content.startsWith(prefix) || message.author.bot) return;
 
-    client.on('message', message => {
-      if (!message.content.startsWith(prefix) || message.author.bot) return;
+        const args = message.content.slice(prefix.length).split(/ +/);
+        const commandName = args.shift().toLowerCase();
 
-      const args = message.content.slice(prefix.length).split(/ +/);
-      const commandName = args.shift().toLowerCase();
-
-      const command =
+        const command =
       client.commands.get(commandName) ||
       client.commands.find(
         cmd => cmd.aliases && cmd.aliases.includes(commandName)
       );
 
-      if (!command) return;
-      if (command.guildOnly && message.channel.type !== 'text') { return message.reply("I can't execute that command inside DMs!"); }
-      if (command.adminOnly && message.channel.type !== 'text') { return message.reply("I can't execute that command inside DMs!"); }
-      if (command.adminOnly && !message.member.hasPermission('ADMINISTRATOR')) { return; }
-      if (command.meOnly && message.author.id !== '80282793766035456') return;
-      if (
-        (command.args && !args.length) ||
+        if (!command) return;
+        if (command.guildOnly && message.channel.type !== 'text') { return message.reply("I can't execute that command inside DMs!"); }
+        if (command.adminOnly && message.channel.type !== 'text') { return message.reply("I can't execute that command inside DMs!"); }
+        if (command.adminOnly && !message.member.hasPermission('ADMINISTRATOR')) { return; }
+        if (command.meOnly && message.author.id !== '80282793766035456') return;
+        if (
+          (command.args && !args.length) ||
         (command.args && args.length !== command.numArgs)
-      ) {
-        let reply = `You didn't provide any arguments, ${message.author}!`;
-        if (command.usage) {
-          reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
+        ) {
+          let reply = `You didn't provide any arguments, ${message.author}!`;
+          if (command.usage) {
+            reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
+          }
+          return message.channel.send(reply);
         }
-        return message.channel.send(reply);
-      }
 
-      try {
-        command.execute(message, args, this);
-      } catch (error) {
-        console.error(error);
-        message.reply('there was an error trying to execute that command!');
-      }
+        try {
+          command.execute(message, args, this);
+        } catch (error) {
+          console.error(error);
+          message.reply('there was an error trying to execute that command!');
+        }
+      });
     });
   }
 
@@ -125,12 +130,6 @@ class Client extends Discord.Client {
       })
     );
   }
-  getStats () {
-    return stats;
-  }
-  getSound () {
-    return sound;
-  }
   getNewSoundCommands () {
     return Array.from(
       client.commands.filter(function (command) {
@@ -142,66 +141,28 @@ class Client extends Discord.Client {
       })
     );
   }
-  getPrefix () {
-    return prefix;
-  }
-  getTools () {
-    return tools;
-  }
-  getDbHelper () {
-    return dbHelper;
-  }
-  getLogger () {
-    return logger;
-  }
-  getCommandsLoader () {
-    return commandsLoader;
-  }
-  getStartTime () {
-    return startTime;
-  }
-  getLogs () {
-    return logs;
+  getLog () {
+    return log;
   }
 }
 
-const client = new Client();
-
-const logger = winston.createLogger({
-  transports: [
-    new winston.transports.Console({'timestamp': true}),
-    new winston.transports.File({
-      filename: '.log',
-      timestamp: true
+// Winston logging
+const logger = createLogger({
+  format: format.combine(
+    format.label({ label: '[my-label]' }),
+    format.timestamp({
+      format: 'YYYY-MM-DD HH:mm:ss'
     }),
-    new ArrayTransport({ array: logs })
-  ],
-  format: winston.format.printf(
-    log => `${log.level.toUpperCase()} - ${log.message}`
-  )
+    format.printf(info => `${info.timestamp} ${info.level.toUpperCase()}: ${info.message}`)
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({
+      filename: '.log'
+    }),
+    new ArrayTransport({ array: log })
+  ]
 });
 
-client.commands = new Discord.Collection();
-
-async function start () {
-  client.init();
-  await dbHelper.sync(client);
-  await commandsLoader.loadCommands(client);
-}
-
-const commandFiles = glob.sync('server/commands' + '/**/*.js');
-
-// generate commands from file
-for (let file of commandFiles) {
-  const command = require(`${file.replace('server/', './')}`);
-  client.commands.set(command.name, command);
-}
-
-client.on('ready', () => logger.log('info', 'Discord-Bot Connected'));
-client.on('debug', m => logger.log('debug', m));
-client.on('warn', m => logger.log('warn', m));
-client.on('error', m => logger.log('error', m));
-
-process.on('uncaughtException', error => logger.log('error', error));
-
-start();
+// Load discord client
+const client = new Client();

@@ -1,15 +1,28 @@
-module.exports = {
-  loadCommands: async function (client) {
-    var gifCommands = await client.getDbHelper().getGifCommands();
-    gifCommands.forEach((item, i) => {
-      this.addGifCommand(client, item.dataValues.command, item.dataValues.link);
+const glob = require('glob');
+
+class CommandsLoader {
+  constructor (client) {
+    // load commands from database
+    client.dbHelper.getGifCommands().then(gifCommands => {
+      gifCommands.forEach((item, i) => {
+        this.addGifCommand(client, item.dataValues.command, item.dataValues.link);
+      });
     });
-    var soundCommands = await client.getDbHelper().getSoundCommands();
-    soundCommands.forEach((item, i) => {
-      this.addSoundCommand(client, item.dataValues.command, item.dataValues.file, item.dataValues.volume, item.dataValues.date);
+    client.dbHelper.getSoundCommands().then(soundCommands => {
+      soundCommands.forEach((item, i) => {
+        this.addSoundCommand(client, item.dataValues.command, item.dataValues.file, item.dataValues.volume, item.dataValues.date);
+      });
     });
-  },
-  addGifCommand: function (client, commandname, link) {
+
+    // Load commands from files
+    const commandFiles = glob.sync('server/commands' + '/**/*.js');
+    for (let file of commandFiles) {
+      const command = require(`${file.replace('server/', '../')}`);
+      client.commands.set(command.name, command);
+    }
+  }
+
+  addGifCommand (client, commandname, link) {
     var command = {
       name: commandname,
       description: 'Post ' + commandname + ' gif',
@@ -20,8 +33,9 @@ module.exports = {
       }
     };
     client.commands.set(commandname, command);
-  },
-  addSoundCommand: function (client, commandname, file, volume, date) {
+  }
+
+  addSoundCommand (client, commandname, file, volume, date) {
     var newSound = false;
     var now = new Date();
     var diff = Math.abs(date - now.getTime());
@@ -45,7 +59,7 @@ module.exports = {
         var sound = {file: file, command: commandname, volume: this.volume};
 
         if (args.length === 0) end = true;
-        client.getSound().queue(message, sound, end);
+        client.soundManager.queue(message, sound, end);
 
         end = false;
         args.forEach((item, i) => {
@@ -53,7 +67,7 @@ module.exports = {
           var cmd = client.commands.get(item);
           if (cmd) {
             var sound = {file: cmd.file, command: cmd.name, volume: cmd.volume};
-            client.getSound().queue(message, sound, end);
+            client.soundManager.queue(message, sound, end);
           }
         });
       }
@@ -61,4 +75,6 @@ module.exports = {
 
     client.commands.set(commandname, command);
   }
-};
+}
+
+module.exports = CommandsLoader;

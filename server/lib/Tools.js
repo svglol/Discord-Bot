@@ -1,5 +1,5 @@
-module.exports = {
-  generateTable: function (rows) {
+class Tools {
+  generateTable (rows) {
     var tableString = '```';
     const spacing = 2;
 
@@ -41,12 +41,14 @@ module.exports = {
 
     tableString += '```';
     return tableString;
-  },
-  getMonthName: function (monthNumber) {
+  }
+
+  getMonthName (monthNumber) {
     var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     return months.slice(monthNumber)[0];
-  },
-  parseMillisecondsIntoReadableTime: function (millisec) {
+  }
+
+  parseMillisecondsIntoReadableTime (millisec) {
     var seconds = (millisec / 1000).toFixed(0);
     var minutes = Math.floor(seconds / 60);
     var hours = '';
@@ -63,12 +65,16 @@ module.exports = {
       return hours + ':' + minutes + ':' + seconds;
     }
     return minutes + ':' + seconds;
-  },
-  calculateExecutionTime: function (startTime) {
+  }
+
+  calculateExecutionTime (startTime) {
     var date = new Date();
     return date.getTime() - startTime;
-  },
-  createCommand: function (file) {
+  }
+
+  createCommand (file) {
     return /[^.]*/.exec(file)[0];
   }
-};
+}
+
+module.exports = Tools;

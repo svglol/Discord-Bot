@@ -14,7 +14,7 @@ module.exports = {
           const file = fs.createWriteStream('database.sqlite');
           https.get(attachment.url, async function (response) {
             await response.pipe(file);
-            client.getLogger().log('info', 'Database Replaced');
+            client.logger.log('info', 'Database Replaced');
           });
         } else {
           message.reply('File does not have the correct extension');

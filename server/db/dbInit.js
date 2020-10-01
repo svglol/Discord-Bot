@@ -3,7 +3,7 @@ const fs = require('fs');
 
 module.exports = {
   init: async function (client) {
-    client.getLogger().log('info', 'Database Initializing');
+    client.logger.log('info', 'Database Initializing');
     const sequelize = new Sequelize('database', 'user', 'password', {
       host: 'localhost',
       dialect: 'sqlite',
@@ -72,7 +72,7 @@ module.exports = {
       var soundCommands = await SoundCommands.findAll();
       var files = fs.readdirSync('./resources/sound/');
       for (file of files) {
-        var command = client.getTools().createCommand(file);
+        var command = client.tools.createCommand(file);
         var soundCommand = await SoundCommands.findOne({ where: { command: command} });
         if (!soundCommand) {
           var mtime = fs.statSync('./resources/sound/' + file).mtime.getTime();
@@ -81,7 +81,7 @@ module.exports = {
       }
 
       sequelize.close();
-      client.getLogger().log('info', 'Database Initialized');
+      client.logger.log('info', 'Database Initialized');
       //
     }).catch(console.error);
   }

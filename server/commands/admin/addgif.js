@@ -8,8 +8,8 @@ module.exports = {
   execute (message, args, client) {
     if (client.commands.get(args[0])) return message.reply('That command name is already taken');
     if (!isValidUrl(args[1])) return message.reply('Please provide a valid URL');
-    client.getDbHelper().addGifCommand(args[0], args[1], new Date().getTime());
-    client.getCommandsLoader().addGifCommand(client, args[0], args[1]);
+    client.dbHelper.addGifCommand(args[0], args[1], new Date().getTime());
+    client.commandsLoader.addGifCommand(client, args[0], args[1]);
     message.delete().catch(err => console.log(err));
   }
 };

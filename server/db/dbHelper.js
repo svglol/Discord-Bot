@@ -1,29 +1,29 @@
 const {Users, UserSoundboard, UserMessage, UserConnection, GifCommands, SoundCommands} = require('./dbObjects.js');
 const Discord = require('discord.js');
 
-const dbInit = require('./dbInit.js');
-
 var usersCollection = new Discord.Collection();
 var userSoundboardCache = [];
 
 var dclient;
 
-module.exports = {
-  sync: async function (client) {
-    await dbInit.init(client);
+class DbHelper {
+  constructor (client) {
     dclient = client;
-    await syncUsersCollection();
-    await syncUserSoundboard();
-    client.getLogger().log('info', 'Synced Database to Cache');
-  },
-  addUser: async function (id) {
+    this.syncGuildUsers();
+    syncUsersCollection();
+    syncUserSoundboard();
+    client.logger.log('info', 'Synced Database to Cache');
+  }
+
+  async addUser (id) {
     var user = await Users.findOne({ where: {user_id: id} });
     if (!user) {
       user = await Users.create({user_id: id});
       await syncUsersCollection();
     }
-  },
-  addUserMessage: async function (message) {
+  }
+
+  async addUserMessage (message) {
     var user = await Users.findOne({ where: { user_id: message.author.id } });
     if (!user) {
       user = await Users.create({user_id: message.author.id});
@@ -32,16 +32,26 @@ module.exports = {
     var date = new Date();
     var userMessage = await user.addMessage(message.author.id, date.getTime());
     usersCollection.get(message.author.id).messages.push(userMessage);
-  },
-  getUserMessages: async function (id) {
+  }
+
+  async getUserMessages (id) {
     var messagesNorm = [];
     var user = usersCollection.get(id);
     if (user != null) {
       messagesNorm.push(user.messages);
     }
     return messagesNorm;
-  },
-  getUserMessageMonthlyRank: async function (id) {
+  }
+
+  async syncGuildUsers () {
+    for (const [key, guild] of dclient.guilds.cache.entries()) {
+      for (const [id, member] of guild.members.cache.entries()) {
+        await this.addUser(member.user.id);
+      }
+    }
+  }
+
+  async getUserMessageMonthlyRank (id) {
     var rank = 'N/A';
     var messages = 0;
     await this.getMonthlyUserMessagesTotals().then(async function (result) {
@@ -53,8 +63,9 @@ module.exports = {
       });
     });
     return {rank: rank, messages: messages};
-  },
-  getUserMessageAllTimeRank: async function (id) {
+  }
+
+  async getUserMessageAllTimeRank (id) {
     var rank = 'N/A';
     var messages = 0;
     await this.getAllTimeUserMessagesTotals().then(async function (result) {
@@ -66,8 +77,9 @@ module.exports = {
       });
     });
     return {rank: rank, messages: messages};
-  },
-  getMonthlyUserMessagesTotals: async function () {
+  }
+
+  async getMonthlyUserMessagesTotals () {
     var leaderboard = [];
     var date = new Date();
     var currentMonth = date.getMonth();
@@ -85,8 +97,9 @@ module.exports = {
       }
     }
     return sortMessagesLeaderboard(leaderboard);
-  },
-  getAllTimeUserMessagesTotals: async function () {
+  }
+
+  async getAllTimeUserMessagesTotals () {
     var leaderboard = [];
     for (const [key, user] of usersCollection.entries()) {
       var count = 0;
@@ -96,8 +109,9 @@ module.exports = {
       }
     }
     return sortMessagesLeaderboard(leaderboard);
-  },
-  updateUserLastConnection: async function (id, lastConnection) {
+  }
+
+  async updateUserLastConnection (id, lastConnection) {
     var user = await Users.findOne({ where: { user_id: id } });
     usersCollection.get(id).lastConnection = lastConnection;
     if (user != null) {
@@ -107,8 +121,9 @@ module.exports = {
       await Users.create({user_id: id, lastConnection: lastConnection});
       syncUsersCollection();
     }
-  },
-  addUserConnection: async function (id) {
+  }
+
+  async addUserConnection (id) {
     var user = await Users.findOne({ where: { user_id: id } });
     if (!user) {
       user = await Users.create({user_id: id});
@@ -124,8 +139,9 @@ module.exports = {
         connectionLength: userConnection.dataValues.connectionLength};
       usersCollection.get(id).connections.push(newConnection);
     }
-  },
-  addUserSoundboard: async function (id, command) {
+  }
+
+  async addUserSoundboard (id, command) {
     var user = await Users.findOne({ where: { user_id: id } });
     if (!user) {
       user = await Users.create({user_id: id});
@@ -135,24 +151,27 @@ module.exports = {
     var userSoundboard = await user.addSoundboard(id, date.getTime(), command);
     usersCollection.get(id).soundboards.push(userSoundboard);
     syncUserSoundboard();
-  },
-  getUserSoundboard: async function (id) {
+  }
+
+  async getUserSoundboard (id) {
     var messagesNorm = [];
     var user = usersCollection.get(id);
     if (user != null) {
       messagesNorm.push(user.soundboard);
     }
     return messagesNorm;
-  },
-  getUserConnections: async function (id) {
+  }
+
+  async getUserConnections (id) {
     var messagesNorm = [];
     var user = usersCollection.get(id);
     if (user != null) {
       messagesNorm.push(user.connections);
     }
     return messagesNorm;
-  },
-  getUserConnectionMonthlyRank: async function (id) {
+  }
+
+  async getUserConnectionMonthlyRank (id) {
     var rank = 'N/A';
     var time = '-';
     await this.getMonthlyUserConnectionsTotals().then(async function (result) {
@@ -164,8 +183,9 @@ module.exports = {
       });
     });
     return {rank: rank, time: time};
-  },
-  getUserConnectionAllTimeRank: async function (id) {
+  }
+
+  async getUserConnectionAllTimeRank (id) {
     var rank = 'N/A';
     var time = '-';
     await this.getAllTimeUserConnectionsTotals().then(async function (result) {
@@ -177,12 +197,14 @@ module.exports = {
       });
     });
     return {rank: rank, time: time};
-  },
-  getUser: async function (id) {
+  }
+
+  async getUser (id) {
     var user = await Users.findOne({ where: { user_id: id } });
     return user;
-  },
-  getCurrentConnectionLength: async function (id) {
+  }
+
+  async getCurrentConnectionLength (id) {
     var total = 0;
     var user = usersCollection.get(id);
     if (user != null) {
@@ -191,8 +213,9 @@ module.exports = {
       total = date.getTime() - user.lastConnection;
     }
     return total;
-  },
-  getMonthlyUserConnectionsTotals: async function () {
+  }
+
+  async getMonthlyUserConnectionsTotals () {
     var leaderboard = [];
 
     var date = new Date();
@@ -215,8 +238,9 @@ module.exports = {
       }
     }
     return sortConnectionsLeaderboard(leaderboard);
-  },
-  getAllTimeUserConnectionsTotals: async function () {
+  }
+
+  async getAllTimeUserConnectionsTotals () {
     var leaderboard = [];
 
     for (const [key, user] of usersCollection.entries()) {
@@ -232,8 +256,9 @@ module.exports = {
       }
     }
     return sortConnectionsLeaderboard(leaderboard);
-  },
-  getAllTimeSoundboardTotals: async function () {
+  }
+
+  async getAllTimeSoundboardTotals () {
     var soundboardUsage = userSoundboardCache;
     var leaderboard = [];
     for (const userSoundboard of soundboardUsage) {
@@ -245,8 +270,9 @@ module.exports = {
       }
     }
     return sortSoundboardUsageLeaderboard(leaderboard);
-  },
-  getMonthlySoundboardTotals: async function () {
+  }
+
+  async getMonthlySoundboardTotals () {
     var soundboardUsage = userSoundboardCache;
     var leaderboard = [];
 
@@ -266,83 +292,87 @@ module.exports = {
       }
     }
     return sortSoundboardUsageLeaderboard(leaderboard);
-  },
-  syncGuildUsers: async function (client) {
-    for (const [key, guild] of client.guilds.cache.entries()) {
-      for (const [id, member] of guild.members.cache.entries()) {
-        await this.addUser(member.user.id);
-      }
-    }
-    await syncUsersCollection();
-  },
-  setSoundCommandVolume: async function (command, volume) {
+  }
+
+  async setSoundCommandVolume (command, volume) {
     var soundCommand = await SoundCommands.findOne({ where: {command: command} });
     if (soundCommand) {
       soundCommand.volume = volume;
       soundCommand.save();
     }
-  },
-  addGifCommand: async function (command, link, date) {
+  }
+
+  async addGifCommand (command, link, date) {
     var gifCommand = await GifCommands.findOne({ where: {command: command} });
     if (!gifCommand) {
       gifCommand = await GifCommands.create({command: command, link: link, date: date});
     }
     return gifCommand;
-  },
-  getGifCommands: async function () {
+  }
+
+  async getGifCommands () {
     return GifCommands.findAll();
-  },
-  getUsers: function () {
+  }
+
+  getUsers () {
     return usersCollection;
-  },
-  addUserIntro: async function (id, link) {
+  }
+
+  async addUserIntro (id, link) {
     var user = await Users.findOne({ where: { user_id: id } });
     if (user != null) {
       user.intro = link;
       await user.save();
     }
     usersCollection.get(id).intro = link;
-  },
-  addUserExit: async function (id, link) {
+  }
+
+  async addUserExit (id, link) {
     var user = await Users.findOne({ where: { user_id: id } });
     if (user != null) {
       user.exit = link;
       await user.save();
     }
     usersCollection.get(id).exit = link;
-  },
-  getSoundCommands: async function () {
+  }
+
+  async getSoundCommands () {
     return SoundCommands.findAll();
-  },
-  addSoundCommand: async function (command, file, volume, date) {
+  }
+
+  async addSoundCommand (command, file, volume, date) {
     var soundCommand = await SoundCommands.findOne({ where: {command: command} });
     if (!soundCommand) {
       soundCommand = await SoundCommands.create({command: command, file: file, volume: volume, date: date});
     }
     return soundCommand;
-  },
-  deleteSoundCommand: async function (command) {
+  }
+
+  async deleteSoundCommand (command) {
     var soundCommand = await SoundCommands.findOne({ where: {command: command} });
     await soundCommand.destroy();
-  },
-  deleteGifCommand: async function (command) {
+  }
+
+  async deleteGifCommand (command) {
     var gifCommand = await GifCommands.findOne({ where: {command: command} });
     await gifCommand.destroy();
-  },
-  editGifCommand: async function (id, command, link) {
+  }
+
+  async editGifCommand (id, command, link) {
     var gifCommand = await GifCommands.findOne({ where: {id: id} });
     gifCommand.command = command;
     gifCommand.link = link;
     gifCommand.save();
-  },
-  editSoundCommand: async function (id, command, file, volume) {
+  }
+
+  async editSoundCommand (id, command, file, volume) {
     var soundCommand = await SoundCommands.findOne({ where: {id: id} });
     soundCommand.command = command;
     soundCommand.volume = volume;
     soundCommand.file = file;
     soundCommand.save();
   }
-};
+}
 
 function sortMessagesLeaderboard (leaderboard) {
   leaderboard.sort(function (a, b) {
@@ -429,3 +459,5 @@ async function syncUsersCollection () {
     usersCollection.set(user.dataValues.user_id, newUser);
   }
 }
+
+module.exports = DbHelper;

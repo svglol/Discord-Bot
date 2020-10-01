@@ -6,9 +6,9 @@ module.exports = {
   numArgs: 2,
   usage: '<userid> <link>',
   execute (message, args, client) {
-    if (!client.getDbHelper().getUsers().get(args[0])) return message.reply('That user doesnt exist');
+    if (!client.dbHelper.getUsers().get(args[0])) return message.reply('That user doesnt exist');
     if (!isValidUrl(args[1])) return message.reply('Please provide a valid URL');
-    client.getDbHelper().addUserExit(args[0], args[1]);
+    client.dbHelper.addUserExit(args[0], args[1]);
     message.delete().catch(err => console.log(err));
   }
 };

@@ -24,7 +24,7 @@ module.exports = {
     var date = new Date();
     var startTime = date.getTime();
     client = cClient;
-    tools = client.getTools();
+    tools = client.tools;
     guild = message.guild;
 
     loadLeaderboards(client).then(function () {
@@ -91,7 +91,7 @@ module.exports = {
           msg.reactions.removeAll();
         });
       });
-      client.getLogger().log('info', 'Leaderboard Command executed in ' + client.getTools().calculateExecutionTime(startTime) + 'ms');
+      client.logger.log('info', 'Leaderboard Command executed in ' + client.tools.calculateExecutionTime(startTime) + 'ms');
     });
   }
 };
@@ -278,27 +278,27 @@ function generateLeaderboardEmbeds (lifetime) {
 }
 
 async function loadLeaderboards (client) {
-  await client.getDbHelper().getAllTimeUserMessagesTotals().then(function (result) {
+  await client.dbHelper.getAllTimeUserMessagesTotals().then(function (result) {
     userChatMessages = result;
   });
 
-  await client.getDbHelper().getMonthlyUserMessagesTotals().then(function (result) {
+  await client.dbHelper.getMonthlyUserMessagesTotals().then(function (result) {
     monthlyUserChatMessages = result;
   });
 
-  await client.getDbHelper().getAllTimeUserConnectionsTotals().then(function (result) {
+  await client.dbHelper.getAllTimeUserConnectionsTotals().then(function (result) {
     totalConnectionTime = result;
   });
 
-  await client.getDbHelper().getMonthlyUserConnectionsTotals().then(function (result) {
+  await client.dbHelper.getMonthlyUserConnectionsTotals().then(function (result) {
     monthlyConnectionTime = result;
   });
 
-  await client.getDbHelper().getMonthlySoundboardTotals().then(function (result) {
+  await client.dbHelper.getMonthlySoundboardTotals().then(function (result) {
     monthlySoundboardUsage = result;
   });
 
-  await client.getDbHelper().getAllTimeSoundboardTotals().then(function (result) {
+  await client.dbHelper.getAllTimeSoundboardTotals().then(function (result) {
     soundboardUsage = result;
   });
 }

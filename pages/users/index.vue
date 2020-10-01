@@ -9,7 +9,6 @@
       default-sort="userid"
       default-sort-direction="desc"
       style="padding-top:1rem;padding-bottom:1rem"
-      @dblclick="openUser"
     >
       <b-table-column
         v-slot="props"
@@ -104,6 +103,11 @@ export default {
     return {
       selected: {}
     };
+  },
+  watch: {
+    selected () {
+      this.openUser();
+    }
   },
   asyncData () {
     return axios.get('/api/users').then(res => {

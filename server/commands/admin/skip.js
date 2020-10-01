@@ -4,6 +4,6 @@ module.exports = {
   adminOnly: true,
   guildOnly: true,
   execute (message, args, client) {
-    client.getSound().skip(message);
+    client.soundManager.skip(message);
   }
 };
