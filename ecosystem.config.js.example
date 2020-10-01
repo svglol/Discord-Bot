@@ -9,8 +9,7 @@ module.exports = {
       NODE_ENV: "dev",
       TOKEN: "",
       PORT: 3000,
-      PREFIX: ".",
-      COOLDOWN: 300000
+      PREFIX: "."
     }
   }]
 }
