@@ -457,7 +457,7 @@ async function syncUsersCollection () {
       newSoundboards.push(newSoundboard);
     });
     var username = '';
-    var duser = dclient.users.cache.get(user.dataValues.user_id);
+    let duser = await dclient.users.fetch(user.dataValues.user_id);
     if (duser !== undefined) {
       username = duser.username;
     }
