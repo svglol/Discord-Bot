@@ -6,7 +6,7 @@ module.exports = {
     message.delete().catch(err => console.log(err));
     message.author.send(new Date().toTimeString(), {
       files: [
-        './database.sqlite'
+        './resources/database.sqlite'
       ]
     });
   }

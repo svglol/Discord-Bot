@@ -4,7 +4,7 @@ module.exports = {
     script: 'server/server.js',
     watch_delay: 1000,
     watch: ['server/server.js','server/commands','server/db','server/lib','server/api'],
-    ignore_watch:['database.sqlite','*.sqlite-journal','*.log','.git'],
+    ignore_watch:['database.sqlite','*.sqlite-journal','*.log','.git','/resources/database.sqlite'],
     env: {
       NODE_ENV: "dev",
       TOKEN: "",

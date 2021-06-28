@@ -7,7 +7,7 @@ module.exports = {
       host: 'localhost',
       dialect: 'sqlite',
       logging: false,
-      storage: 'database.sqlite'
+      storage: 'resources/database.sqlite'
     });
 
     sequelize.import('models/Users');

@@ -93,3 +93,4 @@ sw.*
 ecosystem.config.js
 /resources
 database.sqlite
+/resources/database.sqlite
