@@ -1,0 +1,46 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "server: discordbot",
+        "type": "node",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/bot",
+        "runtimeExecutable": "npm",
+        "runtimeArgs": [
+          "run-script",
+          "start"
+        ]
+      },
+      {
+        "name": "server: nuxt",
+        "type": "node",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/front",
+        "runtimeExecutable": "npm",
+        "runtimeArgs": [
+          "run-script",
+          "dev"
+        ]
+      },
+      {
+        "type": "chrome",
+        "request": "launch",
+        "name": "client: chrome",
+        "url": "http://localhost:3000",
+        "webRoot": "${workspaceFolder}",
+        "sourceMapPathOverrides": {
+          "webpack:///*": "${workspaceRoot}/*"
+        }
+      },
+    ],
+    "compounds": [
+        {
+          "name": "All",
+          "configurations": ["server: discordbot", "server: nuxt", "client: chrome"]
+        }
+      ]
+}
