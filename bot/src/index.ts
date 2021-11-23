@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-dotenv.config({ path: __dirname+'/.env' });
+dotenv.config();
 import Discord = require('discord.js');
 import { Collection, Intents } from 'discord.js';
 import Keyv = require('keyv');

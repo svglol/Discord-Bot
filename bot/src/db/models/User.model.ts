@@ -29,12 +29,6 @@ export default class User extends Model {
 			@Column
 				exit: string;
 
-			@Column({
-				type: DataTypes.BOOLEAN,
-				defaultValue: false
-			})
-				adminPermission: boolean;
-
 	@HasMany(() => Connection,{as: 'connections', foreignKey : 'userId'})
 		connections: Connection[];
 

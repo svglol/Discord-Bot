@@ -1,13 +1,12 @@
 import { BotClient, BotDeployCommands } from '../types';
-
 import * as dotenv from 'dotenv';
-dotenv.config({ path: __dirname+'./.env' });
+dotenv.config();
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 const clientId = process.env.CLIENTID;
 const token = process.env.TOKEN;
 import {ApplicationCommandPermissionData} from 'discord.js';
-
+import { Permissions } from 'discord.js';
 export class DeployCommands implements BotDeployCommands{
 
 	client: BotClient;
@@ -29,21 +28,21 @@ export class DeployCommands implements BotDeployCommands{
 				.then(async () => {
 					console.log('Successfully registered application commands.');
 
-					let adminUsers = await this.client.db.getUsers();
-					adminUsers = adminUsers.filter(user => (user.adminPermission));
-
 					const commands = await this.client.guilds.cache.get(guild.id)?.commands.fetch();
+					const members = await this.client.guilds.cache.get(guild.id)?.members.fetch();
 					commands.forEach(command => {
 						this.client.commands.forEach(baseCommand => {
 							if(command.name === baseCommand.data.name){
 								if(baseCommand.adminOnly){
-									adminUsers.forEach(async (admin) => {
-										const permissions : ApplicationCommandPermissionData[] = [{
-											id: admin.id,
-											type: 'USER',
-											permission: true
-										}];
-										await command.permissions.add({permissions});
+									members.forEach(async (member) => {
+										if(member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)){
+											const permissions : ApplicationCommandPermissionData[] = [{
+												id: member.id,
+												type: 'USER',
+												permission: true
+											}];
+											await command.permissions.add({permissions});
+										}
 									});
 								}
 							}
