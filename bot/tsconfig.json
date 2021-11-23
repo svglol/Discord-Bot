@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "types": ["node"],
+        "typeRoots": ["node_modules/@types"],
+        "module": "commonjs",
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "removeComments": true,
+        "skipLibCheck": true,
+        "noImplicitThis": true,
+        "moduleResolution": "node",
+        "sourceRoot": "src",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "noImplicitReturns": false,
+        "strictNullChecks":false,
+        "sourceMap": true
+    },
+    "include": [
+        "src"
+    ],
+    "exclude": [
+        "dist",
+        "node_modules"
+    ]
+} 

@@ -6,13 +6,13 @@ module.exports = {
 		'node': true
 	},
 	'extends': [
-		'eslint:recommended',
+		'eslint:recommended','plugin:@typescript-eslint/recommended'
 	],
 	'parser': '@typescript-eslint/parser',
 	'parserOptions': {
 		'ecmaVersion': 13
 	},
-	'plugins': [
+	'plugins': ['@typescript-eslint'
 	],
 	'rules': {
 		'indent': [
@@ -30,6 +30,8 @@ module.exports = {
 		'semi': [
 			'error',
 			'always'
-		]
+		],
+		'@typescript-eslint/no-unused-vars': 'error',
+		'no-var': 'error'
 	}
 };
