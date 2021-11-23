@@ -460,10 +460,9 @@ function generateLeaderboardEmbed(title, users, interaction, type) {
 		.setColor('#0099ff');
 
 	const rows = [];
-	switch (type) {
-	case 'voice':
+	if(type === 'voice'){
 		rows.push(['#', 'Name', 'Time']);
-		var voiceRanks = [];
+		let voiceRanks = [];
 		users.forEach(user => {
 			let length = 0;
 			user.connections.forEach(connection => { length += connection.connectionLength; });
@@ -492,10 +491,9 @@ function generateLeaderboardEmbed(title, users, interaction, type) {
 			}
 			rows.push([(index + 1).toString(), username, parseMillisecondsIntoReadableTime(element.total)]);
 		});
-		break;
-	case 'messages':
+	} else if(type === 'messages'){
 		rows.push(['#', 'Name', 'Messages']);
-		var messageRanks = [];
+		let messageRanks = [];
 		users.forEach(user => {
 			if (user.messages.length !== 0) {
 				messageRanks.push({ id: user.id, total: user.messages.length });
@@ -522,11 +520,10 @@ function generateLeaderboardEmbed(title, users, interaction, type) {
 			}
 			rows.push([(index + 1).toString(), username, element.total]);
 		});
-
-		break;
-	case 'sound':
+	}
+	else if (type === 'sound'){
 		rows.push(['#', 'Name', 'Uses']);
-		var soundRanks = [];
+		let soundRanks = [];
 		users.forEach(user => {
 			if (user.soundboards.length !== 0) {
 				soundRanks.push({ id: user.id, total: user.soundboards.length });
@@ -553,12 +550,9 @@ function generateLeaderboardEmbed(title, users, interaction, type) {
 			}
 			rows.push([(index + 1).toString(), username, element.total]);
 		});
-		break;
 	}
 	embed.setDescription(generateTable(rows));
-
 	return embed;
-
 }
 
 function generateTable(rows) {
