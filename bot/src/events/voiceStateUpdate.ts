@@ -5,7 +5,8 @@ const lastUsedExitArray = [];
 
 export default{
 	name: 'voiceStateUpdate',
-	async execute(oldMember, newMember, client) {
+	async execute(oldMember, newMember) {
+		const client = oldMember.client;
 
 		//stats collection
 		const newUserChannel = newMember.channel;
