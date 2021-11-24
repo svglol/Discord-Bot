@@ -29,15 +29,15 @@ export default class User extends Model {
 			@Column
 				exit: string;
 
-	@HasMany(() => Connection,{as: 'connections', foreignKey : 'userId'})
-		connections: Connection[];
+			@HasMany(() => Connection)
+				connections: Connection[];
 
-	@HasMany(() => Message, {as: 'messages', foreignKey : 'userId'})
+	@HasMany(() => Message)
 		messages: Message[];
 
-	@HasMany(() => Quote,{as: 'quotes', foreignKey : 'userId'})
+	@HasMany(() => Quote)
 		quotes: Quote[];
 
-	@HasMany(() => Soundboard,{as: 'soundboards', foreignKey : 'userId'})
+	@HasMany(() => Soundboard)
 		soundboards: Soundboard[];
 }
