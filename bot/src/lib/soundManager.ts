@@ -1,6 +1,6 @@
-const { createReadStream } = require('fs');
-const { createAudioPlayer, createAudioResource, joinVoiceChannel, AudioPlayerStatus, StreamType } = require('@discordjs/voice');
-const ytdl = require('ytdl-core');
+import { createReadStream } from 'fs';
+import { createAudioPlayer, createAudioResource, joinVoiceChannel, AudioPlayerStatus, StreamType } from '@discordjs/voice';
+import ytdl = require('ytdl-core');
 const player = createAudioPlayer();
 let connection;
 import { BotClient, BotSoundManager } from '../types';
@@ -13,7 +13,7 @@ export class SoundManager implements BotSoundManager{
 		this.resources = [];
 
 		player.on('error', error => {
-			console.error(`Error: ${error.message} with resource ${error.resource.metadata.title}`);
+			console.error(`Error: ${error.message} with resource ${error.resource}`);
 			if (this.resources.length === 0) {
 				if (connection !== undefined) {
 					connection.destroy();
@@ -67,7 +67,7 @@ export class SoundManager implements BotSoundManager{
 		const soundCommand = await this.client.db.getSoundCommand(commandName);
 		if (soundCommand === undefined || soundCommand === null) {
 			//no command found
-			await interaction.editReply('Sound command not found "' + commandName + '"');
+			await interaction.editReply(`Sound command not found ${commandName}`);
 			return;
 		}
 
