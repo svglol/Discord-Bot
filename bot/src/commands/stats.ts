@@ -395,7 +395,7 @@ function generateUserEmbed(title, user, users, interaction) {
 
 	//most used sound commands
 	let userSoundboardUsage = [];
-	user.user_soundboards.forEach(userSoundboard => {
+	user.soundboards.forEach(userSoundboard => {
 		let created = false;
 		userSoundboardUsage.forEach(used => {
 			if (used.command === userSoundboard.command) {
