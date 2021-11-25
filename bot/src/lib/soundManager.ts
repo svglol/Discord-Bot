@@ -1,13 +1,13 @@
 import { createReadStream } from 'fs';
-import { createAudioPlayer, createAudioResource, joinVoiceChannel, AudioPlayerStatus, StreamType } from '@discordjs/voice';
+import { createAudioPlayer, createAudioResource, joinVoiceChannel, AudioPlayerStatus, StreamType, VoiceConnection } from '@discordjs/voice';
 import ytdl = require('ytdl-core');
 const player = createAudioPlayer();
-let connection;
-import { BotClient, BotSoundManager } from '../types';
+import { BotAudioResource, BotClient, BotSoundManager } from '../types';
 
 export class SoundManager implements BotSoundManager{
 	client: BotClient;
-	resources: any[];
+	resources: BotAudioResource[];
+	connection: VoiceConnection;
 	constructor(discordClient) {
 		this.client = discordClient;
 		this.resources = [];
@@ -15,9 +15,9 @@ export class SoundManager implements BotSoundManager{
 		player.on('error', error => {
 			console.error(`Error: ${error.message} with resource ${error.resource}`);
 			if (this.resources.length === 0) {
-				if (connection !== undefined) {
-					connection.destroy();
-					connection = undefined;
+				if (this.connection !== undefined) {
+					this.connection.destroy();
+					this.connection = undefined;
 				}
 			}
 			else {
@@ -27,9 +27,9 @@ export class SoundManager implements BotSoundManager{
 
 		player.on(AudioPlayerStatus.Idle, () => {
 			if (this.resources.length === 0) {
-				if (connection !== undefined) {
-					connection.destroy();
-					connection = undefined;
+				if (this.connection !== undefined) {
+					this.connection.destroy();
+					this.connection = undefined;
 				}
 			}
 			else {
@@ -72,10 +72,10 @@ export class SoundManager implements BotSoundManager{
 		}
 
 
-		const resource = { interaction, voiceChannel, guildId, audioResource: createAudioResource(createReadStream(soundCommand.file), { inputType: StreamType.Arbitrary, inlineVolume: true }), commandName };
+		const resource : BotAudioResource = { interaction, voiceChannel, guildId, audioResource: createAudioResource(createReadStream(soundCommand.file), { inputType: StreamType.Arbitrary, inlineVolume: true }), commandName };
 		resource.audioResource.volume.setVolume(soundCommand.volume);
 		this.resources.push(resource);
-		if (connection == undefined) {
+		if (this.connection == undefined) {
 			this.play();
 		}
 	}
@@ -105,17 +105,25 @@ export class SoundManager implements BotSoundManager{
 		const ytStream = ytdl(url, { filter: 'audioonly' });
 		
 		const info = await ytdl.getInfo(url);
-		const resource = { interaction, voiceChannel, guildId, audioResource: createAudioResource(ytStream, { inputType: StreamType.Arbitrary, inlineVolume: true }), commandName: undefined, url, title: info.videoDetails.title };
+		const resource : BotAudioResource = { interaction, voiceChannel, guildId, audioResource: createAudioResource(ytStream, { inputType: StreamType.Arbitrary, inlineVolume: true }), commandName: undefined, url, title: info.videoDetails.title };
 		resource.audioResource.volume.setVolume(0.3);
 		this.resources.push(resource);
-		if (connection == undefined) {
+		if (this.connection == undefined) {
 			this.play();
 		}
 	}
 
 	async queueApi(commandName, channelId, guildId) {
 		const guild = await this.client.guilds.cache.get(guildId);
-		const voiceChannel = await guild.channels.cache.get(channelId);
+		let voiceChannel;
+
+		guild.channels.cache.forEach(channel => {
+			if (channel.type === 'GUILD_VOICE') {
+				if(channel.id == channelId){
+					voiceChannel = channel;
+				}
+			}
+		});
 
 		//getting sound command
 		const soundCommand = await this.client.db.getSoundCommand(commandName);
@@ -124,10 +132,10 @@ export class SoundManager implements BotSoundManager{
 			console.log('Sound command not found');
 			return;
 		}
-		const resource = { interaction: undefined, voiceChannel, guildId, audioResource: createAudioResource(createReadStream(soundCommand.file), { inputType: StreamType.Arbitrary, inlineVolume: true }), commandName };
+		const resource : BotAudioResource = { interaction: undefined, voiceChannel, guildId, audioResource: createAudioResource(createReadStream(soundCommand.file), { inputType: StreamType.Arbitrary, inlineVolume: true }), commandName };
 		resource.audioResource.volume.setVolume(soundCommand.volume);
 		this.resources.push(resource);
-		if (connection == undefined) {
+		if (this.connection == undefined) {
 			this.play();
 		}
 	}
@@ -135,13 +143,13 @@ export class SoundManager implements BotSoundManager{
 	play() {
 		const [resource] = this.resources;
 
-		connection = joinVoiceChannel({
+		this.connection = joinVoiceChannel({
 			channelId: resource.voiceChannel.id,
 			guildId: resource.guildId,
 			adapterCreator: resource.voiceChannel.guild.voiceAdapterCreator,
 		});
 
-		connection.subscribe(player);
+		this.connection.subscribe(player);
 
 		player.play(resource.audioResource);
 
@@ -162,7 +170,7 @@ export class SoundManager implements BotSoundManager{
 
 
 	stop() {
-		if (connection !== undefined) {
+		if (this.connection !== undefined) {
 			this.resources.forEach(resource => {
 				if (resource.interaction !== undefined) {
 					try {
@@ -173,15 +181,15 @@ export class SoundManager implements BotSoundManager{
 				}
 			});
 			this.resources = [];
-			if (connection !== undefined) {
-				connection.destroy();
-				connection = undefined;
+			if (this.connection !== undefined) {
+				this.connection.destroy();
+				this.connection = undefined;
 			}
 		}
 	}
 
 	skip() {
-		if (connection !== undefined) {
+		if (this.connection !== undefined) {
 			const [resource] = this.resources;
 			if (resource.interaction !== undefined) {
 				try {
@@ -192,6 +200,12 @@ export class SoundManager implements BotSoundManager{
 			}
 			this.resources.shift();
 			player.stop();
+		}
+	}
+
+	pause(){
+		if (this.connection !== undefined) {
+			player.pause();
 		}
 	}
 }

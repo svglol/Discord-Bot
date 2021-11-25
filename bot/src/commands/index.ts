@@ -10,6 +10,7 @@ import skip from './skip';
 import stats from './stats';
 import stop from './stop';
 import text from './text';
+import keyboardCheck from './keyboardCheck';
 
 export {
 	clear,
@@ -23,5 +24,6 @@ export {
 	skip,
 	stats,
 	stop,
-	text
+	text,
+	keyboardCheck
 };
