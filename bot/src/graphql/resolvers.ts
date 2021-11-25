@@ -1,5 +1,3 @@
-//TODO update all of these
-
 import fs = require('fs');
 import { GraphQLUpload } from 'graphql-upload';
 import { finished } from 'stream/promises';
