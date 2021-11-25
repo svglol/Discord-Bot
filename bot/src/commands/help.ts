@@ -65,7 +65,7 @@ export default{
 
 async function generateTextEmbed() {
 	textEmbed = new MessageEmbed()
-		.setTitle(':frame_photo: Text Options')
+		.setTitle(':newspaper: Text Options')
 		.setColor('#0099ff');
 
 	const textCommands = await client.db.getTextCommands();
