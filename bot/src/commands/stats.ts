@@ -1,15 +1,19 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
+import { CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { BotCommand } from '../types';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('stats')
-		.setDescription('Stats')
+		.setDescription('Gets stats about user/server/leaderboard')
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('user')
-				.setDescription('Info about user'))
+				.setDescription('Info about @user')
+				.addUserOption(option =>
+					option.setName('user')
+						.setDescription('User to get stats for')
+						.setRequired(true)))
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('server')
@@ -22,7 +26,8 @@ export default {
 	async execute(interaction) {
 		await interaction.deferReply();
 		if (interaction.options._subcommand === 'user') {
-			const user = await interaction.client.db.getUser(interaction.member.id);
+			const userId = interaction.options._hoistedOptions[0].value;
+			const user = await interaction.client.db.getUser(userId);
 			const users = await interaction.client.db.getUsers();
 
 			const allEmbed = await generateUserAllEmbed(user, users, interaction);
@@ -242,9 +247,10 @@ async function generateUserYearEmbed(_user, _users, interaction) {
 }
 
 function generateServerEmbed(title, users, interaction) {
+	const icon = interaction.guild.iconURL({size: 1024, dynamic: true});
 	const embed = new MessageEmbed()
 		.setTitle(title)
-		.setAuthor(interaction.guild.name)
+		.setAuthor(interaction.guild.name, icon)
 		.setColor('#0099ff');
 
 	let totalMessages = '';
@@ -313,19 +319,21 @@ function generateServerYearEmbed(_users, interaction) {
 	return generateServerEmbed('Last 365 Days Stats', users, interaction);
 }
 
-function generateUserEmbed(title, user, users, interaction) {
+async function generateUserEmbed(title, user, users, interaction : CommandInteraction) {
+	const user_ = interaction.client.users.cache.get(user.id);
+	const avatar = user_.displayAvatarURL({size: 1024, dynamic: true});
 	const embed = new MessageEmbed()
 		.setTitle(title)
-		.setAuthor(interaction.user.tag, interaction.user.avatarURL)
+		.setAuthor(user_.username,avatar)
 		.setColor('#0099ff');
 
 	const totalMessages = String(user.messages.length);
-	let totalConnection = '';
+	let totalConnection = '-';
 	const totalSoundboard = String(user.soundboards.length);
-	let totalMessagesPos = '';
-	let totalConnectionPos = '';
-	let totalSoundboardPos = '';
-	let mostUsedCommands = '';
+	let totalMessagesPos = '-';
+	let totalConnectionPos = '-';
+	let totalSoundboardPos = '-';
+	let mostUsedCommands = '-';
 
 	let length = 0;
 	user.connections.forEach(connection => { length += connection.connectionLength; });
@@ -453,10 +461,11 @@ function parseMillisecondsIntoReadableTime(millisec : number) {
 	return minutes + ':' + seconds;
 }
 
-function generateLeaderboardEmbed(title, users, interaction, type) {
+function generateLeaderboardEmbed(title, users, interaction : CommandInteraction, type) {
+	const icon = interaction.guild.iconURL({size: 1024, dynamic: true});
 	const embed = new MessageEmbed()
 		.setTitle(title)
-		.setAuthor(interaction.guild.name)
+		.setAuthor(interaction.guild.name, icon)
 		.setColor('#0099ff');
 
 	const rows = [];
