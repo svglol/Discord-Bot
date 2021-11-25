@@ -27,13 +27,13 @@ export = {
 	Query: {
 		user: (parent, { id }, { db }) => db.getUser(id),
 		users: (parent, args, { db }) => db.getUsers(),
-		soundCommand: (parent, { id }, { db }) => db.sound_commands.findByPk(id),
-		soundCommands: (parent, args, { db }) => db.sound_commands.findAll(),
-		textCommands: (parent, args, { db }) => db.text_commands.findAll(),
-		textCommand: (parent, { id }, { db }) => db.text_commands.findByPk(id),
-		userMessages: (parent, args, { db }) => db.user_message.findAll(),
-		userConnections: (parent, args, { db }) => db.user_connection.findAll(),
-		userSoundboards: (parent, args, { db }) => db.user_soundboard.findAll(),
+		soundCommand: (parent, { id }, { db }) => db.sequelize.models.SoundCommand.findByPk(id),
+		soundCommands: (parent, args, { db }) => db.sequelize.models.SoundCommand.findAll(),
+		textCommands: (parent, args, { db }) => db.sequelize.models.TextCommand.findAll(),
+		textCommand: (parent, { id }, { db }) =>  db.sequelize.models.TextCommand.findAll().findByPk(id),
+		userMessages: (parent, args, { db }) =>  db.sequelize.models.Message.findAll(),
+		userConnections: (parent, args, { db }) =>  db.sequelize.models.Connection.findAll(),
+		userSoundboards: (parent, args, { db }) =>  db.sequelize.models.Soundboard.findAll(),
 		bot: (parent, args, { client }) => {
 			let totalUsers = 0;
 			let onlineUsers = 0;
@@ -56,7 +56,7 @@ export = {
 			return guild.channels.cache.filter(c => c.type === 'GUILD_TEXT');
 		},
 		soundCommandFileExists: (parent, { id }, { db }) => {
-			return db.sound_commands.findByPk(id).then((result) => {
+			return  db.sequelize.models.SoundCommand.findByPk(id).then((result) => {
 				if (fs.existsSync(result.file)) {
 					return true;
 				}
@@ -64,7 +64,7 @@ export = {
 			});
 		},
 		soundCommandFile: (parent, { id }, { db }) => {
-			return db.sound_commands.findByPk(id).then((result) => {
+			return db.sequelize.models.SoundCommand.findByPk(id).then((result) => {
 				const file = result.file;
 				const data = fs.readFileSync(file);
 				return data.toString('base64');
@@ -111,7 +111,7 @@ export = {
 			return 'sound queued';
 		},
 		updateUser: (parent, { id, intro, exit, adminPermission }, { db }) => {
-			return db.user.update(
+			return db.sequelize.models.Users.update(
 				{
 					intro: intro,
 					exit: exit,
@@ -125,7 +125,7 @@ export = {
 			);
 		},
 		deleteTextCommand: (parent, { id }, { db, client }) => {
-			return db.text_commands.destroy({
+			return db.sequelize.models.TextCommand.destroy({
 				where: {
 					id: id
 				}
@@ -135,7 +135,7 @@ export = {
 			});
 		},
 		updateTextCommand: (parent, { id, command, link }, { db, client }) => {
-			return db.text_commands.update(
+			return db.sequelize.models.TextCommand.update(
 				{
 					command: command,
 					link: link
@@ -147,11 +147,11 @@ export = {
 				}
 			).then(() => {
 				client.loadCommands();
-				return db.text_commands.findByPk(id);
+				return db.sequelize.models.TextCommand.findByPk(id);
 			});
 		},
 		addTextCommand: (parent, { command, link, date }, { db, client }) => {
-			return db.text_commands.create({
+			return db.sequelize.models.TextCommand.create({
 				command: command,
 				link: link,
 				date: date
@@ -161,7 +161,7 @@ export = {
 			});
 		},
 		deleteSoundCommand: async (parent, { id }, { db, client }) => {
-			await db.sound_commands.findByPk(id).then(result => {
+			await db.sequelize.models.SoundCommand.findByPk(id).then(result => {
 				try {
 					fs.unlinkSync(result.file);
 				}
@@ -169,7 +169,7 @@ export = {
 					console.log(error);
 				}
 			});
-			return db.sound_commands.destroy({
+			return db.sequelize.models.SoundCommand.destroy({
 				where: {
 					id: id
 				}
@@ -185,7 +185,7 @@ export = {
 			const out = fs.createWriteStream(path);
 			stream.pipe(out);
 			await finished(out);
-			return db.sound_commands.create({
+			return db.sequelize.models.SoundCommand.create({
 				command: command,
 				file: path,
 				volume: volume,
@@ -209,7 +209,7 @@ export = {
 			// 	stream.pipe(out);
 			// 	await finished(out);
 			// }
-			return db.sound_commands.update(
+			return db.sequelize.models.SoundCommand.update(
 				{
 					command: command,
 					// file: path,
@@ -222,7 +222,7 @@ export = {
 				}
 			).then(() => {
 				client.loadCommands();
-				return db.sound_commands.findByPk(id);
+				return db.sequelize.models.SoundCommand.findByPk(id);
 			});
 
 		},
