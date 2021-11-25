@@ -60,8 +60,8 @@ export default {
 
 		const dennyResource : BotAudioResource = { interaction: undefined, voiceChannel: voiceChannel2, guildId, audioResource: createAudioResource(createReadStream('./denny.wav'), { inputType: StreamType.Arbitrary, inlineVolume: true }), commandName: undefined, title: 'Denny'};
 		const keyboardCheckResource : BotAudioResource = { interaction: undefined, voiceChannel, guildId, audioResource: createAudioResource(createReadStream('./keyboard_check.wav'), { inputType: StreamType.Arbitrary, inlineVolume: true }), commandName: undefined, title: 'Keyboard Check'};
-		keyboardCheckResource.audioResource.volume.setVolume(.1);
-		dennyResource.audioResource.volume.setVolume(.1);
+		keyboardCheckResource.audioResource.volume.setVolume(0.3);
+		dennyResource.audioResource.volume.setVolume(0.3);
 		
 		if(newResource != undefined){
 			client.soundManager.resources.unshift(newResource);
