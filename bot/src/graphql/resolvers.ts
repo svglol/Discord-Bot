@@ -105,7 +105,7 @@ export = {
 		},
 		play: (parent, { command, channel, server }, { client }) => {
 			command = command.replace(/['"]+/g, '');
-			client.soundManager.queueApi(command, client.channels.cache.get(channel).id, server);
+			client.soundManager.queue(null,command,null,client.channels.cache.get(channel).id,server);
 			return 'sound queued';
 		},
 		updateUser: (parent, { id, intro, exit, adminPermission }, { db }) => {

@@ -6,7 +6,7 @@ module.exports = {
 		'node': true
 	},
 	'extends': [
-		'eslint:recommended','plugin:@typescript-eslint/recommended'
+		'eslint:recommended', 'plugin:@typescript-eslint/recommended'
 	],
 	'parser': '@typescript-eslint/parser',
 	'parserOptions': {
@@ -32,6 +32,6 @@ module.exports = {
 			'always'
 		],
 		'@typescript-eslint/no-unused-vars': 'error',
-		'no-var': 'error'
+		'no-var': 'error',
 	}
 };

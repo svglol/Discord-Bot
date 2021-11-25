@@ -23,7 +23,7 @@ export default {
 				.setName('leaderboard')
 				.setDescription('Server leaderboard')),
 
-	async execute(interaction) {
+	async execute(interaction : any) {
 		await interaction.deferReply();
 		if (interaction.options._subcommand === 'user') {
 			const userId = interaction.options._hoistedOptions[0].value;

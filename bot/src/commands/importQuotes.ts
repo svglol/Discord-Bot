@@ -1,6 +1,6 @@
 import processQuote from'../lib/processQuote';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { BotClient, BotCommand } from '../types';
+import { BotCommand } from '../types';
 
 let client;
 export default{
@@ -31,7 +31,7 @@ export default{
 				lastID = fetchedMessages.lastKey();
 			}
 		}
-        
+
 		const quotes = await client.db.getQuotes();
 		//process messages
 		messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
@@ -42,9 +42,9 @@ export default{
 		await interaction.deleteReply();
 	},
 	needsClient: true,
-	async setClient(client_ : BotClient) {
+	async setClient(client_) {
 		client = client_;
 	},
 	adminOnly: true
-} as BotCommand;
+}  as BotCommand;
 

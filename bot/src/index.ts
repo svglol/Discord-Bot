@@ -16,15 +16,20 @@ import { BotClient, BotCommand, BotEvent, BotSoundManager, Database } from './ty
 import * as events from './events';
 import * as commands from './commands';
 
+
 // Create a new client instance
 class Client extends Discord.Client implements BotClient{
 	public db : Database;
 	public deployCommands: DeployCommands;
-	public commands: any;
-	public startTime: any;
-	public keyv: any;
+	public startTime: number;
+	public keyv: Keyv;
 	soundManager: BotSoundManager;
+	commands: Discord.Collection<string, BotCommand>;
 
+	/**
+	 * Creates an instance of client.
+	 * @param options 
+	 */
 	constructor(options : Discord.ClientOptions) {
 		super(options);
 		this.db = new Db();
@@ -66,6 +71,10 @@ class Client extends Discord.Client implements BotClient{
 		});
 	}
 
+	/**
+	 * Loads commands
+	 * @returns commands 
+	 */
 	public async loadCommands() : Promise<void>{
 		client.commands = new Collection();
 		await Object.values(commands).forEach(async (command : BotCommand) => {
@@ -78,6 +87,6 @@ class Client extends Discord.Client implements BotClient{
 	}
 }
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_PRESENCES] });
+const client : BotClient = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_PRESENCES] });
 
 client.login(process.env.TOKEN);

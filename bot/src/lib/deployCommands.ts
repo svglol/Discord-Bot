@@ -1,4 +1,4 @@
-import { BotClient, BotDeployCommands } from '../types';
+import { BotClient, BotCommand, BotDeployCommands } from '../types';
 import * as dotenv from 'dotenv';
 dotenv.config();
 import { REST } from '@discordjs/rest';
@@ -16,7 +16,7 @@ export class DeployCommands implements BotDeployCommands{
 	async deploy(): Promise<void>{
 		const commands = [];
 
-		this.client.commands.forEach(element => {
+		this.client.commands.forEach((element : any) => {
 			commands.push(element.data.toJSON());
 		});
 		const rest = new REST({ version: '9' }).setToken(token);
@@ -31,7 +31,7 @@ export class DeployCommands implements BotDeployCommands{
 					const commands = await this.client.guilds.cache.get(guild.id)?.commands.fetch();
 					const members = await this.client.guilds.cache.get(guild.id)?.members.fetch();
 					commands.forEach(command => {
-						this.client.commands.forEach(baseCommand => {
+						this.client.commands.forEach((baseCommand : BotCommand) => {
 							if(command.name === baseCommand.data.name){
 								if(baseCommand.adminOnly){
 									members.forEach(async (member) => {

@@ -3,8 +3,8 @@ import { createAudioResource, StreamType } from '@discordjs/voice';
 import { CommandInteraction } from 'discord.js';
 import { createReadStream } from 'fs';
 import ytdl = require('ytdl-core');
-import { BotAudioResource, BotClient, BotCommand } from '../types';
-let client: BotClient;
+import { BotAudioResource, BotCommand } from '../types';
+let client;
 export default {
 	data: new SlashCommandBuilder()
 		.setName('keyboardcheck')
@@ -89,7 +89,7 @@ export default {
 
 	},
 	needsClient: true,
-	async setClient(client_ : BotClient) {
+	async setClient(client_) {
 		client = client_;
 	},
 	adminOnly: true

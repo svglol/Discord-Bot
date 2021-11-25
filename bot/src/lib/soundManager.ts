@@ -3,6 +3,8 @@ import { createAudioPlayer, createAudioResource, joinVoiceChannel, AudioPlayerSt
 import ytdl = require('ytdl-core');
 const player = createAudioPlayer();
 import { BotAudioResource, BotClient, BotSoundManager } from '../types';
+import { CommandInteraction } from 'discord.js';
+import SoundCommand from '../db/models/SoundCommand.model';
 
 export class SoundManager implements BotSoundManager{
 	client: BotClient;
@@ -38,108 +40,55 @@ export class SoundManager implements BotSoundManager{
 		});
 	}
 
-	async queue(interaction, commandName) {
-		//getting user voice channel
-		const userId = interaction.user.id;
-		const guildId = interaction.guildId;
-
+	async queue(interaction?: CommandInteraction, commandName?: string, url?: string, channelId?: string, guildId?: string): Promise<void> {
+		let userId;
 		let voiceChannel;
-
+		if(interaction != null){
+			userId = interaction.user.id;
+			guildId = interaction.guildId;
+		}
 		const guild = await this.client.guilds.cache.get(guildId);
-
 		guild.channels.cache.forEach(channel => {
-			if (channel.type === 'GUILD_VOICE') {
+			if (channel.type === 'GUILD_VOICE' && channelId == null) {
 				channel.members.forEach(member => {
 					if (member.id === userId) {
 						voiceChannel = channel;
 					}
 				});
+			}else if( channelId != null && channelId === channel.id){
+				voiceChannel = channel;
 			}
 		});
 
-		//not in a voice channel
-		if (voiceChannel === undefined) {
+		if (voiceChannel == undefined) {
 			await interaction.editReply('Must be in a voice channel for this command');
 			return;
 		}
 
-		//getting sound command
-		const soundCommand = await this.client.db.getSoundCommand(commandName);
-		if (soundCommand === undefined || soundCommand === null) {
+		let soundCommand : SoundCommand;
+		let resource : BotAudioResource;
+		if(commandName != undefined){
+			soundCommand = await this.client.db.getSoundCommand(commandName);
+			if (soundCommand === undefined || soundCommand === null) {
 			//no command found
-			await interaction.editReply(`Sound command not found ${commandName}`);
-			return;
-		}
-
-
-		const resource : BotAudioResource = { interaction, voiceChannel, guildId, audioResource: createAudioResource(createReadStream(soundCommand.file), { inputType: StreamType.Arbitrary, inlineVolume: true }), commandName };
-		resource.audioResource.volume.setVolume(soundCommand.volume);
-		this.resources.push(resource);
-		if (this.connection == undefined) {
-			this.play();
-		}
-	}
-
-	async queueYt(interaction, url) {
-		const userId = interaction.user.id;
-		const guildId = interaction.guildId;
-		let voiceChannel;
-		const guild = await this.client.guilds.cache.get(guildId);
-
-		guild.channels.cache.forEach(channel => {
-			if (channel.type === 'GUILD_VOICE') {
-				channel.members.forEach(member => {
-					if (member.id === userId) {
-						voiceChannel = channel;
-					}
-				});
+				await interaction.editReply(`Sound command not found ${commandName}`);
+				return;
 			}
-		});
-
-		//not in a voice channel
-		if (voiceChannel === undefined) {
-			await interaction.editReply('Must be in a voice channel for this command');
-			return;
+			resource = { interaction, voiceChannel, guildId, audioResource: createAudioResource(createReadStream(soundCommand.file), { inputType: StreamType.Arbitrary, inlineVolume: true }), commandName };
+			resource.audioResource.volume.setVolume(soundCommand.volume);
+		}else if(url != undefined){
+			const ytStream = ytdl(url, { filter: 'audioonly' });
+			const info = await ytdl.getInfo(url);
+			resource  = { interaction, voiceChannel, guildId, audioResource: createAudioResource(ytStream, { inputType: StreamType.Arbitrary, inlineVolume: true }), commandName: undefined, url, title: info.videoDetails.title };
+			resource.audioResource.volume.setVolume(0.3);
 		}
 
-		const ytStream = ytdl(url, { filter: 'audioonly' });
-		
-		const info = await ytdl.getInfo(url);
-		const resource : BotAudioResource = { interaction, voiceChannel, guildId, audioResource: createAudioResource(ytStream, { inputType: StreamType.Arbitrary, inlineVolume: true }), commandName: undefined, url, title: info.videoDetails.title };
-		resource.audioResource.volume.setVolume(0.3);
 		this.resources.push(resource);
 		if (this.connection == undefined) {
 			this.play();
 		}
 	}
-
-	async queueApi(commandName, channelId, guildId) {
-		const guild = await this.client.guilds.cache.get(guildId);
-		let voiceChannel;
-
-		guild.channels.cache.forEach(channel => {
-			if (channel.type === 'GUILD_VOICE') {
-				if(channel.id == channelId){
-					voiceChannel = channel;
-				}
-			}
-		});
-
-		//getting sound command
-		const soundCommand = await this.client.db.getSoundCommand(commandName);
-		if (soundCommand.file === undefined) {
-			//no command found
-			console.log('Sound command not found');
-			return;
-		}
-		const resource : BotAudioResource = { interaction: undefined, voiceChannel, guildId, audioResource: createAudioResource(createReadStream(soundCommand.file), { inputType: StreamType.Arbitrary, inlineVolume: true }), commandName };
-		resource.audioResource.volume.setVolume(soundCommand.volume);
-		this.resources.push(resource);
-		if (this.connection == undefined) {
-			this.play();
-		}
-	}
-
+	
 	play() {
 		const [resource] = this.resources;
 
@@ -167,7 +116,6 @@ export class SoundManager implements BotSoundManager{
 			this.resources.shift();
 		});
 	}
-
 
 	stop() {
 		if (this.connection !== undefined) {

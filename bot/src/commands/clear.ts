@@ -7,14 +7,15 @@ export default {
 		.setDefaultPermission(false),
 	async execute(interaction) {
 		await interaction.deferReply();
-		interaction.channel.messages.fetch(20).then(messages => {
+		interaction.channel.messages.fetch({limit:20}).then(messages => {
 			const messagesToDelete = [];
 			messages.forEach(chatMessage => {
 				if (chatMessage.author.bot) {
 					messagesToDelete.push(chatMessage);
 				}
 			});
-			interaction.channel.bulkDelete(messagesToDelete);
+
+			// interaction.channel.bulkDelete(messagesToDelete);
 		});
 		await interaction.deleteReply();
 	},

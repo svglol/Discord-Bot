@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { BotClient, BotCommand } from '../types';
+import { BotCommand } from '../types';
 const choices = [];
 let client;
 
@@ -15,7 +15,7 @@ export default {
 	async execute(interaction) {
 		if (validateYouTubeUrl(interaction.options.data[0].value)) {
 			await interaction.reply('Queuing Youtube - ' + interaction.options.data[0].value);
-			client.soundManager.queueYt(interaction, interaction.options.data[0].value);
+			client.soundManager.queue(interaction,null, interaction.options.data[0].value);
 		}
 		else {
 			await interaction.reply('Queuing Command - ' + interaction.options.data[0].value);
@@ -23,7 +23,7 @@ export default {
 		}
 	},
 	needsClient: true,
-	async setClient(client_ : BotClient) {
+	async setClient(client_) {
 		client = client_;
 		// choices = [];
 		// let soundCommands = await client.db.getTopSoundCommands();

@@ -1,6 +1,6 @@
-import { MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
+import { ButtonInteraction, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { BotClient, BotCommand } from '../types';
+import { BotCommand } from '../types';
 
 let generalEmbed;
 let soundEmbed;
@@ -12,7 +12,7 @@ export default{
 	data: new SlashCommandBuilder()
 		.setName('help')
 		.setDescription('Help'),
-	async execute(interaction ) {
+	async execute(interaction) {
 		await interaction.deferReply();
 		await generateGeneralEmbed();
 		await generateSoundEmbed();
@@ -38,7 +38,8 @@ export default{
 
 		const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
 
-		collector.on('collect', async i => {
+		collector.on('collect', async (i: ButtonInteraction) => {
+			console.log(i);
 			if (i.customId === 'general') {
 				currentEmbed = generalEmbed;
 			}
@@ -58,7 +59,7 @@ export default{
 		await interaction.editReply({ embeds: [generalEmbed], components: [row] });
 	},
 	needsClient: true,
-	async setClient(client_ : BotClient) {
+	async setClient(client_) {
 		client = client_;
 	},
 } as BotCommand;

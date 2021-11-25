@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { BotClient, BotCommand } from '../types';
-let client : BotClient;
+import { BotCommand } from '../types';
+let client;
 
 export default {
 	data: new SlashCommandBuilder()
@@ -40,7 +40,7 @@ export default {
 		interaction.editReply({ embeds: [embed], components: [] });
 	},
 	needsClient: true,
-	async setClient(client_ : BotClient) {
+	async setClient(client_) {
 		client = client_;
 	}
 } as BotCommand;
