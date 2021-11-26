@@ -5,17 +5,20 @@ export default {
 		.setName('clear')
 		.setDescription('Clear bot messages in current chat channel')
 		.setDefaultPermission(false),
-	async execute(interaction : any) {
+	async execute(interaction) {
 		await interaction.deferReply();
-		interaction.channel.messages.fetch({limit:20}).then(messages => {
+		interaction.channel.messages.fetch({limit:20}).then(async messages => {
 			const messagesToDelete = [];
 			messages.forEach(chatMessage => {
 				if (chatMessage.author.bot) {
 					messagesToDelete.push(chatMessage);
 				}
 			});
-
-			interaction.channel.bulkDelete(messagesToDelete);
+			
+			const channel  = await interaction.guild.channels.cache.get(interaction.channelId);
+			if (channel.isText()) {
+				channel.bulkDelete(messagesToDelete);
+			}
 		});
 		await interaction.deleteReply();
 	},
