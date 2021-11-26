@@ -10,8 +10,13 @@ export default {
 				.setDescription('The text command')
 				.setRequired(true)),
 	async execute(interaction) {
-		const command = await client.db.getTextCommand(String(interaction.options.data[0].value));
-		await interaction.reply(command.link);
+		await interaction.deferReply();
+		const command = await client.db.getTextCommand(interaction.options.getString('command'));
+		if (command == undefined ) {
+		//no command found
+			await interaction.editReply(`Text command not found ${interaction.options.getString('command')}`);
+		}
+		await interaction.editReply(command.link);
 	},
 	needsClient: true,
 	async setClient(client_) {

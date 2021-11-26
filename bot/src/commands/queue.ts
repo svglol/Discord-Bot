@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { MessageEmbed } from 'discord.js';
 import { BotCommand } from '../types';
 let client;
 
@@ -7,7 +7,7 @@ export default {
 	data: new SlashCommandBuilder()
 		.setName('queue')
 		.setDescription('Show the current sound queue'),
-	async execute(interaction : CommandInteraction) {
+	async execute(interaction) {
 		await interaction.deferReply();
 		const resources = client.soundManager.resources;
 		const embed = new MessageEmbed()

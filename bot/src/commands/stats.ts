@@ -1,7 +1,9 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
+import { ButtonInteraction, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { BotCommand } from '../types';
+import prettyMilliseconds = require('pretty-ms');
 
+let client;
 export default {
 	data: new SlashCommandBuilder()
 		.setName('stats')
@@ -23,12 +25,12 @@ export default {
 				.setName('leaderboard')
 				.setDescription('Server leaderboard')),
 
-	async execute(interaction : any) {
+	async execute(interaction) {
 		await interaction.deferReply();
-		if (interaction.options._subcommand === 'user') {
-			const userId = interaction.options._hoistedOptions[0].value;
-			const user = await interaction.client.db.getUser(userId);
-			const users = await interaction.client.db.getUsers();
+		if (interaction.options.getSubcommand() === 'user') {
+			const userId = interaction.options.getUser('user').id;
+			const user = await client.db.getUser(userId);
+			const users = await client.db.getUsers();
 
 			const allEmbed = await generateUserAllEmbed(user, users, interaction);
 			const yearEmbed = await generateUserYearEmbed(user, users, interaction);
@@ -54,7 +56,7 @@ export default {
 			const filter = i => (i.customId === 'all' || 'month' || 'year') && i.user.id === interaction.user.id && i.message.interaction.id === interaction.id;
 
 			const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
-			collector.on('collect', async i => {
+			collector.on('collect', async (i: ButtonInteraction) => {
 				if (i.customId === 'all') {
 					currentEmbed = allEmbed;
 				}
@@ -73,8 +75,8 @@ export default {
 
 			await interaction.editReply({ embeds: [currentEmbed], components: [row] });
 		}
-		else if (interaction.options._subcommand === 'server') {
-			const users = await interaction.client.db.getUsers();
+		else if (interaction.options.getSubcommand() === 'server') {
+			const users = await client.db.getUsers();
 
 			const allEmbed = await generateServerAllEmbed(users, interaction);
 			const yearEmbed = await generateServerYearEmbed(users, interaction);
@@ -101,7 +103,7 @@ export default {
 
 			const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
 
-			collector.on('collect', async i => {
+			collector.on('collect', async (i: ButtonInteraction) => {
 				if (i.customId === 'all') {
 					currentServerEmbed = allEmbed;
 				}
@@ -120,15 +122,15 @@ export default {
 
 			await interaction.editReply({ embeds: [currentServerEmbed], components: [row] });
 		}
-		else if (interaction.options._subcommand === 'leaderboard') {
+		else if (interaction.options.getSubcommand() === 'leaderboard') {
 			let currentLeaderboard = 'voice';
 			let currentLeaderboardSort = 'all';
 			const embedMap = new Map();
 
-			const users = await interaction.client.db.getUsers();
+			const users = await client.db.getUsers();
 
-			const users_30 = generateUsersData(await interaction.client.db.getUsers(), 30);
-			const users_365 = generateUsersData(await interaction.client.db.getUsers(), 365);
+			const users_30 = generateUsersData(await client.db.getUsers(), 30);
+			const users_365 = generateUsersData(await client.db.getUsers(), 365);
 
 			embedMap.set('voice', { all: generateLeaderboardEmbed('Voice All Time Leaderboard', users, interaction, 'voice'), year: generateLeaderboardEmbed('Voice Last 365 Days Leaderboard', users_365, interaction, 'voice'), month: generateLeaderboardEmbed('Voice Last 30 Days Leaderboard', users_30, interaction, 'voice') });
 			embedMap.set('messages', { all: generateLeaderboardEmbed('Messages All Time Leaderboard', users, interaction, 'messages'), year: generateLeaderboardEmbed('Messages Last 365 Days Leaderboard', users_365, interaction, 'messages'), month: generateLeaderboardEmbed('Messages Last 30 Days Leaderboard', users_30, interaction, 'messages') });
@@ -172,7 +174,7 @@ export default {
 
 			const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
 
-			collector.on('collect', async i => {
+			collector.on('collect', async (i: ButtonInteraction) => {
 				if (i.customId === 'all') {
 					currentLeaderboardSort = 'all';
 				}
@@ -201,6 +203,10 @@ export default {
 
 			await interaction.editReply({ embeds: [currentLeaderboardEmbed], components: [row, row2] });
 		}
+	},
+	needsClient: true,
+	async setClient(client_) {
+		client = client_;
 	},
 } as BotCommand;
 
@@ -333,7 +339,7 @@ async function generateUserEmbed(title, user, users, interaction : CommandIntera
 	let totalMessagesPos = '-';
 	let totalConnectionPos = '-';
 	let totalSoundboardPos = '-';
-	let mostUsedCommands = '-';
+	let mostUsedCommands = '';
 
 	let length = 0;
 	user.connections.forEach(connection => { length += connection.connectionLength; });
@@ -428,6 +434,9 @@ async function generateUserEmbed(title, user, users, interaction : CommandIntera
 	userSoundboardUsage.forEach(element => {
 		mostUsedCommands += ' `' + element.command + '`';
 	});
+	if(userSoundboardUsage.length == 0){
+		mostUsedCommands = '-';
+	}
 
 	embed.addField('Pos', totalConnectionPos, true);
 	embed.addField('Connection Time', totalConnection, true);
@@ -443,22 +452,7 @@ async function generateUserEmbed(title, user, users, interaction : CommandIntera
 }
 
 function parseMillisecondsIntoReadableTime(millisec : number) {
-	let seconds : any = (millisec / 1000).toFixed(0);
-	let minutes : any = Math.floor(seconds / 60);
-	let hours : any= '';
-	if (minutes > 59) {
-		hours = Math.floor(minutes / 60);
-		hours = hours >= 10 ? hours : '0' + hours;
-		minutes = minutes - hours * 60;
-		minutes = minutes >= 10 ? minutes : '0' + minutes;
-	}
-
-	seconds = Math.floor(seconds % 60);
-	seconds = seconds >= 10 ? seconds : '0' + seconds;
-	if (hours !== '') {
-		return hours + ':' + minutes + ':' + seconds;
-	}
-	return minutes + ':' + seconds;
+	return prettyMilliseconds(millisec);
 }
 
 function generateLeaderboardEmbed(title, users, interaction : CommandInteraction, type) {

@@ -11,7 +11,7 @@ export default {
 				.setRequired(true)),
 	async execute(interaction) {
 		await interaction.deferReply();
-		const quote = await client.db.getQuote(interaction.options.data[0].value);
+		const quote = await client.db.getQuote(interaction.options.getInteger('id'));
 		if(quote){
 			interaction.editReply(quote.quote + ' - ' + '<@' + quote.userId + '>');
 		}

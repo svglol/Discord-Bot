@@ -13,25 +13,19 @@ export default {
 				.setRequired(true)
 				.addChoices(choices)),
 	async execute(interaction) {
-		if (validateYouTubeUrl(interaction.options.data[0].value)) {
-			await interaction.reply('Queuing Youtube - ' + interaction.options.data[0].value);
-			client.soundManager.queue(interaction,null, interaction.options.data[0].value);
+		const command = interaction.options.getString('command');
+		if (validateYouTubeUrl(command)) {
+			await interaction.reply('Queuing Youtube - ' + command);
+			client.soundManager.queue(interaction,null, command);
 		}
 		else {
-			await interaction.reply('Queuing Command - ' + interaction.options.data[0].value);
-			client.soundManager.queue(interaction, interaction.options.data[0].value);
+			await interaction.reply('Queuing Command - ' + command);
+			client.soundManager.queue(interaction, command);
 		}
 	},
 	needsClient: true,
 	async setClient(client_) {
 		client = client_;
-		// choices = [];
-		// let soundCommands = await client.db.getTopSoundCommands();
-		// soundCommands.forEach(command => {
-		//     let choice = { name: String(command.command), value: String(command.command) }
-		//     choices.push(choice);
-		// });
-		// this.data.options[0].choices = choices;
 	}
 } as BotCommand;
 

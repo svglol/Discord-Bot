@@ -12,9 +12,9 @@ export default {
 				.setRequired(true)),
 	async execute(interaction) {
 		await interaction.deferReply();
-		const user = await client.db.getUser(interaction.options.data[0].value);
+		const user = await client.db.getUser(interaction.options.getUser('user').id);
 		if(user){
-			const cUser =  await interaction.client.users.fetch(String(interaction.options.data[0].value));
+			const cUser =  await interaction.client.users.fetch(interaction.options.getUser('user').id);
 			const embed = new MessageEmbed()
 				.setTitle('Quotes')
 				.setAuthor(cUser.username)
