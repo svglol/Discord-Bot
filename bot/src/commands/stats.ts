@@ -1,34 +1,41 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { ButtonInteraction, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
-import { BotCommand } from '../types';
-import prettyMilliseconds = require('pretty-ms');
+import { SlashCommandBuilder } from "@discordjs/builders";
+import {
+	ButtonInteraction,
+	CommandInteraction,
+	MessageActionRow,
+	MessageButton,
+	MessageEmbed,
+} from "discord.js";
+import { BotCommand } from "../types";
+import prettyMilliseconds = require("pretty-ms");
 
 let client;
 export default {
 	data: new SlashCommandBuilder()
-		.setName('stats')
-		.setDescription('Gets stats about user/server/leaderboard')
-		.addSubcommand(subcommand =>
+		.setName("stats")
+		.setDescription("Gets stats about user/server/leaderboard")
+		.addSubcommand((subcommand) =>
 			subcommand
-				.setName('user')
-				.setDescription('Info about @user')
-				.addUserOption(option =>
-					option.setName('user')
-						.setDescription('User to get stats for')
-						.setRequired(true)))
-		.addSubcommand(subcommand =>
-			subcommand
-				.setName('server')
-				.setDescription('Info about server'))
-		.addSubcommand(subcommand =>
-			subcommand
-				.setName('leaderboard')
-				.setDescription('Server leaderboard')),
+				.setName("user")
+				.setDescription("Info about @user")
+				.addUserOption((option) =>
+					option
+						.setName("user")
+						.setDescription("User to get stats for")
+						.setRequired(true)
+				)
+		)
+		.addSubcommand((subcommand) =>
+			subcommand.setName("server").setDescription("Info about server")
+		)
+		.addSubcommand((subcommand) =>
+			subcommand.setName("leaderboard").setDescription("Server leaderboard")
+		),
 
 	async execute(interaction) {
 		await interaction.deferReply();
-		if (interaction.options.getSubcommand() === 'user') {
-			const userId = interaction.options.getUser('user').id;
+		if (interaction.options.getSubcommand() === "user") {
+			const userId = interaction.options.getUser("user").id;
 			const user = await client.db.getUser(userId);
 			const users = await client.db.getUsers();
 
@@ -37,45 +44,50 @@ export default {
 			const monthEmbed = await generateUserMonthEmbed(user, users, interaction);
 			let currentEmbed = allEmbed;
 
-			const row = new MessageActionRow()
-				.addComponents(
-					new MessageButton()
-						.setCustomId('all')
-						.setLabel('All-Time')
-						.setStyle('SECONDARY'),
-					new MessageButton()
-						.setCustomId('year')
-						.setLabel('Last Year')
-						.setStyle('SECONDARY'),
-					new MessageButton()
-						.setCustomId('month')
-						.setLabel('Last Month')
-						.setStyle('SECONDARY')
-				);
+			const row = new MessageActionRow().addComponents(
+				new MessageButton()
+					.setCustomId("all")
+					.setLabel("All-Time")
+					.setStyle("SECONDARY"),
+				new MessageButton()
+					.setCustomId("year")
+					.setLabel("Last Year")
+					.setStyle("SECONDARY"),
+				new MessageButton()
+					.setCustomId("month")
+					.setLabel("Last Month")
+					.setStyle("SECONDARY")
+			);
 
-			const filter = i => (i.customId === 'all' || 'month' || 'year') && i.user.id === interaction.user.id && i.message.interaction.id === interaction.id;
+			const filter = (i) =>
+				(i.customId === "all" || "month" || "year") &&
+				i.user.id === interaction.user.id &&
+				i.message.interaction.id === interaction.id;
 
-			const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
-			collector.on('collect', async (i: ButtonInteraction) => {
-				if (i.customId === 'all') {
+			const collector = interaction.channel.createMessageComponentCollector({
+				filter,
+				time: 60000,
+			});
+			collector.on("collect", async (i: ButtonInteraction) => {
+				if (i.customId === "all") {
 					currentEmbed = allEmbed;
-				}
-				else if (i.customId === 'month') {
+				} else if (i.customId === "month") {
 					currentEmbed = monthEmbed;
-				}
-				else if (i.customId === 'year') {
+				} else if (i.customId === "year") {
 					currentEmbed = yearEmbed;
 				}
 				await i.update({ embeds: [currentEmbed], components: [row] });
 			});
 
-			collector.on('end', () => {
+			collector.on("end", () => {
 				interaction.editReply({ embeds: [currentEmbed], components: [] });
 			});
 
-			await interaction.editReply({ embeds: [currentEmbed], components: [row] });
-		}
-		else if (interaction.options.getSubcommand() === 'server') {
+			await interaction.editReply({
+				embeds: [currentEmbed],
+				components: [row],
+			});
+		} else if (interaction.options.getSubcommand() === "server") {
 			const users = await client.db.getUsers();
 
 			const allEmbed = await generateServerAllEmbed(users, interaction);
@@ -83,48 +95,53 @@ export default {
 			const monthEmbed = await generateServerMonthEmbed(users, interaction);
 			let currentServerEmbed = allEmbed;
 
-			const row = new MessageActionRow()
-				.addComponents(
-					new MessageButton()
-						.setCustomId('all')
-						.setLabel('All-Time')
-						.setStyle('SECONDARY'),
-					new MessageButton()
-						.setCustomId('year')
-						.setLabel('Last Year')
-						.setStyle('SECONDARY'),
-					new MessageButton()
-						.setCustomId('month')
-						.setLabel('Last Month')
-						.setStyle('SECONDARY')
-				);
+			const row = new MessageActionRow().addComponents(
+				new MessageButton()
+					.setCustomId("all")
+					.setLabel("All-Time")
+					.setStyle("SECONDARY"),
+				new MessageButton()
+					.setCustomId("year")
+					.setLabel("Last Year")
+					.setStyle("SECONDARY"),
+				new MessageButton()
+					.setCustomId("month")
+					.setLabel("Last Month")
+					.setStyle("SECONDARY")
+			);
 
-			const filter = i => (i.customId === 'all' || 'month' || 'year') && i.user.id === interaction.user.id && i.message.interaction.id === interaction.id;
+			const filter = (i) =>
+				(i.customId === "all" || "month" || "year") &&
+				i.user.id === interaction.user.id &&
+				i.message.interaction.id === interaction.id;
 
-			const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
+			const collector = interaction.channel.createMessageComponentCollector({
+				filter,
+				time: 60000,
+			});
 
-			collector.on('collect', async (i: ButtonInteraction) => {
-				if (i.customId === 'all') {
+			collector.on("collect", async (i: ButtonInteraction) => {
+				if (i.customId === "all") {
 					currentServerEmbed = allEmbed;
-				}
-				else if (i.customId === 'month') {
+				} else if (i.customId === "month") {
 					currentServerEmbed = monthEmbed;
-				}
-				else if (i.customId === 'year') {
+				} else if (i.customId === "year") {
 					currentServerEmbed = yearEmbed;
 				}
 				await i.update({ embeds: [currentServerEmbed], components: [row] });
 			});
 
-			collector.on('end', () => {
+			collector.on("end", () => {
 				interaction.editReply({ embeds: [currentServerEmbed], components: [] });
 			});
 
-			await interaction.editReply({ embeds: [currentServerEmbed], components: [row] });
-		}
-		else if (interaction.options.getSubcommand() === 'leaderboard') {
-			let currentLeaderboard = 'voice';
-			let currentLeaderboardSort = 'all';
+			await interaction.editReply({
+				embeds: [currentServerEmbed],
+				components: [row],
+			});
+		} else if (interaction.options.getSubcommand() === "leaderboard") {
+			let currentLeaderboard = "voice";
+			let currentLeaderboardSort = "all";
 			const embedMap = new Map();
 
 			const users = await client.db.getUsers();
@@ -132,98 +149,176 @@ export default {
 			const users_30 = generateUsersData(await client.db.getUsers(), 30);
 			const users_365 = generateUsersData(await client.db.getUsers(), 365);
 
-			embedMap.set('voice', { all: generateLeaderboardEmbed('Voice All Time Leaderboard', users, interaction, 'voice'), year: generateLeaderboardEmbed('Voice Last 365 Days Leaderboard', users_365, interaction, 'voice'), month: generateLeaderboardEmbed('Voice Last 30 Days Leaderboard', users_30, interaction, 'voice') });
-			embedMap.set('messages', { all: generateLeaderboardEmbed('Messages All Time Leaderboard', users, interaction, 'messages'), year: generateLeaderboardEmbed('Messages Last 365 Days Leaderboard', users_365, interaction, 'messages'), month: generateLeaderboardEmbed('Messages Last 30 Days Leaderboard', users_30, interaction, 'messages') });
-			embedMap.set('sound', { all: generateLeaderboardEmbed('Soundboard All Time Leaderboard', users, interaction, 'sound'), year: generateLeaderboardEmbed('Soundboard Last 365 Days Leaderboard', users_365, interaction, 'sound'), month: generateLeaderboardEmbed('Soundboard Last 30 Days Leaderboard', users_30, interaction, 'sound') });
-
-			let currentLeaderboardEmbed = embedMap.get(currentLeaderboard)[currentLeaderboardSort];
-
-			const row2 = new MessageActionRow()
-				.addComponents(
-					new MessageButton()
-						.setCustomId('all')
-						.setLabel('All-Time')
-						.setStyle('SECONDARY'),
-					new MessageButton()
-						.setCustomId('year')
-						.setLabel('Last Year')
-						.setStyle('SECONDARY'),
-					new MessageButton()
-						.setCustomId('month')
-						.setLabel('Last Month')
-						.setStyle('SECONDARY'),
-				);
-
-			const row = new MessageActionRow()
-				.addComponents(
-					new MessageButton()
-						.setCustomId('voice')
-						.setLabel('🗣️')
-						.setStyle('PRIMARY'),
-					new MessageButton()
-						.setCustomId('messages')
-						.setLabel('⌨️')
-						.setStyle('PRIMARY'),
-					new MessageButton()
-						.setCustomId('sound')
-						.setLabel('🔊')
-						.setStyle('PRIMARY')
-				);
-
-			const filter = i => (i.customId === 'all' || 'month' || 'year' || 'voice' || 'messages' || 'sound') && i.user.id === interaction.user.id && i.message.interaction.id === interaction.id;
-
-			const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
-
-			collector.on('collect', async (i: ButtonInteraction) => {
-				if (i.customId === 'all') {
-					currentLeaderboardSort = 'all';
-				}
-				else if (i.customId === 'month') {
-					currentLeaderboardSort = 'month';
-				}
-				else if (i.customId === 'year') {
-					currentLeaderboardSort = 'year';
-				}
-				else if (i.customId === 'voice') {
-					currentLeaderboard = i.customId;
-				}
-				else if (i.customId === 'messages') {
-					currentLeaderboard = i.customId;
-				}
-				else if (i.customId === 'sound') {
-					currentLeaderboard = i.customId;
-				}
-				currentLeaderboardEmbed = embedMap.get(currentLeaderboard)[currentLeaderboardSort];
-				await i.update({ embeds: [currentLeaderboardEmbed], components: [row, row2] });
+			embedMap.set("voice", {
+				all: generateLeaderboardEmbed(
+					"Voice All Time Leaderboard",
+					users,
+					interaction,
+					"voice"
+				),
+				year: generateLeaderboardEmbed(
+					"Voice Last 365 Days Leaderboard",
+					users_365,
+					interaction,
+					"voice"
+				),
+				month: generateLeaderboardEmbed(
+					"Voice Last 30 Days Leaderboard",
+					users_30,
+					interaction,
+					"voice"
+				),
+			});
+			embedMap.set("messages", {
+				all: generateLeaderboardEmbed(
+					"Messages All Time Leaderboard",
+					users,
+					interaction,
+					"messages"
+				),
+				year: generateLeaderboardEmbed(
+					"Messages Last 365 Days Leaderboard",
+					users_365,
+					interaction,
+					"messages"
+				),
+				month: generateLeaderboardEmbed(
+					"Messages Last 30 Days Leaderboard",
+					users_30,
+					interaction,
+					"messages"
+				),
+			});
+			embedMap.set("sound", {
+				all: generateLeaderboardEmbed(
+					"Soundboard All Time Leaderboard",
+					users,
+					interaction,
+					"sound"
+				),
+				year: generateLeaderboardEmbed(
+					"Soundboard Last 365 Days Leaderboard",
+					users_365,
+					interaction,
+					"sound"
+				),
+				month: generateLeaderboardEmbed(
+					"Soundboard Last 30 Days Leaderboard",
+					users_30,
+					interaction,
+					"sound"
+				),
 			});
 
-			collector.on('end', () => {
-				interaction.editReply({ embeds: [currentLeaderboardEmbed], components: [] });
+			let currentLeaderboardEmbed =
+				embedMap.get(currentLeaderboard)[currentLeaderboardSort];
+
+			const row2 = new MessageActionRow().addComponents(
+				new MessageButton()
+					.setCustomId("all")
+					.setLabel("All-Time")
+					.setStyle("SECONDARY"),
+				new MessageButton()
+					.setCustomId("year")
+					.setLabel("Last Year")
+					.setStyle("SECONDARY"),
+				new MessageButton()
+					.setCustomId("month")
+					.setLabel("Last Month")
+					.setStyle("SECONDARY")
+			);
+
+			const row = new MessageActionRow().addComponents(
+				new MessageButton()
+					.setCustomId("voice")
+					.setLabel("🗣️")
+					.setStyle("PRIMARY"),
+				new MessageButton()
+					.setCustomId("messages")
+					.setLabel("⌨️")
+					.setStyle("PRIMARY"),
+				new MessageButton()
+					.setCustomId("sound")
+					.setLabel("🔊")
+					.setStyle("PRIMARY")
+			);
+
+			const filter = (i) =>
+				(i.customId === "all" ||
+					"month" ||
+					"year" ||
+					"voice" ||
+					"messages" ||
+					"sound") &&
+				i.user.id === interaction.user.id &&
+				i.message.interaction.id === interaction.id;
+
+			const collector = interaction.channel.createMessageComponentCollector({
+				filter,
+				time: 60000,
 			});
 
-			await interaction.editReply({ embeds: [currentLeaderboardEmbed], components: [row, row2] });
+			collector.on("collect", async (i: ButtonInteraction) => {
+				if (i.customId === "all") {
+					currentLeaderboardSort = "all";
+				} else if (i.customId === "month") {
+					currentLeaderboardSort = "month";
+				} else if (i.customId === "year") {
+					currentLeaderboardSort = "year";
+				} else if (i.customId === "voice") {
+					currentLeaderboard = i.customId;
+				} else if (i.customId === "messages") {
+					currentLeaderboard = i.customId;
+				} else if (i.customId === "sound") {
+					currentLeaderboard = i.customId;
+				}
+				currentLeaderboardEmbed =
+					embedMap.get(currentLeaderboard)[currentLeaderboardSort];
+				await i.update({
+					embeds: [currentLeaderboardEmbed],
+					components: [row, row2],
+				});
+			});
+
+			collector.on("end", () => {
+				interaction.editReply({
+					embeds: [currentLeaderboardEmbed],
+					components: [],
+				});
+			});
+
+			await interaction.editReply({
+				embeds: [currentLeaderboardEmbed],
+				components: [row, row2],
+			});
 		}
 	},
 	needsClient: true,
-	async setClient(client_) {
-		client = client_;
+	async setClient(_client) {
+		client = _client;
 	},
 } as BotCommand;
 
 async function generateUserAllEmbed(user, users, interaction) {
-	return generateUserEmbed('All Time Stats', user, users, interaction);
+	return generateUserEmbed("All Time Stats", user, users, interaction);
 }
 
 function generateUserData(_user, _users, days) {
 	const users = _users;
 	const date = Number(new Date());
-	const time = new Date(date - (1000 * 60 * 60 * 24 * days));
-	users.forEach(element => {
-		element.messages = element.messages.filter(item => (time.getTime() < item.date));
-		element.soundboards = element.soundboards.filter(item => (time.getTime() < item.date));
-		element.connections = element.connections.filter(item => (time.getTime() < item.disconnectTime));
+	const time = new Date(date - 1000 * 60 * 60 * 24 * days);
+	users.forEach((element) => {
+		element.messages = element.messages.filter(
+			(item) => time.getTime() < item.date
+		);
+		element.soundboards = element.soundboards.filter(
+			(item) => time.getTime() < item.date
+		);
+		element.connections = element.connections.filter(
+			(item) => time.getTime() < item.disconnectTime
+		);
 	});
-	const user = users.find(element => element.id === _user.id);
+	const user = users.find((element) => element.id === _user.id);
 
 	return { user, users };
 }
@@ -231,11 +326,17 @@ function generateUserData(_user, _users, days) {
 function generateUsersData(_users, days) {
 	const users = _users;
 	const date = Number(new Date());
-	const time = new Date(date - (1000 * 60 * 60 * 24 * days));
-	users.forEach(element => {
-		element.messages = element.messages.filter(item => (time.getTime() < item.date));
-		element.soundboards = element.soundboards.filter(item => (time.getTime() < item.date));
-		element.connections = element.connections.filter(item => (time.getTime() < item.disconnectTime));
+	const time = new Date(date - 1000 * 60 * 60 * 24 * days);
+	users.forEach((element) => {
+		element.messages = element.messages.filter(
+			(item) => time.getTime() < item.date
+		);
+		element.soundboards = element.soundboards.filter(
+			(item) => time.getTime() < item.date
+		);
+		element.connections = element.connections.filter(
+			(item) => time.getTime() < item.disconnectTime
+		);
 	});
 
 	return users;
@@ -243,46 +344,50 @@ function generateUsersData(_users, days) {
 
 async function generateUserMonthEmbed(_user, _users, interaction) {
 	const { user, users } = generateUserData(_user, _users, 30);
-	return generateUserEmbed('Last 30 Days Stats', user, users, interaction);
+	return generateUserEmbed("Last 30 Days Stats", user, users, interaction);
 }
-
 
 async function generateUserYearEmbed(_user, _users, interaction) {
 	const { user, users } = generateUserData(_user, _users, 365);
-	return generateUserEmbed('Last 365 Days Stats', user, users, interaction);
+	return generateUserEmbed("Last 365 Days Stats", user, users, interaction);
 }
 
 function generateServerEmbed(title, users, interaction) {
-	const icon = interaction.guild.iconURL({size: 1024, dynamic: true});
+	const icon = interaction.guild.iconURL({ size: 1024, dynamic: true });
 	const embed = new MessageEmbed()
 		.setTitle(title)
 		.setAuthor(interaction.guild.name, icon)
-		.setColor('#0099ff');
+		.setColor("#0099ff");
 
-	let totalMessages = '';
-	let totalConnection = '';
-	let totalSoundboard = '';
-	let mostUsedCommands = '';
+	let totalMessages = "";
+	let totalConnection = "";
+	let totalSoundboard = "";
+	let mostUsedCommands = "";
 
 	let messageNum = 0;
 	let length = 0;
 	let soundboard = 0;
 	let usersSoundboardUsage = [];
-	users.forEach(user => {
+	users.forEach((user) => {
 		messageNum += user.messages.length;
-		user.connections.forEach(connection => { length += connection.connectionLength; });
+		user.connections.forEach((connection) => {
+			length += connection.connectionLength;
+		});
 		soundboard += user.soundboards.length;
 
-		user.soundboards.forEach(userSoundboard => {
+		user.soundboards.forEach((userSoundboard) => {
 			let created = false;
-			usersSoundboardUsage.forEach(used => {
+			usersSoundboardUsage.forEach((used) => {
 				if (used.command === userSoundboard.command) {
 					created = true;
 					used.total++;
 				}
 			});
 			if (!created) {
-				usersSoundboardUsage.push({ command: userSoundboard.command, total: 1 });
+				usersSoundboardUsage.push({
+					command: userSoundboard.command,
+					total: 1,
+				});
 			}
 		});
 	});
@@ -300,55 +405,65 @@ function generateServerEmbed(title, users, interaction) {
 		return 0;
 	});
 	usersSoundboardUsage = usersSoundboardUsage.slice(0, 10);
-	usersSoundboardUsage.forEach(element => {
-		mostUsedCommands += ' `' + element.command + '`';
+	usersSoundboardUsage.forEach((element) => {
+		mostUsedCommands += " `" + element.command + "`";
 	});
 
-	embed.addField('Connection Time', totalConnection);
-	embed.addField('Messages', totalMessages);
-	embed.addField('Soundboard Usage', totalSoundboard);
-	embed.addField('Top 10 Soundboard Commands', mostUsedCommands);
+	embed.addField("Connection Time", totalConnection);
+	embed.addField("Messages", totalMessages);
+	embed.addField("Soundboard Usage", totalSoundboard);
+	embed.addField("Top 10 Soundboard Commands", mostUsedCommands);
 	return embed;
 }
 
 function generateServerAllEmbed(users, interaction) {
-	return generateServerEmbed('All Time Stats', users, interaction);
+	return generateServerEmbed("All Time Stats", users, interaction);
 }
 
 function generateServerMonthEmbed(_users, interaction) {
 	const users = generateUsersData(_users, 30);
-	return generateServerEmbed('Last 30 Days Stats', users, interaction);
+	return generateServerEmbed("Last 30 Days Stats", users, interaction);
 }
 
 function generateServerYearEmbed(_users, interaction) {
 	const users = generateUsersData(_users, 365);
-	return generateServerEmbed('Last 365 Days Stats', users, interaction);
+	return generateServerEmbed("Last 365 Days Stats", users, interaction);
 }
 
-async function generateUserEmbed(title, user, users, interaction : CommandInteraction) {
+async function generateUserEmbed(
+	title,
+	user,
+	users,
+	interaction: CommandInteraction
+) {
 	const user_ = interaction.client.users.cache.get(user.id);
-	const avatar = user_.displayAvatarURL({size: 1024, dynamic: true});
+	const avatar = user_.displayAvatarURL({ size: 1024, dynamic: true });
 	const embed = new MessageEmbed()
 		.setTitle(title)
-		.setAuthor(user_.username,avatar)
-		.setColor('#0099ff');
+		.setAuthor(user_.username, avatar)
+		.setColor("#0099ff");
 
 	const totalMessages = String(user.messages.length);
-	let totalConnection = '-';
+	let totalConnection = "-";
 	const totalSoundboard = String(user.soundboards.length);
-	let totalMessagesPos = '-';
-	let totalConnectionPos = '-';
-	let totalSoundboardPos = '-';
-	let mostUsedCommands = '';
+	let totalMessagesPos = "-";
+	let totalConnectionPos = "-";
+	let totalSoundboardPos = "-";
+	let mostUsedCommands = "";
 
 	let length = 0;
-	user.connections.forEach(connection => { length += connection.connectionLength; });
+	user.connections.forEach((connection) => {
+		length += connection.connectionLength;
+	});
 	totalConnection = parseMillisecondsIntoReadableTime(length);
 
-	//messages rank
+	// messages rank
 	const userMessageRanks = [];
-	users.forEach(element => {
-		userMessageRanks.push({ id: element.id, messages: element.messages.length });
+	users.forEach((element) => {
+		userMessageRanks.push({
+			id: element.id,
+			messages: element.messages.length,
+		});
 	});
 	userMessageRanks.sort(function (a, b) {
 		if (a.messages > b.messages) {
@@ -361,15 +476,17 @@ async function generateUserEmbed(title, user, users, interaction : CommandIntera
 	});
 	userMessageRanks.forEach((element, index) => {
 		if (element.id === user.id) {
-			totalMessagesPos = '#' + (index + 1);
+			totalMessagesPos = "#" + (index + 1);
 		}
 	});
 
-	//connection rank
+	// connection rank
 	const userConnectionRanks = [];
-	users.forEach(element => {
+	users.forEach((element) => {
 		let total = 0;
-		element.connections.forEach(connection => { total += connection.connectionLength; });
+		element.connections.forEach((connection) => {
+			total += connection.connectionLength;
+		});
 		userConnectionRanks.push({ id: element.id, total: total });
 	});
 	userConnectionRanks.sort(function (a, b) {
@@ -383,14 +500,17 @@ async function generateUserEmbed(title, user, users, interaction : CommandIntera
 	});
 	userConnectionRanks.forEach((element, index) => {
 		if (element.id === user.id) {
-			totalConnectionPos = '#' + (index + 1);
+			totalConnectionPos = "#" + (index + 1);
 		}
 	});
 
-	//soundboard rank
+	// soundboard rank
 	const userSoundboardRank = [];
-	users.forEach(element => {
-		userSoundboardRank.push({ id: element.id, uses: element.soundboards.length });
+	users.forEach((element) => {
+		userSoundboardRank.push({
+			id: element.id,
+			uses: element.soundboards.length,
+		});
 	});
 	userSoundboardRank.sort(function (a, b) {
 		if (a.uses > b.uses) {
@@ -403,15 +523,15 @@ async function generateUserEmbed(title, user, users, interaction : CommandIntera
 	});
 	userSoundboardRank.forEach((element, index) => {
 		if (element.id === user.id) {
-			totalSoundboardPos = '#' + (index + 1);
+			totalSoundboardPos = "#" + (index + 1);
 		}
 	});
 
-	//most used sound commands
+	// most used sound commands
 	let userSoundboardUsage = [];
-	user.soundboards.forEach(userSoundboard => {
+	user.soundboards.forEach((userSoundboard) => {
 		let created = false;
-		userSoundboardUsage.forEach(used => {
+		userSoundboardUsage.forEach((used) => {
 			if (used.command === userSoundboard.command) {
 				created = true;
 				used.total++;
@@ -431,44 +551,51 @@ async function generateUserEmbed(title, user, users, interaction : CommandIntera
 		return 0;
 	});
 	userSoundboardUsage = userSoundboardUsage.slice(0, 5);
-	userSoundboardUsage.forEach(element => {
-		mostUsedCommands += ' `' + element.command + '`';
+	userSoundboardUsage.forEach((element) => {
+		mostUsedCommands += " `" + element.command + "`";
 	});
-	if(userSoundboardUsage.length == 0){
-		mostUsedCommands = '-';
+	if (userSoundboardUsage.length == 0) {
+		mostUsedCommands = "-";
 	}
 
-	embed.addField('Pos', totalConnectionPos, true);
-	embed.addField('Connection Time', totalConnection, true);
-	embed.addField('\u200B', '\u200B', true);
-	embed.addField('Pos', totalMessagesPos, true);
-	embed.addField('Messages', totalMessages, true);
-	embed.addField('\u200B', '\u200B', true);
-	embed.addField('Pos', totalSoundboardPos, true);
-	embed.addField('Soundboard Usage', totalSoundboard, true);
-	embed.addField('\u200B', '\u200B', true);
-	embed.addField('Top 5 Soundboard Commands', mostUsedCommands);
+	embed.addField("Pos", totalConnectionPos, true);
+	embed.addField("Connection Time", totalConnection, true);
+	embed.addField("\u200B", "\u200B", true);
+	embed.addField("Pos", totalMessagesPos, true);
+	embed.addField("Messages", totalMessages, true);
+	embed.addField("\u200B", "\u200B", true);
+	embed.addField("Pos", totalSoundboardPos, true);
+	embed.addField("Soundboard Usage", totalSoundboard, true);
+	embed.addField("\u200B", "\u200B", true);
+	embed.addField("Top 5 Soundboard Commands", mostUsedCommands);
 	return embed;
 }
 
-function parseMillisecondsIntoReadableTime(millisec : number) {
+function parseMillisecondsIntoReadableTime(millisec: number) {
 	return prettyMilliseconds(millisec);
 }
 
-function generateLeaderboardEmbed(title, users, interaction : CommandInteraction, type) {
-	const icon = interaction.guild.iconURL({size: 1024, dynamic: true});
+function generateLeaderboardEmbed(
+	title,
+	users,
+	interaction: CommandInteraction,
+	type
+) {
+	const icon = interaction.guild.iconURL({ size: 1024, dynamic: true });
 	const embed = new MessageEmbed()
 		.setTitle(title)
 		.setAuthor(interaction.guild.name, icon)
-		.setColor('#0099ff');
+		.setColor("#0099ff");
 
 	const rows = [];
-	if(type === 'voice'){
-		rows.push(['#', 'Name', 'Time']);
+	if (type === "voice") {
+		rows.push(["#", "Name", "Time"]);
 		let voiceRanks = [];
-		users.forEach(user => {
+		users.forEach((user) => {
 			let length = 0;
-			user.connections.forEach(connection => { length += connection.connectionLength; });
+			user.connections.forEach((connection) => {
+				length += connection.connectionLength;
+			});
 			if (length !== 0) {
 				voiceRanks.push({ id: user.id, total: length });
 			}
@@ -488,16 +615,20 @@ function generateLeaderboardEmbed(title, users, interaction : CommandInteraction
 
 		voiceRanks.forEach((element, index) => {
 			const user = interaction.client.users.cache.get(element.id);
-			let username = '';
+			let username = "";
 			if (user !== undefined) {
 				username = user.username;
 			}
-			rows.push([(index + 1).toString(), username, parseMillisecondsIntoReadableTime(element.total)]);
+			rows.push([
+				(index + 1).toString(),
+				username,
+				parseMillisecondsIntoReadableTime(element.total),
+			]);
 		});
-	} else if(type === 'messages'){
-		rows.push(['#', 'Name', 'Messages']);
+	} else if (type === "messages") {
+		rows.push(["#", "Name", "Messages"]);
 		let messageRanks = [];
-		users.forEach(user => {
+		users.forEach((user) => {
 			if (user.messages.length !== 0) {
 				messageRanks.push({ id: user.id, total: user.messages.length });
 			}
@@ -517,17 +648,16 @@ function generateLeaderboardEmbed(title, users, interaction : CommandInteraction
 
 		messageRanks.forEach((element, index) => {
 			const user = interaction.client.users.cache.get(element.id);
-			let username = '';
+			let username = "";
 			if (user !== undefined) {
 				username = user.username;
 			}
 			rows.push([(index + 1).toString(), username, element.total]);
 		});
-	}
-	else if (type === 'sound'){
-		rows.push(['#', 'Name', 'Uses']);
+	} else if (type === "sound") {
+		rows.push(["#", "Name", "Uses"]);
 		let soundRanks = [];
-		users.forEach(user => {
+		users.forEach((user) => {
 			if (user.soundboards.length !== 0) {
 				soundRanks.push({ id: user.id, total: user.soundboards.length });
 			}
@@ -547,7 +677,7 @@ function generateLeaderboardEmbed(title, users, interaction : CommandInteraction
 
 		soundRanks.forEach(async (element, index) => {
 			const user = interaction.client.users.cache.get(element.id);
-			let username = '';
+			let username = "";
 			if (user !== undefined) {
 				username = user.username;
 			}
@@ -559,7 +689,7 @@ function generateLeaderboardEmbed(title, users, interaction : CommandInteraction
 }
 
 function generateTable(rows) {
-	let tableString = '```';
+	let tableString = "```";
 	const spacing = 2;
 
 	const colLength = new Map();
@@ -587,17 +717,17 @@ function generateTable(rows) {
 		row.forEach((line, i) => {
 			if (line != null) {
 				const text = line;
-				let space = '';
+				let space = "";
 				for (let j = 0; j < colLength.get(i) - text.length; j++) {
-					space += ' ';
+					space += " ";
 				}
 				tableString += text;
 				tableString += space;
 			}
 		});
-		tableString += '\n';
+		tableString += "\n";
 	});
 
-	tableString += '```';
+	tableString += "```";
 	return tableString;
 }

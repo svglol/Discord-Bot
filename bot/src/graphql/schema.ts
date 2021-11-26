@@ -1,4 +1,4 @@
-export= `
+export = `
 scalar Upload
 
   type User {

@@ -1,20 +1,22 @@
-import processQuote from'../lib/processQuote';
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { BotCommand } from '../types';
+import processQuote from "../lib/processQuote";
+import { SlashCommandBuilder } from "@discordjs/builders";
+import { BotCommand } from "../types";
 
 let client;
-export default{
+export default {
 	data: new SlashCommandBuilder()
-		.setName('importquotes')
-		.setDescription('Import quotes from current channel & bind this channel to listen for new quotes')
+		.setName("importquotes")
+		.setDescription(
+			"Import quotes from current channel & bind this channel to listen for new quotes"
+		)
 		.setDefaultPermission(false),
 	async execute(interaction) {
 		await interaction.deferReply();
 
-		//save this channel id to listen for new quotes
-		await client.keyv.set('quote_channel', interaction.channelId);
+		// save this channel id to listen for new quotes
+		await client.keyv.set("quote_channel", interaction.channelId);
 
-		//fetch all messages from current channel
+		// fetch all messages from current channel
 		let messages = [];
 		let lastID;
 		let fetch = true;
@@ -25,15 +27,14 @@ export default{
 			});
 			if (fetchedMessages.size === 0) {
 				fetch = false;
-			}
-			else {
+			} else {
 				messages = messages.concat(Array.from(fetchedMessages.values()));
 				lastID = fetchedMessages.lastKey();
 			}
 		}
 
 		const quotes = await client.db.getQuotes();
-		//process messages
+		// process messages
 		messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 		messages.forEach(async (message) => {
 			await processQuote(message, client, quotes);
@@ -42,9 +43,8 @@ export default{
 		await interaction.deleteReply();
 	},
 	needsClient: true,
-	async setClient(client_) {
-		client = client_;
+	async setClient(_client) {
+		client = _client;
 	},
-	adminOnly: true
-}  as BotCommand;
-
+	adminOnly: true,
+} as BotCommand;

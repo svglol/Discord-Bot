@@ -1,36 +1,47 @@
-import { Database } from '../types';
-import { Sequelize } from 'sequelize-typescript';
-import User from './models/User.model';
-import Connection from './models/Connection.model';
-import Message from './models/Message.model';
-import Quote from './models/Quote.model';
-import Soundboard from './models/Soundboard.model';
-import SoundCommand from './models/SoundCommand.model';
-import TextCommand from './models/TextCommand.model';
+import { Database } from "../types";
+import { Sequelize } from "sequelize-typescript";
+import User from "./models/User.model";
+import Connection from "./models/Connection.model";
+import Message from "./models/Message.model";
+import Quote from "./models/Quote.model";
+import Soundboard from "./models/Soundboard.model";
+import SoundCommand from "./models/SoundCommand.model";
+import TextCommand from "./models/TextCommand.model";
 
-export class Db implements Database{
+export class Db implements Database {
 	sequelize: Sequelize;
 
 	/**
 	 * Creates an instance of db.
 	 */
-	constructor(){
+	constructor() {
 		this.sequelize = new Sequelize({
-			host: 'localhost',
-			dialect: 'sqlite',
+			host: "localhost",
+			dialect: "sqlite",
 			logging: false,
-			storage: '../resources/database.sqlite',
-			models: [User,Message,Connection,Quote,Soundboard,SoundCommand,TextCommand]
+			storage: "../resources/database.sqlite",
+			models: [
+				User,
+				Message,
+				Connection,
+				Quote,
+				Soundboard,
+				SoundCommand,
+				TextCommand,
+			],
 		});
 	}
 
 	/**
 	 * Updates user last connection
-	 * @param id 
-	 * @param lastConnection 
-	 * @returns user last connection 
+	 * @param id
+	 * @param lastConnection
+	 * @returns user last connection
 	 */
-	async updateUserLastConnection(id: string, lastConnection: number): Promise<User> {
+	async updateUserLastConnection(
+		id: string,
+		lastConnection: number
+	): Promise<User> {
 		const user_ = await User.findByPk(id);
 		if (user_ != null) {
 			user_.lastConnection = lastConnection;
@@ -42,8 +53,8 @@ export class Db implements Database{
 
 	/**
 	 * Adds user connection
-	 * @param id 
-	 * @returns user connection 
+	 * @param id
+	 * @returns user connection
 	 */
 	async addUserConnection(id: string): Promise<Connection> {
 		let user_ = await User.findByPk(id);
@@ -58,50 +69,59 @@ export class Db implements Database{
 				userId: id,
 				connectTime: lastConnection,
 				disconnectTime: date.getTime(),
-				connectionLength: date.getTime() - lastConnection
+				connectionLength: date.getTime() - lastConnection,
 			});
 		}
 	}
 
 	/**
 	 * Gets sound commands
-	 * @returns sound commands 
+	 * @returns sound commands
 	 */
 	getSoundCommands(): Promise<SoundCommand[]> {
 		return SoundCommand.findAll();
 	}
+
 	/**
 	 * Gets sound command
-	 * @param commandName 
-	 * @returns sound command 
+	 * @param commandName
+	 * @returns sound command
 	 */
 	getSoundCommand(commandName: string): Promise<SoundCommand> {
 		return SoundCommand.findOne({ where: { command: commandName } });
 	}
+
 	/**
 	 * Adds user soundboard
-	 * @param id 
-	 * @param command 
-	 * @param date 
-	 * @returns user soundboard 
+	 * @param id
+	 * @param command
+	 * @param date
+	 * @returns user soundboard
 	 */
-	async addUserSoundboard(id: string, command: string, date: number): Promise<Soundboard> {
+	async addUserSoundboard(
+		id: string,
+		command: string,
+		date: number
+	): Promise<Soundboard> {
 		const user_ = User.findByPk(id);
 		if (!user_) {
 			await this.addUser(id);
 		}
 		return Soundboard.create({ userId: id, command, date });
 	}
+
 	/**
 	 * Gets top sound commands
-	 * @returns top sound commands 
+	 * @returns top sound commands
 	 */
 	async getTopSoundCommands(): Promise<SoundCommand[]> {
 		const soundboardUsage = await Soundboard.findAll();
 
 		const top = [];
 		for (const userSoundboard of soundboardUsage) {
-			const update = top.find(data => data.command === userSoundboard.command);
+			const update = top.find(
+				(data) => data.command === userSoundboard.command
+			);
 			if (update != null) {
 				update.uses += 1;
 			} else {
@@ -121,45 +141,55 @@ export class Db implements Database{
 		top.length = 25;
 		return top;
 	}
+
 	/**
 	 * Gets text commands
-	 * @returns text commands 
+	 * @returns text commands
 	 */
 	getTextCommands(): Promise<TextCommand[]> {
 		return TextCommand.findAll();
 	}
+
 	/**
 	 * Gets text command
-	 * @param commandName 
-	 * @returns text command 
+	 * @param commandName
+	 * @returns text command
 	 */
 	getTextCommand(commandName: string): Promise<TextCommand> {
 		return TextCommand.findOne({ where: { command: commandName } });
 	}
+
 	/**
 	 * Gets quotes
-	 * @returns quotes 
+	 * @returns quotes
 	 */
 	getQuotes(): Promise<Quote[]> {
 		return Quote.findAll();
 	}
+
 	/**
 	 * Gets quote
-	 * @param id 
-	 * @returns quote 
+	 * @param id
+	 * @returns quote
 	 */
 	getQuote(id: number): Promise<Quote> {
 		return Quote.findOne({ where: { id: id } });
 	}
+
 	/**
 	 * Adds quote
-	 * @param userId 
-	 * @param quote 
-	 * @param date 
-	 * @param messageId 
-	 * @returns  
+	 * @param userId
+	 * @param quote
+	 * @param date
+	 * @param messageId
+	 * @returns
 	 */
-	async addQuote(userId: string, quote: string, date: number, messageId: string) {
+	async addQuote(
+		userId: string,
+		quote: string,
+		date: number,
+		messageId: string
+	) {
 		const user_ = await User.findByPk(userId);
 		if (!user_) {
 			await this.addUser(userId);
@@ -169,9 +199,9 @@ export class Db implements Database{
 
 	/**
 	 * Adds message
-	 * @param id 
-	 * @param date 
-	 * @returns message 
+	 * @param id
+	 * @param date
+	 * @returns message
 	 */
 	async addMessage(id: string, date: number): Promise<Message> {
 		let user_ = await User.findByPk(id);
@@ -183,8 +213,8 @@ export class Db implements Database{
 
 	/**
 	 * Adds user
-	 * @param id 
-	 * @returns user 
+	 * @param id
+	 * @returns user
 	 */
 	async addUser(id: string): Promise<User> {
 		let user_ = await User.findByPk(id);
@@ -196,64 +226,64 @@ export class Db implements Database{
 
 	/**
 	 * Gets user
-	 * @param id 
-	 * @returns user 
+	 * @param id
+	 * @returns user
 	 */
-	getUser(id : string) : Promise<User>{
+	getUser(id: string): Promise<User> {
 		return User.findByPk(id, {
 			include: [
 				{
 					model: Message,
-					as: 'messages',
+					as: "messages",
 					separate: true,
 				},
 				{
 					model: Connection,
-					as: 'connections',
+					as: "connections",
 					separate: true,
 				},
 				{
 					model: Soundboard,
-					as: 'soundboards',
+					as: "soundboards",
 					separate: true,
 				},
 				{
 					model: Quote,
-					as: 'quotes',
+					as: "quotes",
 					separate: true,
 				},
-			]
+			],
 		});
 	}
 
 	/**
 	 * Gets users
-	 * @returns users 
+	 * @returns users
 	 */
 	getUsers(): Promise<User[]> {
 		return User.findAll({
 			include: [
 				{
 					model: Message,
-					as: 'messages',
+					as: "messages",
 					separate: true,
 				},
 				{
 					model: Connection,
-					as: 'connections',
+					as: "connections",
 					separate: true,
 				},
 				{
 					model: Soundboard,
-					as: 'soundboards',
+					as: "soundboards",
 					separate: true,
 				},
 				{
 					model: Quote,
-					as: 'quotes',
+					as: "quotes",
 					separate: true,
 				},
-			]
+			],
 		});
 	}
 }
