@@ -2,6 +2,6 @@ import { BotEvent } from '../types';
 export default {
 	name: 'guildMemberAdd',
 	execute(member) {
-		member.client.dbHelper.addUser(member.id);
+		member.client.db.addUser(member.id);
 	},
 } as BotEvent;

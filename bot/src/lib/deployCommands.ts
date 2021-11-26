@@ -16,8 +16,8 @@ export class DeployCommands implements BotDeployCommands{
 	async deploy(): Promise<void>{
 		const commands = [];
 
-		this.client.commands.forEach((element : any) => {
-			commands.push(element.data.toJSON());
+		this.client.commands.forEach((command : BotCommand) => {
+			commands.push(command.data.toJSON());
 		});
 		const rest = new REST({ version: '9' }).setToken(token);
 		

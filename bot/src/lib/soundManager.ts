@@ -69,7 +69,7 @@ export class SoundManager implements BotSoundManager{
 		let resource : BotAudioResource;
 		if(commandName != undefined){
 			soundCommand = await this.client.db.getSoundCommand(commandName);
-			if (soundCommand === undefined || soundCommand === null) {
+			if (soundCommand != undefined) {
 			//no command found
 				await interaction.editReply(`Sound command not found ${commandName}`);
 				return;
@@ -118,7 +118,7 @@ export class SoundManager implements BotSoundManager{
 	}
 
 	stop() {
-		if (this.connection !== undefined) {
+		if (this.connection != undefined) {
 			this.resources.forEach(resource => {
 				if (resource.interaction !== undefined) {
 					try {
@@ -129,7 +129,7 @@ export class SoundManager implements BotSoundManager{
 				}
 			});
 			this.resources = [];
-			if (this.connection !== undefined) {
+			if (this.connection != undefined) {
 				this.connection.destroy();
 				this.connection = undefined;
 			}
@@ -137,7 +137,7 @@ export class SoundManager implements BotSoundManager{
 	}
 
 	skip() {
-		if (this.connection !== undefined) {
+		if (this.connection != undefined) {
 			const [resource] = this.resources;
 			if (resource.interaction !== undefined) {
 				try {
@@ -152,7 +152,7 @@ export class SoundManager implements BotSoundManager{
 	}
 
 	pause(){
-		if (this.connection !== undefined) {
+		if (this.connection != undefined) {
 			player.pause();
 		}
 	}
