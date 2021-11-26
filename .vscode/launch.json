@@ -10,7 +10,8 @@
       "request": "launch",
       "cwd": "${workspaceFolder}/bot",
       "args": ["${workspaceFolder}/bot/src/index.ts"],
-      "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "dev"],
       "sourceMaps": true,
       "protocol": "inspector"
     },
