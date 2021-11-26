@@ -10,9 +10,19 @@ import { Permissions } from 'discord.js';
 export class DeployCommands implements BotDeployCommands{
 
 	client: BotClient;
-	constructor(client_) {
-		this.client = client_;
+
+	/**
+	 * Creates an instance of deploy commands.
+	 * @param client 
+	 */
+	constructor(client) {
+		this.client = client;
 	}
+
+	/**
+	 * Deploys commands
+	 * @returns deploy 
+	 */
 	async deploy(): Promise<void>{
 		const commands = [];
 

@@ -11,6 +11,9 @@ import TextCommand from './models/TextCommand.model';
 export class Db implements Database{
 	sequelize: Sequelize;
 
+	/**
+	 * Creates an instance of db.
+	 */
 	constructor(){
 		this.sequelize = new Sequelize({
 			host: 'localhost',
@@ -21,6 +24,12 @@ export class Db implements Database{
 		});
 	}
 
+	/**
+	 * Updates user last connection
+	 * @param id 
+	 * @param lastConnection 
+	 * @returns user last connection 
+	 */
 	async updateUserLastConnection(id: string, lastConnection: number): Promise<User> {
 		const user_ = await User.findByPk(id);
 		if (user_ != null) {
@@ -31,6 +40,11 @@ export class Db implements Database{
 		}
 	}
 
+	/**
+	 * Adds user connection
+	 * @param id 
+	 * @returns user connection 
+	 */
 	async addUserConnection(id: string): Promise<Connection> {
 		let user_ = await User.findByPk(id);
 		if (!user_) {
@@ -49,12 +63,28 @@ export class Db implements Database{
 		}
 	}
 
+	/**
+	 * Gets sound commands
+	 * @returns sound commands 
+	 */
 	getSoundCommands(): Promise<SoundCommand[]> {
 		return SoundCommand.findAll();
 	}
+	/**
+	 * Gets sound command
+	 * @param commandName 
+	 * @returns sound command 
+	 */
 	getSoundCommand(commandName: string): Promise<SoundCommand> {
 		return SoundCommand.findOne({ where: { command: commandName } });
 	}
+	/**
+	 * Adds user soundboard
+	 * @param id 
+	 * @param command 
+	 * @param date 
+	 * @returns user soundboard 
+	 */
 	async addUserSoundboard(id: string, command: string, date: number): Promise<Soundboard> {
 		const user_ = User.findByPk(id);
 		if (!user_) {
@@ -62,6 +92,10 @@ export class Db implements Database{
 		}
 		return Soundboard.create({ userId: id, command, date });
 	}
+	/**
+	 * Gets top sound commands
+	 * @returns top sound commands 
+	 */
 	async getTopSoundCommands(): Promise<SoundCommand[]> {
 		const soundboardUsage = await Soundboard.findAll();
 
@@ -87,18 +121,44 @@ export class Db implements Database{
 		top.length = 25;
 		return top;
 	}
+	/**
+	 * Gets text commands
+	 * @returns text commands 
+	 */
 	getTextCommands(): Promise<TextCommand[]> {
 		return TextCommand.findAll();
 	}
+	/**
+	 * Gets text command
+	 * @param commandName 
+	 * @returns text command 
+	 */
 	getTextCommand(commandName: string): Promise<TextCommand> {
 		return TextCommand.findOne({ where: { command: commandName } });
 	}
+	/**
+	 * Gets quotes
+	 * @returns quotes 
+	 */
 	getQuotes(): Promise<Quote[]> {
 		return Quote.findAll();
 	}
+	/**
+	 * Gets quote
+	 * @param id 
+	 * @returns quote 
+	 */
 	getQuote(id: number): Promise<Quote> {
 		return Quote.findOne({ where: { id: id } });
 	}
+	/**
+	 * Adds quote
+	 * @param userId 
+	 * @param quote 
+	 * @param date 
+	 * @param messageId 
+	 * @returns  
+	 */
 	async addQuote(userId: string, quote: string, date: number, messageId: string) {
 		const user_ = await User.findByPk(userId);
 		if (!user_) {
@@ -107,6 +167,12 @@ export class Db implements Database{
 		return await Quote.create({ userId, quote, date, messageId });
 	}
 
+	/**
+	 * Adds message
+	 * @param id 
+	 * @param date 
+	 * @returns message 
+	 */
 	async addMessage(id: string, date: number): Promise<Message> {
 		let user_ = await User.findByPk(id);
 		if (!user_) {
@@ -115,6 +181,11 @@ export class Db implements Database{
 		return Message.create({ userId: id, date: date });
 	}
 
+	/**
+	 * Adds user
+	 * @param id 
+	 * @returns user 
+	 */
 	async addUser(id: string): Promise<User> {
 		let user_ = await User.findByPk(id);
 		if (!user_) {
@@ -123,6 +194,11 @@ export class Db implements Database{
 		return user_;
 	}
 
+	/**
+	 * Gets user
+	 * @param id 
+	 * @returns user 
+	 */
 	getUser(id : string) : Promise<User>{
 		return User.findByPk(id, {
 			include: [
@@ -150,6 +226,10 @@ export class Db implements Database{
 		});
 	}
 
+	/**
+	 * Gets users
+	 * @returns users 
+	 */
 	getUsers(): Promise<User[]> {
 		return User.findAll({
 			include: [

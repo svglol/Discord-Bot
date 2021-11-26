@@ -2,6 +2,7 @@ import { Message } from 'discord.js';
 import Quote from '../db/models/Quote.model';
 import { BotClient } from '../types';
 
+
 export default async function(message: Message, client: BotClient, quotes: Array<Quote>): Promise<void>  {
 	const quote = message.content.match(/(?:"[^"]*"|^[^"]*$)/)[0];
 	let userID = '';

@@ -17,3 +17,4 @@ export default{
 	},
 	adminOnly: true
 } as BotCommand;
+

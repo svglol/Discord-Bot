@@ -6,12 +6,21 @@ import { BotAudioResource, BotClient, BotSoundManager } from '../types';
 import { CommandInteraction } from 'discord.js';
 import SoundCommand from '../db/models/SoundCommand.model';
 
+
+/**
+ * Sound manager
+ */
 export class SoundManager implements BotSoundManager{
 	client: BotClient;
 	resources: BotAudioResource[];
 	connection: VoiceConnection;
-	constructor(discordClient) {
-		this.client = discordClient;
+
+	/**
+	 * Creates an instance of sound manager.
+	 * @param client 
+	 */
+	constructor(client) {
+		this.client = client;
 		this.resources = [];
 
 		player.on('error', error => {
@@ -40,6 +49,15 @@ export class SoundManager implements BotSoundManager{
 		});
 	}
 
+	/**
+	 * Queues sound command / youtube url
+	 * @param [interaction] 
+	 * @param [commandName] 
+	 * @param [url] 
+	 * @param [channelId] 
+	 * @param [guildId] 
+	 * @returns queue 
+	 */
 	async queue(interaction?: CommandInteraction, commandName?: string, url?: string, channelId?: string, guildId?: string): Promise<void> {
 		let userId;
 		let voiceChannel;
@@ -89,6 +107,9 @@ export class SoundManager implements BotSoundManager{
 		}
 	}
 	
+	/**
+	 * Plays sound manager
+	 */
 	play() {
 		const [resource] = this.resources;
 
@@ -117,6 +138,9 @@ export class SoundManager implements BotSoundManager{
 		});
 	}
 
+	/**
+	 * Stops sound manager
+	 */
 	stop() {
 		if (this.connection != undefined) {
 			this.resources.forEach(resource => {
@@ -136,6 +160,9 @@ export class SoundManager implements BotSoundManager{
 		}
 	}
 
+	/**
+	 * Skips sound manager
+	 */
 	skip() {
 		if (this.connection != undefined) {
 			const [resource] = this.resources;
@@ -151,6 +178,9 @@ export class SoundManager implements BotSoundManager{
 		}
 	}
 
+	/**
+	 * Pauses sound manager
+	 */
 	pause(){
 		if (this.connection != undefined) {
 			player.pause();
