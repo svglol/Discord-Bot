@@ -46,7 +46,6 @@ export default {
 		});
 
 		collector.on("collect", async (i: ButtonInteraction) => {
-			console.log(i);
 			if (i.customId === "general") {
 				currentEmbed = generalEmbed;
 			} else if (i.customId === "sound") {
