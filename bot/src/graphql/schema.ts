@@ -92,6 +92,8 @@ scalar Upload
     textChannels(id: ID!): [Channel!]
     soundCommandFileExists(id: ID!) : Boolean
     soundCommandFile(id: ID!) : String
+    quotes: [Quote!]!
+    quote(id: ID!): Quote
   }
 
   type Mutation {
@@ -108,5 +110,6 @@ scalar Upload
     deleteSoundCommand(id: ID!) : String
     addSoundCommand(command: String!, file: Upload!, volume: Float!, date: Float!) : SoundCommand
     updateSoundCommand(id: ID!,command: String, file: Upload, volume: Float) : SoundCommand
+    deleteQuote(id: ID!) : String
   }
 `;
