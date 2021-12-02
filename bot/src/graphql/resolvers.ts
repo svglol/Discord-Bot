@@ -48,7 +48,7 @@ export = {
 			db.sequelize.models.Connection.findAll(),
 		userSoundboards: (parent, args, { db }) =>
 			db.sequelize.models.Soundboard.findAll(),
-		bot: (parent, args, { client }) => {
+		bot: (parent, args, { client, update }) => {
 			let totalUsers = 0;
 			let onlineUsers = 0;
 			let connectedUsers = 0;
@@ -66,6 +66,7 @@ export = {
 				totalUsers: totalUsers,
 				onlineUsers: onlineUsers,
 				connectedUsers: connectedUsers,
+				needsUpdate: update.checkForUpdate(),
 			};
 			return bot;
 		},
@@ -275,6 +276,9 @@ export = {
 			}).then((result) => {
 				return result;
 			});
+		},
+		update: (parent, args, { update }) => {
+			update.update();
 		},
 	},
 };

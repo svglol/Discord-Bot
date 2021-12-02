@@ -64,3 +64,8 @@ export interface BotAudioResource {
 	url?: string;
 	title?: string;
 }
+
+export interface BotUpdate {
+	update(): Promise<void>;
+	checkForUpdate(): Promise<boolean>;
+}

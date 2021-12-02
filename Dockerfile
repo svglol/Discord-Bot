@@ -7,7 +7,7 @@ COPY . .
 
 RUN mkdir -p /resources/sound
 
-RUN npm install
+RUN npm ci
 
 EXPOSE 3000
 EXPOSE 4000
@@ -15,6 +15,7 @@ ENV HOST 0.0.0.0
 
 ENV TOKEN ''
 ENV CLIENTID ''
+ENV NODE_ENV 'production'
 VOLUME ["/usr/src/resources"]
 
 ENTRYPOINT npm start
