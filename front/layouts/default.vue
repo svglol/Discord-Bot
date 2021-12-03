@@ -8,29 +8,17 @@
       open
       fullheight
     >
-      <h2 class="app-title">
-        Discord Bot Dashboard
-      </h2>
+      <h2 class="app-title">Discord Bot Dashboard</h2>
       <ul class="menu-list">
-        <li
-          v-for="(item, key) of items"
-          :key="key"
-        >
-          <nuxt-link
-            :to="item.to"
-            exact-active-class="is-active"
-          >
+        <li v-for="(item, key) of items" :key="key">
+          <nuxt-link :to="item.to" exact-active-class="is-active">
             <b-icon :icon="item.icon" /> {{ item.title }}
           </nuxt-link>
         </li>
       </ul>
     </b-sidebar>
-    <section
-      class="main-content columns"
-    >
-      <div
-        class="container column"
-      >
+    <section class="main-content columns">
+      <div class="container column">
         <nuxt />
       </div>
     </section>
@@ -39,45 +27,49 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
       items: [
         {
-          title: 'Dashboard',
-          icon: 'home',
-          to: { name: 'index' }
+          title: "Dashboard",
+          icon: "home",
+          to: { name: "index" },
         },
         {
-          title: 'Stats',
-          icon: 'chart-line-variant',
-          to: { name: 'stats' }
+          title: "Stats",
+          icon: "chart-line-variant",
+          to: { name: "stats" },
         },
         {
-          title: 'Users',
-          icon: 'account-multiple',
-          to: { name: 'users' }
+          title: "Users",
+          icon: "account-multiple",
+          to: { name: "users" },
         },
         {
-          title: 'Sound Commands',
-          icon: 'volume-high',
-          to: { name: 'soundcommands' }
+          title: "Quotes",
+          icon: "format-quote-close",
+          to: { name: "quotes" },
         },
         {
-          title: 'Text Commands',
-          icon: 'message-outline',
-          to: { name: 'textcommands' }
-        }
-      ]
+          title: "Sound Commands",
+          icon: "volume-high",
+          to: { name: "soundcommands" },
+        },
+        {
+          title: "Text Commands",
+          icon: "message-outline",
+          to: { name: "textcommands" },
+        },
+      ],
     };
   },
-  head () {
+  head() {
     return {
-      title: 'Discord Bot - Dashboard'
+      title: "Discord Bot - Dashboard",
     };
-  }
+  },
 };
 </script>
 
 <style scoped>
-
 </style>
