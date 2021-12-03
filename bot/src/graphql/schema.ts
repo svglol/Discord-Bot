@@ -27,7 +27,7 @@ scalar Upload
     id: ID
     date: Float
     quote: String
-    messagedId: String
+    messageId: String
   }
 
   type Soundboard{
