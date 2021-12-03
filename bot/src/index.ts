@@ -21,6 +21,7 @@ import {
 } from "./types";
 import * as events from "./events";
 import * as commands from "./commands";
+import cors = require("cors");
 dotenv.config();
 
 // Create a new client instance
@@ -47,6 +48,12 @@ class Client extends Discord.Client implements BotClient {
 
 		this.once("ready", () => {
 			const db = this.db;
+
+			const corsOptions = {
+				origin: "http://localhost:3000",
+				credentials: true,
+			};
+
 			const server = new ApolloServer({
 				typeDefs: gql(typeDefs),
 				resolvers,
@@ -58,6 +65,7 @@ class Client extends Discord.Client implements BotClient {
 
 			const app = express();
 			app.use(graphqlUploadExpress());
+			app.use(cors(corsOptions));
 			server.applyMiddleware({ app });
 			this.db.sequelize.sync().then(() => {
 				console.log("Database Initialized");
