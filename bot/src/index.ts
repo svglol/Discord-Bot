@@ -50,8 +50,10 @@ class Client extends Discord.Client implements BotClient {
 			const server = new ApolloServer({
 				typeDefs: gql(typeDefs),
 				resolvers,
-				context: { db, client, update: new Update()},
+				context: { db, client, update: new Update() },
 				uploads: false,
+				introspection: true,
+				playground: true,
 			});
 
 			const app = express();
