@@ -64,7 +64,6 @@ scalar Upload
     onlineUsers: Float
     connectedUsers: Float
     uptime: Float
-    needsUpdate: Boolean
   }
 
   type Server{
@@ -112,6 +111,5 @@ scalar Upload
     addSoundCommand(command: String!, file: Upload!, volume: Float!, date: Float!) : SoundCommand
     updateSoundCommand(id: ID!,command: String, file: Upload, volume: Float) : SoundCommand
     deleteQuote(id: ID!) : String
-    update : String
   }
 `;

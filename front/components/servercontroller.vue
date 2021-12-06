@@ -34,16 +34,6 @@
       >
         Reset
       </b-button>
-
-      <b-button
-        v-if="bot.needsUpdate"
-        icon-left="cached"
-        style="margin-top: 1rem"
-        type="is-danger"
-        @click="update"
-      >
-        Update
-      </b-button>
     </footer>
   </div>
 </template>
@@ -58,7 +48,6 @@ const BOT_QUERY = gql`
       onlineUsers
       connectedUsers
       uptime
-      needsUpdate
     }
   }
 `;
@@ -66,12 +55,6 @@ const BOT_QUERY = gql`
 const BOT_RESET_MUTATION = gql`
   mutation {
     reset
-  }
-`;
-
-const BOT_UPDATE_MUTATION = gql`
-  mutation {
-    update
   }
 `;
 
@@ -122,7 +105,6 @@ export default {
       let diffTime = now - this.bot.uptime;
       this.uptimeMS = diffTime;
     },
-    update() {},
   },
 };
 </script>

@@ -38,7 +38,6 @@
     "reflect-metadata": "^0.1.13",
     "sequelize": "^6.11.0",
     "sequelize-typescript": "^2.1.1",
-    "shelljs": "^0.8.4",
     "sodium": "^3.0.2",
     "sqlite3": "^4.2.0",
     "ytdl-core": "^4.9.1"

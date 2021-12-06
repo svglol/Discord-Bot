@@ -11,7 +11,6 @@ import resolvers = require("./graphql/resolvers");
 import { Db } from "./db";
 import { SoundManager } from "./lib/soundManager";
 import { DeployCommands } from "./lib/deployCommands";
-import { Update } from "./lib/update";
 import {
 	BotClient,
 	BotCommand,
@@ -51,7 +50,7 @@ class Client extends Discord.Client implements BotClient {
 			const server = new ApolloServer({
 				typeDefs: gql(typeDefs),
 				resolvers,
-				context: { db, client, update: new Update() },
+				context: { db, client },
 				uploads: false,
 				introspection: true,
 				playground: true,

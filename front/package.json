@@ -20,8 +20,6 @@
   "license": "ISC",
   "dependencies": {
     "@nuxtjs/apollo": "^4.0.1-rc.5",
-    "@nuxtjs/axios": "^5.13.6",
-    "axios": "^0.24.0",
     "graphql-tag": "^2.12.6",
     "nuxt": "^2.15.8",
     "nuxt-buefy": "^0.4.11",
