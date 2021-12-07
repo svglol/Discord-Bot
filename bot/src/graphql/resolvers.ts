@@ -48,14 +48,14 @@ export = {
 			db.sequelize.models.Connection.findAll(),
 		userSoundboards: (parent, args, { db }) =>
 			db.sequelize.models.Soundboard.findAll(),
-		bot: (parent, args, { client, update }) => {
+		bot: (parent, args, { client }) => {
 			let totalUsers = 0;
 			let onlineUsers = 0;
 			let connectedUsers = 0;
 			client.guilds.cache.forEach((guild) => {
 				totalUsers += guild.memberCount;
 				onlineUsers += guild.members.cache.filter(
-					(m) => m.presence.status === "online"
+					(m) => m.presence?.status != "offline"
 				).size;
 				connectedUsers += guild.members.cache.filter(
 					(m) => m.voice.channel !== null
@@ -66,7 +66,6 @@ export = {
 				totalUsers: totalUsers,
 				onlineUsers: onlineUsers,
 				connectedUsers: connectedUsers,
-				needsUpdate: update.checkForUpdate(),
 			};
 			return bot;
 		},
@@ -276,9 +275,6 @@ export = {
 			}).then((result) => {
 				return result;
 			});
-		},
-		update: (parent, args, { update }) => {
-			update.update();
 		},
 	},
 };

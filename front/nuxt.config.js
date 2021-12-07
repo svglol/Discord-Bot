@@ -27,31 +27,16 @@ module.exports = {
   build: {
   },
 
-  axios: {
-    credentials: true,
-    proxy: true
-  },
-
-  proxy: {
-    '/api': {
-      target: 'http://localhost:3001/api',
-      pathRewrite: { '^/api': '/' }
-    }
-  },
-
   // Apollo configuration
   apollo: {
     clientConfigs: {
       default: {
-        httpEndpoint: process.env.GRAPHQL_URL,
+        httpEndpoint: process.env.GRAPHQL_URL || 'http://localhost:4000/graphql',
       },
     },
   },
 
   css: ['~/assets/css/main.scss'],
-  modules: ['nuxt-buefy', '@nuxtjs/axios', '@nuxtjs/apollo',],
-  env: {
-    WS_URL: process.env.WS_URL || 'http://localhost:3000'
-  },
+  modules: ['nuxt-buefy', '@nuxtjs/apollo',],
   telemetry: false
 };

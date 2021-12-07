@@ -55,7 +55,6 @@
 </template>
 
 <script>
-// import axios from '~/plugins/axios';
 import gql from "graphql-tag";
 
 const SERVER_QUERY = gql`
