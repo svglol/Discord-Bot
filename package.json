@@ -5,10 +5,12 @@
   "main": "index.js",
   "scripts": {
     "start": "pm2 start --no-daemon",
-    "start-front": "npm run build --prefix front && npm run start --prefix front",
+    "start-front": "npm run start --prefix front",
     "start-bot": "npm run start --prefix bot",
     "postinstall": "subpkg install",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run build --prefix front && npm run build --prefix bot",
+    "prune": "subpkg run prune"
   },
   "author": "",
   "license": "ISC",
@@ -18,5 +20,5 @@
   "subPackages": [
     "bot",
     "front"
-]
+  ]
 }
