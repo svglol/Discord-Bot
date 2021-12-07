@@ -10,8 +10,6 @@ RUN npm config set python /usr/bin/python2
 
 WORKDIR /usr/src/
 
-ENV GRAPHQL_URL 'http://192.168.0.50:4000/graphql'
-
 COPY . .
 
 RUN npm ci

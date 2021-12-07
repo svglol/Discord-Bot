@@ -30,10 +30,12 @@ module.exports = {
   // Apollo configuration
   apollo: {
     clientConfigs: {
-      default: {
-        httpEndpoint: process.env.GRAPHQL_URL || 'http://localhost:4000/graphql',
-      },
+      default: '~~/apollo-default-client-config.js'
     },
+  },
+
+  publicRuntimeConfig: {
+    baseUrl: process.env.GRAPHQL_URL
   },
 
   css: ['~/assets/css/main.scss'],
