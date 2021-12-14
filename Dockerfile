@@ -18,16 +18,6 @@ RUN npm run build
 
 RUN npm run prune
 
-RUN modclean -n default:safe -r
-
-WORKDIR /usr/src/bot
-
-RUN modclean -n default:safe -r
-
-WORKDIR /usr/src/front
-
-RUN modclean -n default:safe -r
-
 FROM node:16-alpine
 
 RUN npm install pm2 -g

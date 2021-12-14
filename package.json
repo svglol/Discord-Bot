@@ -5,20 +5,19 @@
   "main": "index.js",
   "scripts": {
     "start": "pm2 start --no-daemon",
-    "start-front": "npm run start --prefix front",
-    "start-bot": "npm run start --prefix bot",
-    "postinstall": "subpkg install",
+    "start-front": "npm run start --workspace=front",
+    "start-bot": "npm run start --workspace=bot",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run build --prefix front && npm run build --prefix bot",
-    "prune": "subpkg run prune"
+    "build": "npm run build ---workspaces",
+    "prune": "npm prune --production && npx modclean -n default:safe -r"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "subpackage": "^1.1.0"
-  },
-  "subPackages": [
+  "workspaces": [
     "bot",
     "front"
-  ]
+  ],
+  "devDependencies": {
+    "modclean-patterns-default": "^1.1.2"
+  }
 }
