@@ -31,6 +31,7 @@ export class SoundManager implements BotSoundManager {
 
 		player.on("error", (error) => {
 			console.error(`Error: ${error.message} with resource ${error.resource}`);
+			this.resources.shift();
 			if (this.resources.length === 0) {
 				if (this.connection !== undefined) {
 					this.connection.destroy();
