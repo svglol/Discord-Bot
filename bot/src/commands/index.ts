@@ -11,6 +11,7 @@ import stats from "./stats";
 import stop from "./stop";
 import text from "./text";
 import keyboardCheck from "./keyboardCheck";
+import countdown from "./countdown";
 
 export {
 	clear,
@@ -26,4 +27,5 @@ export {
 	stop,
 	text,
 	keyboardCheck,
+	countdown,
 };
