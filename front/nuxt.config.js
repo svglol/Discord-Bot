@@ -27,18 +27,22 @@ module.exports = {
   build: {
   },
 
-  // Apollo configuration
-  apollo: {
-    clientConfigs: {
-      default: '~~/apollo-default-client-config.js'
-    },
-  },
-
   publicRuntimeConfig: {
     baseUrl: process.env.GRAPHQL_URL
   },
 
   css: ['~/assets/css/main.scss'],
-  modules: ['nuxt-buefy', '@nuxtjs/apollo',],
-  telemetry: false
+  modules: ['nuxt-buefy', '@nuxtjs/apollo', '@nuxtjs/proxy',],
+  telemetry: false,
+
+  proxy: {
+    '/graphql': 'http://localhost:4000/graphql',
+  },
+
+  // Apollo configuration
+  apollo: {
+    clientConfigs: {
+      default: '~~/apollo-default-client-config.js'
+    }
+  },
 };
