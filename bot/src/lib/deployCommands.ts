@@ -38,35 +38,6 @@ export class DeployCommands implements BotDeployCommands {
 				})
 				.then(async () => {
 					console.log("Successfully registered application commands.");
-
-					const commands = await this.client.guilds.cache
-						.get(guild.id)
-						?.commands.fetch();
-					const members = await this.client.guilds.cache
-						.get(guild.id)
-						?.members.fetch();
-					commands.forEach((command) => {
-						this.client.commands.forEach(async (baseCommand: BotCommand) => {
-							if (command.name === baseCommand.data.name) {
-								if (baseCommand.adminOnly) {
-									const permissions: ApplicationCommandPermissionData[] = [];
-									members.forEach(async (member) => {
-										if (
-											member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)
-										) {
-											await permissions.push({
-												id: member.id,
-												type: "USER",
-												permission: true,
-											});
-										}
-									});
-									await command.permissions.add({ permissions });
-								}
-							}
-						});
-					});
-					console.log("Successfully set commands permissions");
 				})
 				.catch(console.error);
 		});
