@@ -4,8 +4,7 @@ let client;
 export default {
 	data: new SlashCommandBuilder()
 		.setName("skip")
-		.setDescription("Skip currently playing sound command")
-		.setDefaultPermission(false),
+		.setDescription("Skip currently playing sound command"),
 	async execute(interaction) {
 		await interaction.deferReply();
 		client.soundManager.skip();

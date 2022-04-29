@@ -8,8 +8,7 @@ let client;
 export default {
 	data: new SlashCommandBuilder()
 		.setName("keyboardcheck")
-		.setDescription("Keyboard check")
-		.setDefaultPermission(false),
+		.setDescription("Keyboard check"),
 	async execute(interaction: CommandInteraction) {
 		await interaction.deferReply();
 		const userId = interaction.user.id;
